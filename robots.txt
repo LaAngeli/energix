@@ -4,5 +4,4 @@ Disallow:
 
 # Specify the location of the sitemap
 Sitemap: https://energix.md/sitemap.xml
-
-
+Host: https://energix.md
