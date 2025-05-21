@@ -1,0 +1,30 @@
+# Redirecționează versiunile HTTP și www către HTTPS fără www
+RewriteEngine On
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+RewriteRule ^(.*)$ https://energix.md/$1 [R=301,L]
+# Redirecționează /index.html către https://advista.marketing/
+RewriteCond %{THE_REQUEST} /index\.html [NC]
+RewriteRule ^index\.html$ https://energix.md [R=301,L]
+
+# Setari de securitate adiționale:
+# Permite afișarea paginii într-un iframe doar dacă este încărcată de pe același domeniu, prevenind atacurile de tip clickjacking
+Header always set X-Frame-Options "SAMEORIGIN"
+
+# Împiedică browserul să „ghicească” tipul de conținut al fișierelor, pentru a preveni atacurile MIME sniffing și a asigura interpretarea corectă
+Header set X-Content-Type-Options "nosniff"
+
+# Controlează ce informații despre referință sunt trimise atunci când un utilizator accesează un link extern, protejând datele utilizatorilor și evitând transmiterea referințelor în mod nesecurizat
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+# Instruiește browserul să acceseze site-ul doar prin HTTPS pentru următoarele 31536000 secunde (1 an), aplicând politica și pentru subdomenii și solicitând includerea site-ului în lista de preîncărcare HSTS pentr securitate maximă
+Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+# MIME Config:
+AddType text/css .css
+AddType text/html .html .htm
+AddType application/javascript .js
+AddType image/webp .webp
+AddType image/x-icon .ico
+AddType image/png .png
+AddType image/svg+xml .svg

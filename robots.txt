@@ -1,0 +1,8 @@
+# Allow all robots to access everything
+User-agent: *
+Disallow:
+
+# Specify the location of the sitemap
+Sitemap: https://energix.md/sitemap.xml
+
+
