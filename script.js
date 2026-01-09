@@ -1,1 +1,358 @@
-document.addEventListener("DOMContentLoaded",function(){let e=document.querySelector("#mobile-menu"),t=document.querySelector(".navbar__menu");e.addEventListener("click",function(){e.classList.toggle("is-active"),t.classList.toggle("active")})}),document.addEventListener("DOMContentLoaded",()=>{let e=document.getElementById("cookie-consent-banner");var t=document.getElementById("accept-cookies");localStorage.getItem("cookiesAccepted")||setTimeout(()=>{e.style.display="block"},2e3),t.addEventListener("click",()=>{localStorage.setItem("cookiesAccepted","true"),e.style.display="none"})});let navbar=document.querySelector(".navbar"),slideIndex=(window.addEventListener("scroll",()=>{0<window.scrollY?navbar.classList.add("scrolled"):navbar.classList.remove("scrolled")}),document.addEventListener("DOMContentLoaded",function(){let t=document.getElementById("contactForm"),n=t.querySelectorAll("input[required], textarea[required]"),o=t.querySelector('button[type="submit"]'),s=t.querySelector("#email");function e(){let t=!0;var e;n.forEach(e=>{e.classList.remove("error"),e.value.trim()?e.classList.add("filled"):e.classList.remove("filled"),e.value.trim()&&e.maxLength&&e.value.length>e.maxLength?(t=!1,e.classList.add("error"),e.setCustomValidity(`Maxim ${e.maxLength} caractere sunt permise.`)):e.setCustomValidity(""),e.value.trim()&&!e.checkValidity()&&(t=!1,e.classList.add("error"))}),s.value.trim()&&(e=s.value,!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e))&&(t=!1,s.classList.add("error")),o.disabled=!t}let l=((t,n=300)=>{let o;return function(...e){clearTimeout(o),o=setTimeout(()=>t.apply(this,e),n)}})(e);function a(e){var t=document.getElementById("popup");t.classList.contains("open-popup")&&(t.classList.remove("open-popup"),t.style.transform="translate(-50%, -50%) scale(0.1)");let n=document.createElement("div");n.id="error-popup",n.style.position="fixed",n.style.top="50%",n.style.left="50%",n.style.transform="translate(-50%, -50%)",n.style.padding="20px",n.style.backgroundColor="#f44336",n.style.color="#fff",n.style.borderRadius="5px",n.style.zIndex="1000",n.innerText=e,document.body.appendChild(n),setTimeout(()=>{document.body.removeChild(n)},5e3)}n.forEach(e=>{e.addEventListener("input",l)}),t.addEventListener("submit",function(e){e.preventDefault(),t.checkValidity()&&(e=new FormData(t),fetch("send_email_php.php",{method:"POST",body:e,headers:{Accept:"application/json"}}).then(t=>t.json().then(e=>{if(t.ok&&e.success){let e=document.getElementById("popup"),t=document.querySelector(".loading-bar"),n=document.getElementById("popup-message"),o=document.getElementById("success-icon"),s=0,l=(t.style.width="0%",t.textContent="0%",t.style.display="flex",n.textContent="Mesajul este în curs de expediere",o.style.display="none",t.className="loading-bar",e.classList.add("open-popup"),e.style.transform="translate(-50%, -50%) scale(1)",sessionStorage.setItem("originalUrl",window.location.href),window.location.href.replace("contacts.html","contacts/form_submission.html")),a=(window.history.replaceState(null,null,l),setInterval(()=>{s+=1,t.style.width=s+"%",t.textContent=s+"%",20<=s&&s<40?t.classList.add("color-20"):40<=s&&s<60?t.classList.add("color-40"):60<=s&&s<80?t.classList.add("color-60"):80<=s&&s<100?t.classList.add("color-80"):100<=s&&(t.classList.add("color-100"),clearInterval(a),setTimeout(()=>{t.style.display="none",o.style.display="block",n.textContent="Expediat cu Succes",n.style.marginTop="20px",setTimeout(()=>{var e;(e=document.getElementById("popup")).classList.remove("open-popup"),e.style.transform="translate(-50%, -50%) scale(0.1)",setTimeout(()=>{window.location.href="/contacts.html"},500)},3e3)},500))},40))}else 500===t.status?a("A apărut o eroare de server. Încearcă din nou mai târziu."):a("A apărut o eroare neașteptată. Încearcă din nou mai târziu.")})).catch(()=>{a("A apărut o eroare de rețea. Încearcă din nou mai târziu.")}))}),e()}),document.addEventListener("DOMContentLoaded",()=>{let e=document.getElementById("cookie-consent-banner");var t=document.getElementById("accept-cookies");localStorage.getItem("cookiesAccepted")||(e.style.display="block"),t.addEventListener("click",()=>{localStorage.setItem("cookiesAccepted","true"),e.style.display="none"})}),document.addEventListener("DOMContentLoaded",function(){let t=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);document.querySelectorAll(".telefon-link, .phone_number").forEach(e=>{e.addEventListener("click",function(){var e=document.querySelector(".phone_number").textContent.trim();t&&(window.location.href="tel:"+e)})})}),1);function plusSlides(e){showSlides(slideIndex+=e)}function currentSlide(e){showSlides(slideIndex=e)}function showSlides(e){let t;var n=document.getElementsByClassName("mySlides"),o=document.getElementsByClassName("dot");for(e>n.length&&(slideIndex=1),e<1&&(slideIndex=n.length),t=0;t<n.length;t++)n[t].style.display="none";for(t=0;t<o.length;t++)o[t].className=o[t].className.replace(" active","");n[slideIndex-1].style.display="block",o[slideIndex-1].className+=" active"}showSlides(slideIndex);let touchStartX=0,touchEndX=0,sliderContainer=document.querySelector(".slideshow-container");function handleSwipeGesture(){touchEndX<touchStartX&&plusSlides(1),touchEndX>touchStartX&&plusSlides(-1)}sliderContainer.addEventListener("touchstart",function(e){touchStartX=e.changedTouches[0].screenX}),sliderContainer.addEventListener("touchend",function(e){touchEndX=e.changedTouches[0].screenX,handleSwipeGesture()}),document.addEventListener("DOMContentLoaded",function(){document.querySelectorAll(".services-menu nav ul li a").forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();e=this.getAttribute("href"),e=document.querySelector(e);e&&e.scrollIntoView({behavior:"smooth",block:"start"})})})});
+/**
+ * Mobile Menu Toggle
+ */
+document.addEventListener("DOMContentLoaded", function() {
+    let menuToggle = document.querySelector("#mobile-menu");
+    let navMenu = document.querySelector(".navbar__menu");
+    
+    menuToggle.addEventListener("click", function() {
+        menuToggle.classList.toggle("is-active");
+        navMenu.classList.toggle("active");
+    });
+});
+
+/**
+ * Cookie Consent Banner
+ */
+document.addEventListener("DOMContentLoaded", () => {
+    let cookieBanner = document.getElementById("cookie-consent-banner");
+    var acceptButton = document.getElementById("accept-cookies");
+    
+    if (!localStorage.getItem("cookiesAccepted")) {
+        setTimeout(() => {
+            cookieBanner.style.display = "block";
+        }, 2000);
+    }
+    
+    acceptButton.addEventListener("click", () => {
+        localStorage.setItem("cookiesAccepted", "true");
+        cookieBanner.style.display = "none";
+    });
+});
+
+/**
+ * Navbar Scroll Effect
+ */
+let navbar = document.querySelector(".navbar");
+
+window.addEventListener("scroll", () => {
+    if (window.scrollY > 0) {
+        navbar.classList.add("scrolled");
+    } else {
+        navbar.classList.remove("scrolled");
+    }
+});
+
+/**
+ * Contact Form Validation and Submission
+ */
+document.addEventListener("DOMContentLoaded", function() {
+    let contactForm = document.getElementById("contactForm");
+    let requiredFields = contactForm.querySelectorAll("input[required], textarea[required]");
+    let submitButton = contactForm.querySelector('button[type="submit"]');
+    let emailField = contactForm.querySelector("#email");
+
+    /**
+     * Validate all form fields
+     */
+    function validateForm() {
+        let isValid = true;
+        
+        requiredFields.forEach(field => {
+            field.classList.remove("error");
+            
+            if (field.value.trim()) {
+                field.classList.add("filled");
+            } else {
+                field.classList.remove("filled");
+            }
+            
+            // Check max length
+            if (field.value.trim() && field.maxLength && field.value.length > field.maxLength) {
+                isValid = false;
+                field.classList.add("error");
+                field.setCustomValidity(`Maxim ${field.maxLength} caractere sunt permise.`);
+            } else {
+                field.setCustomValidity("");
+            }
+            
+            // Check validity
+            if (field.value.trim() && !field.checkValidity()) {
+                isValid = false;
+                field.classList.add("error");
+            }
+        });
+        
+        // Validate email format
+        if (emailField.value.trim()) {
+            let emailValue = emailField.value;
+            let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (!emailPattern.test(emailValue)) {
+                isValid = false;
+                emailField.classList.add("error");
+            }
+        }
+        
+        submitButton.disabled = !isValid;
+    }
+
+    /**
+     * Debounce function for input validation
+     */
+    let debounce = ((func, delay = 300) => {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), delay);
+        };
+    })(validateForm);
+
+    /**
+     * Show error popup
+     */
+    function showErrorPopup(message) {
+        var popup = document.getElementById("popup");
+        
+        if (popup.classList.contains("open-popup")) {
+            popup.classList.remove("open-popup");
+            popup.style.transform = "translate(-50%, -50%) scale(0.1)";
+        }
+        
+        let errorPopup = document.createElement("div");
+        errorPopup.id = "error-popup";
+        errorPopup.style.position = "fixed";
+        errorPopup.style.top = "50%";
+        errorPopup.style.left = "50%";
+        errorPopup.style.transform = "translate(-50%, -50%)";
+        errorPopup.style.padding = "20px";
+        errorPopup.style.backgroundColor = "#f44336";
+        errorPopup.style.color = "#fff";
+        errorPopup.style.borderRadius = "5px";
+        errorPopup.style.zIndex = "1000";
+        errorPopup.innerText = message;
+        
+        document.body.appendChild(errorPopup);
+        
+        setTimeout(() => {
+            document.body.removeChild(errorPopup);
+        }, 5000);
+    }
+
+    // Add input event listeners
+    requiredFields.forEach(field => {
+        field.addEventListener("input", debounce);
+    });
+
+    /**
+     * Form submission handler
+     */
+    contactForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+        
+        if (!contactForm.checkValidity()) {
+            return;
+        }
+        
+        let formData = new FormData(contactForm);
+        
+        fetch("send_email_php.php", {
+            method: "POST",
+            body: formData,
+            headers: {
+                Accept: "application/json"
+            }
+        })
+        .then(response => response.json().then(data => {
+            if (response.ok && data.success) {
+                let popup = document.getElementById("popup");
+                let loadingBar = document.querySelector(".loading-bar");
+                let popupMessage = document.getElementById("popup-message");
+                let successIcon = document.getElementById("success-icon");
+                let progress = 0;
+                
+                loadingBar.style.width = "0%";
+                loadingBar.textContent = "0%";
+                loadingBar.style.display = "flex";
+                popupMessage.textContent = "Mesajul este în curs de expediere";
+                successIcon.style.display = "none";
+                loadingBar.className = "loading-bar";
+                
+                popup.classList.add("open-popup");
+                popup.style.transform = "translate(-50%, -50%) scale(1)";
+                
+                sessionStorage.setItem("originalUrl", window.location.href);
+                let newUrl = window.location.href.replace("contacts.html", "contacts/form_submission.html");
+                window.history.replaceState(null, null, newUrl);
+                
+                let progressInterval = setInterval(() => {
+                    progress += 1;
+                    loadingBar.style.width = progress + "%";
+                    loadingBar.textContent = progress + "%";
+                    
+                    if (progress >= 20 && progress < 40) {
+                        loadingBar.classList.add("color-20");
+                    } else if (progress >= 40 && progress < 60) {
+                        loadingBar.classList.add("color-40");
+                    } else if (progress >= 60 && progress < 80) {
+                        loadingBar.classList.add("color-60");
+                    } else if (progress >= 80 && progress < 100) {
+                        loadingBar.classList.add("color-80");
+                    } else if (progress >= 100) {
+                        loadingBar.classList.add("color-100");
+                        clearInterval(progressInterval);
+                        
+                        setTimeout(() => {
+                            loadingBar.style.display = "none";
+                            successIcon.style.display = "block";
+                            popupMessage.textContent = "Expediat cu Succes";
+                            popupMessage.style.marginTop = "20px";
+                            
+                            setTimeout(() => {
+                                let popupElement = document.getElementById("popup");
+                                popupElement.classList.remove("open-popup");
+                                popupElement.style.transform = "translate(-50%, -50%) scale(0.1)";
+                                
+                                setTimeout(() => {
+                                    window.location.href = "/contacts.html";
+                                }, 500);
+                            }, 3000);
+                        }, 500);
+                    }
+                }, 40);
+            } else {
+                if (response.status === 500) {
+                    showErrorPopup("A apărut o eroare de server. Încearcă din nou mai târziu.");
+                } else {
+                    showErrorPopup("A apărut o eroare neașteptată. Încearcă din nou mai târziu.");
+                }
+            }
+        }))
+        .catch(() => {
+            showErrorPopup("A apărut o eroare de rețea. Încearcă din nou mai târziu.");
+        });
+    });
+
+    validateForm();
+});
+
+/**
+ * Cookie Consent Banner (duplicate listener for other pages)
+ */
+document.addEventListener("DOMContentLoaded", () => {
+    let cookieBanner = document.getElementById("cookie-consent-banner");
+    var acceptButton = document.getElementById("accept-cookies");
+    
+    if (!localStorage.getItem("cookiesAccepted")) {
+        cookieBanner.style.display = "block";
+    }
+    
+    acceptButton.addEventListener("click", () => {
+        localStorage.setItem("cookiesAccepted", "true");
+        cookieBanner.style.display = "none";
+    });
+});
+
+/**
+ * Phone Link Click Handler (Mobile devices)
+ */
+document.addEventListener("DOMContentLoaded", function() {
+    let isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    document.querySelectorAll(".telefon-link, .phone_number").forEach(element => {
+        element.addEventListener("click", function() {
+            var phoneNumber = document.querySelector(".phone_number").textContent.trim();
+            
+            if (isMobile) {
+                window.location.href = "tel:" + phoneNumber;
+            }
+        });
+    });
+});
+
+/**
+ * Image Slideshow
+ */
+let slideIndex = 1;
+
+function plusSlides(n) {
+    showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+    showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+    let i;
+    var slides = document.getElementsByClassName("mySlides");
+    var dots = document.getElementsByClassName("dot");
+    
+    if (n > slides.length) {
+        slideIndex = 1;
+    }
+    
+    if (n < 1) {
+        slideIndex = slides.length;
+    }
+    
+    for (i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
+    }
+    
+    for (i = 0; i < dots.length; i++) {
+        dots[i].className = dots[i].className.replace(" active", "");
+    }
+    
+    slides[slideIndex - 1].style.display = "block";
+    dots[slideIndex - 1].className += " active";
+}
+
+showSlides(slideIndex);
+
+/**
+ * Touch Swipe Gestures for Slideshow
+ */
+let touchStartX = 0;
+let touchEndX = 0;
+let sliderContainer = document.querySelector(".slideshow-container");
+
+function handleSwipeGesture() {
+    if (touchEndX < touchStartX) {
+        plusSlides(1);
+    }
+    
+    if (touchEndX > touchStartX) {
+        plusSlides(-1);
+    }
+}
+
+sliderContainer.addEventListener("touchstart", function(event) {
+    touchStartX = event.changedTouches[0].screenX;
+});
+
+sliderContainer.addEventListener("touchend", function(event) {
+    touchEndX = event.changedTouches[0].screenX;
+    handleSwipeGesture();
+});
+
+/**
+ * Services Menu Smooth Scroll
+ */
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".services-menu nav ul li a").forEach(link => {
+        link.addEventListener("click", function(event) {
+            event.preventDefault();
+            
+            let targetId = this.getAttribute("href");
+            let targetElement = document.querySelector(targetId);
+            
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+            }
+        });
+    });
+});
