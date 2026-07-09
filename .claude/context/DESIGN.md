@@ -3,32 +3,50 @@
 Clientul a cerut **accent pe design și pe modul responsiv**. Acest fișier fixează punctul
 de plecare; nu e o lege, e o bază de la care se argumentează schimbările.
 
-## Identitatea existentă (site vechi)
+## 🔴 Corecție de brand (2026-07-10): albastrul electric NU e în logo
 
-Temă **dark**, „electric / tech". Tokens extrase din `styles.css`:
+Culorile au fost **extrase din pixelii logo-ului**, nu preluate din CSS-ul vechi:
 
-```
---bg-primary      #0a0e17   (fundal principal, aproape negru-albastru)
---bg-secondary    #0f1420
---bg-tertiary     #151b2b
---bg-card         rgba(15, 20, 32, 0.8)
+| Culoare | Hex | De unde |
+|---|---|---|
+| Auriu | `#F2D147` | becul din logo (media pixelilor) |
+| Bleumarin | `#091A31` | fundalul oficial (`energix-blue-bg.png`) |
+| Alb | `#FFFFFF` | wordmark |
 
---electric-blue   #00d4ff   ← culoarea de brand / accent principal
---electric-purple #7b2cbf   ← a doua culoare din gradient
---amber           #ffb800   ← accent secundar
---amber-light     #ffd54f
---success         #00e676
---danger          #ff5252
+Cyan-ul `#00d4ff` din site-ul vechi era o **alegere de web design, nu culoare de brand**.
+La fel și fundalul `#0a0e17`.
 
---text-primary    #ffffff
---text-secondary  #a8b2c1
---text-muted      #6b7688
-```
+Marca: un bec cu raze, iar în interiorul lui un **„Y"** — care se citește ca simbolul
+**conexiunii în stea (wye)** dintr-un sistem trifazat. E cel mai specific și mai ownable
+semn al brandului.
 
-Gradient de brand: `linear-gradient(135deg, #00d4ff, #7b2cbf)`
-`theme-color` / `color-scheme`: `#0a0e17` / `dark`
+### Paleta implementată
 
-Radius: 8 / 12 / 20px. Container: 1200px. Secțiuni: 100px vertical.
+| Token | Hex | Rol | Contrast pe `ink` |
+|---|---|---|---|
+| `--color-ink` | `#091a31` | fundal | — |
+| `--color-ink-raised` | `#0f2540` | carduri, suprafețe ridicate | — |
+| `--color-line` | `#22395b` | conductori, hairline, contururi | — |
+| `--color-gold` | `#f2d147` | **primar** — CTA, nodul Y, „sub tensiune" | 11.6:1 ✅ |
+| `--color-cyan` | `#00d4ff` | **doar instrument** — schemă, măsurare | 10.8:1 ✅ |
+| `--color-paper` | `#eaf1fb` | text principal | 15.4:1 ✅ |
+| `--color-paper-dim` | `#93a6c4` | text secundar | 7.0:1 ✅ |
+
+Banda luminoasă (o singură apariție pe site, secțiunea de răspunsuri):
+
+| Token | Hex | Contrast pe `sheet` |
+|---|---|---|
+| `--color-sheet` | `#edf1f6` | — |
+| `--color-graphite` | `#0e1b2e` | 15.2:1 ✅ |
+| `--color-graphite-dim` | `#47566c` | 6.6:1 ✅ |
+
+### 🔒 Reguli dure de paletă (verificate în browser)
+
+1. **Auriul trăiește doar pe bleumarin.** Pe `sheet` dă **1.32:1** — invizibil.
+   Pe foaie, indicatorii și glyph-urile sunt `graphite` / `graphite-dim`.
+   Componenta `<x-signature.wye>` are prop-ul `:on-sheet` exact pentru asta.
+2. **Cyan-ul nu iese din schemă.** Niciodată CTA, niciodată pe foaie.
+3. Contrastele de mai sus sunt **măsurate**, nu estimate.
 
 ## Tipografie
 
@@ -100,11 +118,43 @@ CLS e controlat.
    WCAG AA de 4.5:1. **Corectat:** `--color-paper-dim #94a3b8` dă **7.4:1**.
 8. **CTA telefon sticky pe mobil** — vezi `BUSINESS.md`, telefonul e conversia principală.
 
-## Componente Blade de anticipat
+## Elementul-semnătură: schema monofilară cu nodul Y
 
-`layouts/app`, `partials/navbar`, `partials/footer`, `partials/cookie-banner`,
-`components/section-header`, `components/service-card`, `components/cta-band`,
-`components/stat-item`, `components/back-to-top`.
+Hero-ul nu are o poză cu un om și o bormașină, ci **schema monofilară a unui tablou
+electric real**: sursă 230 V → siguranță generală → diferențial 30 mA → patru circuite.
+
+Nodul „Y" (conexiunea în stea din becul logo-ului) e **sursa**. La încărcare se aprinde
+auriu, apoi curentul curge prin traseu, apoi diferențialul semnalează că instalația e sub
+tensiune. În ordinea asta, fiindcă așa se întâmplă în realitate.
+
+Asta e răspunsul la golul lăsat de eliminarea lui „electrician autorizat":
+**competența se demonstrează, nu se revendică.**
+
+⚠️ **Capcană SVG, deja plătită o dată:** `transform: scale()` din CSS **suprascrie**
+atributul `transform="translate(...)"` din SVG. Animația trebuie pusă pe un `<g>` interior,
+cu `translate` pe cel exterior. Altfel elementul aterizează în colțul stânga-sus.
+
+Două layout-uri, nu unul lat cu scroll orizontal: riser vertical sub `md`, bus orizontal
+peste. Verificat: zero scroll orizontal la 360px pe toate paginile.
+
+## Componente Blade (implementate)
+
+`layouts/app` · `partials/{navbar,footer,sticky-call,cookie-banner}` ·
+`seo/{head,json-ld}` · `signature/{wye,schematic}` · `section-header` · `service-card` ·
+`answer-cote` · `promise-item` · `process-step` · `value-item` · `gallery-grid` ·
+`cta-band` · `contact-form`
+
+## Motion
+
+Un singur limbaj: **energizare la intrare, o dată, niciodată în buclă.**
+
+- Load: schema se alimentează (secvența de mai sus). Singurul moment orchestrat.
+- Scroll: `IntersectionObserver` → `opacity` + `translateY` mic. Glyph-urile Y comută
+  `line → gold`. **Niciodată legat de poziția scroll-ului** (paint-bound, janează).
+- Hover: cardurile se încălzesc spre auriu; CTA primește un bloom auriu.
+- **Zero** mișcare ambientală, zero count-up pe cifre neverificate.
+- `prefers-reduced-motion`: **starea finală, instant** — nu o versiune mai lentă.
+  Gardat pe două niveluri: `@media` în CSS **și** `matchMedia` în JS.
 
 ## Skill-uri de folosit
 
