@@ -70,31 +70,31 @@ Repo: `https://github.com/LaAngeli/energix.git` (remote `origin`).
 `origin/main` conține încă **site-ul static vechi**, cu o parolă SMTP commit-uită în clar
 (vezi `SECURITY-NOTES.md`). Decis 2026-07-10: **nu facem merge** cu acel istoric.
 
-Starea locală:
+Starea:
 
 | Ref | Ce e |
 |---|---|
-| `main` (local) | istorie **nouă, orfană** — scheletul Laravel. Fără părinte comun cu `origin/main`. |
-| `legacy-static-site` | copie locală a lui `origin/main` de dinainte de rescriere |
+| `laravel-rewrite` | **ramura de lucru.** Istorie orfană, fără părinte comun cu `origin/main`. Trackează `origin/laravel-rewrite`. |
+| `origin/main` | site-ul static vechi. **Neatins.** Se rescrie doar la cutover. |
+| `legacy-static-site` | copie locală a lui `origin/main` dinainte de rescriere |
 | tag `site-static-2024` | același commit, marcat |
 
-**De ce orfană:** e singurul drum prin care secretul dispare efectiv de pe GitHub. Un
-`merge -s ours` ar fi păstrat commit-urile vechi ca strămoși ai lui `main`, deci parola ar
-fi rămas accesibilă pe vecie în repo-ul nou.
+Nu există branch `main` local — intenționat, ca să nu-l comiți din greșeală.
+
+**De ce istorie orfană:** e singurul drum prin care parola scursă dispare efectiv de pe
+GitHub. Un `merge -s ours` ar fi păstrat commit-urile vechi ca strămoși, deci secretul ar
+fi rămas accesibil pe vecie în repo-ul nou.
 
 **Cutover-ul pe GitHub (NU s-a făcut încă):**
 
 ```bash
-git push --force origin main
+git push --force origin laravel-rewrite:main
 ```
 
-Se face **doar** când site-ul nou e gata și **doar după** ce parola a fost schimbată în
-hPanel. `--force` e acceptabil aici: repo personal, nimeni altcineva nu a clonat.
-Istoricul vechi rămâne local pe `legacy-static-site` / `site-static-2024`. Nu-l urca pe
-GitHub — ar readuce secretul.
-
-⚠️ `main` **nu are upstream setat**, intenționat. Un `git push` fără argumente nu trimite
-nimic din greșeală.
+Se face **doar** când site-ul nou e gata, **doar la cererea explicită a userului** și
+**doar după** ce parola a fost schimbată în hPanel. `--force` e acceptabil: repo personal,
+nimeni altcineva nu a clonat. Istoricul vechi rămâne local pe `legacy-static-site` /
+`site-static-2024`. **Nu-l urca pe GitHub** — ar readuce secretul.
 
 ⚠️ `.gitignore` ignoră `/public/build`. Deci **nu poți face deploy prin `git pull` pe
 server** (unde nu există Node). Asset-urile compilate se urcă separat, prin `rsync`/`scp`.

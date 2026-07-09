@@ -175,6 +175,43 @@ proiect; nu deduce contextul din cod.
 - @.claude/context/DEPLOY-HOSTINGER.md — constrângeri shared hosting, redirect-uri SEO
 - @.claude/context/SECURITY-NOTES.md — probleme moștenite din site-ul vechi
 
+## Flux de lucru: commit + push automat, deploy doar la comandă
+
+Cerință directă a userului (2026-07-10).
+
+### După fiecare task terminat și **verificat** că funcționează
+
+Commit + push, fără să mai întrebi:
+
+```bash
+git add -A
+git commit -m "<mesaj descriptiv, in romana>"
+git push            # merge pe origin/laravel-rewrite, upstream deja setat
+```
+
+„Verificat" înseamnă **dovadă**, nu impresie: testele trec, pagina se randează, comanda
+returnează ce trebuie. Dacă un task a eșuat parțial sau e work-in-progress, **nu comite** —
+spune ce nu merge. Un commit după fiecare task e util doar dacă fiecare commit e verde.
+
+Înainte de commit, dacă ai atins fișiere PHP: `vendor/bin/pint --dirty --format agent`
+(prin unealta PowerShell).
+
+Nu comite niciodată secrete. `.env` e în `.gitignore` — verifică cu `git check-ignore .env`
+dacă ai vreun dubiu, nu presupune.
+
+### Deploy pe host: **doar** la comanda explicită `deploy`
+
+Fără cuvântul `deploy` din partea userului, **nu** scrii nimic pe server:
+fără `rsync`, fără `scp`, fără `ssh ... 'mv/ln/rm'`, fără `artisan` remote.
+Citirea de pe server (inspecție, `ls`, `curl -I`) e permisă oricând.
+
+La `deploy` se urmează pas cu pas `.claude/context/DEPLOY-HOSTINGER.md`.
+
+### `git push --force origin laravel-rewrite:main`
+
+Ăsta e cutover-ul pe GitHub. Nu e „push". **Nu-l face niciodată din proprie inițiativă**,
+nici după un task reușit. Doar la cerere explicită.
+
 ## Reguli scurte, non-negociabile
 
 1. **`php` din unealta Bash este 8.3 (Laragon) și crapă.** Rulează `php` / `artisan` /
