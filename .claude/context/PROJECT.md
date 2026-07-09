@@ -52,7 +52,7 @@ Mapare 1:1 după site-ul vechi, minus ce s-a exclus (vezi `BUSINESS.md`):
 | Rută | Pagină veche | Note |
 |---|---|---|
 | `/` | `index.html` | hero, servicii, de ce noi, proces, preview galerie, CTA |
-| `/servicii` | `services.html` | 4 secțiuni (era 5) |
+| `/servicii` | `services.html` | 3 secțiuni (erau 5) |
 | `/galerie` | `galery.html` | filtre: rezidențial, industrial (era + smart) |
 | `/despre` | `about.html` | echipă, valori, cifre |
 | `/contacte` | `contacts.html` | date contact + formular |

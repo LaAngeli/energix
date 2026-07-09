@@ -14,7 +14,7 @@
             </h1>
 
             <p class="mt-6 max-w-xl text-lead text-paper-dim">
-                Instalații, reparații și audit energetic pentru case, apartamente și spații
+                Instalații, reparații și mentenanță pentru case, apartamente și spații
                 comerciale. În Chișinău și în toată Republica Moldova.
             </p>
 

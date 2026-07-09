@@ -73,14 +73,29 @@ Serviciul dispare complet:
 **Verificare obligatorie:** caută `smart`, `automatiz`, `inteligent` în pagină. Zero
 rezultate.
 
-### ✅ Servicii care rămân (4)
+### ❌ EXCLUS: „Audit Energetic"
+
+Decis de client 2026-07-10. Serviciul dispare complet:
+
+- secțiunea `#audit` de pe `/servicii` și item-ul „Audit" din nav-ul de servicii;
+- link-ul „Audit Energetic" din footer (pe toate paginile);
+- mențiunile „audit energetic" din meta description și `<meta keywords>`;
+- textul din hero-ul homepage-ului.
+
+**Verificare obligatorie:** caută `audit`, `energetic` în pagină. Zero rezultate.
+(Nu căuta `consum` — „monitorizare consum" rămâne, e o caracteristică la Industriale.)
+
+### ✅ Servicii care rămân (3)
 
 | # | Serviciu | Ancoră | Conținut cheie |
 |---|---|---|---|
 | 1 | Instalații Electrice Rezidențiale | `#rezidentiale` | tablouri electrice, prize și întrerupătoare, cablare completă, verificări și măsurători |
 | 2 | Instalații Electrice Industriale | `#industriale` | tablouri de distribuție, cablare utilaje, monitorizare consum ⚠️ *fără* „Automatizări Industriale" |
 | 3 | Reparații și Mentenanță | `#reparatii` | intervenții de urgență, diagnosticare, reparații, mentenanță preventivă |
-| 4 | Audit Energetic | `#audit` | analiza consumului, identificare pierderi, plan de optimizare, raport detaliat |
+
+⚠️ De la 5 servicii pe site-ul vechi am rămas la 3. Pagina `/servicii` devine subțire, iar
+o grilă de 3 carduri pe homepage cere alt layout decât una de 4. Nu compensa cu umplutură:
+mai bine trei servicii descrise în profunzime decât cinci enumerate.
 
 ## Proces de lucru (rămâne, 4 pași)
 
@@ -134,6 +149,7 @@ Direct, practic, fără jargon tehnic inutil. Se păstrează.
 
 - ✅ Excluderea acoperă **orice** afirmație de certificare/licențiere, nu doar sintagma.
 - ✅ „Automatizări Industriale" **se elimină** odată cu Smart Home.
+- ✅ „Audit Energetic" **se elimină** din serviciile oferite. Rămân 3 servicii.
 
 ## Întrebări încă deschise
 
