@@ -3,7 +3,152 @@
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
+/*
+| Energix — sistem de design
+|
+| Fonturile sunt servite self-hosted prin laravel-vite-plugin/fonts (Bunny).
+| Variabilele --font-archivo / --font-plex / --font-plex-mono sunt injectate
+| de `Vite::fonts()` in <head>. Aici doar le dam roluri semantice.
+*/
+
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    /* --- Tipografie: trei roluri --- */
+    --font-display: var(--font-archivo);
+    --font-sans: var(--font-plex);
+    --font-mono: var(--font-plex-mono);
+
+    /* --- Culori ---
+     | Paleta electric-blue pastrata din identitatea existenta.
+     | Contrast pe --color-ink, calculat (WCAG 2.1):
+     |   paper      16.4:1   text principal
+     |   paper-dim   7.4:1   text secundar  (vechiul #6b7688 avea 4.30:1 = sub AA)
+     |   arc        10.9:1   accent
+     |   live       11.9:1   urgente / telefon
+     */
+    --color-ink: #0a0e17; /* fundal */
+    --color-ink-raised: #101624; /* carduri, suprafete ridicate */
+    --color-line: #1e2a3d; /* conductori, hairline, contururi */
+    --color-arc: #00d4ff; /* accent, brand */
+    --color-live: #ffb800; /* „sub tensiune”: telefon, urgente */
+    --color-paper: #e8edf5; /* text principal (nu alb pur: reduce halation) */
+    --color-paper-dim: #94a3b8; /* text secundar */
+
+    /* --- Scara tipografica, fluida, mobile-first --- */
+    --text-eyebrow: 0.75rem;
+    --text-body: 1.0625rem; /* 17px pe mobil */
+    --text-body--line-height: 1.65;
+    --text-lead: clamp(1.125rem, 1.02rem + 0.5vw, 1.375rem);
+    --text-h3: clamp(1.25rem, 1.12rem + 0.6vw, 1.5rem);
+    --text-h2: clamp(1.875rem, 1.4rem + 2.2vw, 3rem);
+    --text-h1: clamp(2.5rem, 1.6rem + 4.4vw, 4.5rem);
+    --text-readout: clamp(2rem, 1.5rem + 2.4vw, 3rem);
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        background-color: var(--color-ink);
+        color: var(--color-paper);
+        font-family: var(--font-sans);
+        font-size: var(--text-body);
+        line-height: var(--text-body--line-height);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* Titlurile poarta personalitatea: display, strans, fara aer inutil. */
+    h1,
+    h2,
+    h3 {
+        font-family: var(--font-display);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.05;
+        text-wrap: balance;
+    }
+
+    /* Focus vizibil, obligatoriu. Nu se scoate. */
+    :focus-visible {
+        outline: 2px solid var(--color-arc);
+        outline-offset: 3px;
+        border-radius: 2px;
+    }
+
+    ::selection {
+        background-color: var(--color-arc);
+        color: var(--color-ink);
+    }
+}
+
+@utility eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--text-eyebrow);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-paper-dim);
+}
+
+/* Cifre de instrument: latime fixa, ca sa nu „danseze” la animatie. */
+@utility readout {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: var(--text-readout);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--color-paper);
+}
+
+/*
+| Semnatura paginii: schema monofilara se „alimenteaza” la incarcare.
+| Un singur moment orchestrat — traseul se deseneaza, apoi LED-ul
+| diferentialului se aprinde. Nimic altceva nu se misca.
+*/
+@layer components {
+    .schema-path {
+        stroke-dasharray: 1200;
+        stroke-dashoffset: 1200;
+        animation: schema-draw 1.4s ease-out forwards;
+    }
+
+    .schema-led {
+        opacity: 0;
+        animation: schema-energize 0.4s ease-out 1.3s forwards;
+    }
+
+    @keyframes schema-draw {
+        to {
+            stroke-dashoffset: 0;
+        }
+    }
+
+    @keyframes schema-energize {
+        to {
+            opacity: 1;
+        }
+    }
+}
+
+/* Starea finala se randeaza instant pentru cine a cerut miscare redusa. */
+@media (prefers-reduced-motion: reduce) {
+    .schema-path {
+        stroke-dashoffset: 0;
+    }
+
+    .schema-led {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }

@@ -159,15 +159,23 @@ Prescurtare folosită mai jos: `PHP84=/opt/alt/php84/usr/bin/php`
 1. **Local:** `npm run build` → produce `public/build/`. (Pe server nu există Node.)
 2. **Urcă** proiectul în `~/domains/energix.md/laravel/`, **fără** `node_modules/`,
    `.env`, `.git/`, `tests/`.
-3. **`.env` de producție** se creează direct pe server:
+3. **🔑 ROTAȚIA PAROLEI — pas obligatoriu, decis 2026-07-10 să se facă exact aici.**
+   Înainte de a scrie `.env`-ul de producție:
+   a. Generează o parolă aleatoare (min. 20 caractere) în password manager.
+   b. Schimb-o în hPanel → Emails → energix.md → contul `contact@` → Change password.
+   c. Abia apoi o pui în `MAIL_PASSWORD` din `.env`-ul de pe server.
+   Parola veche e commit-uită în istoricul repo-ului vechi. Vezi `SECURITY-NOTES.md`.
+   **Nu continua cu pasul 4 dacă acest pas nu e făcut.**
+
+4. **`.env` de producție** se creează direct pe server:
    `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://energix.md`,
    `SESSION_DRIVER=file`, `CACHE_STORE=file`, `QUEUE_CONNECTION=sync`, `MAIL_*`.
-4. `$PHP84 /usr/local/bin/composer install --no-dev --optimize-autoloader`
-5. `$PHP84 artisan key:generate` (o singură dată).
-6. `$PHP84 artisan config:cache && $PHP84 artisan route:cache && $PHP84 artisan view:cache`
-7. Permisiuni: `chmod -R 775 storage bootstrap/cache`
-8. **hPanel:** PHP-ul domeniului pe **8.4**. Fără asta, 500 garantat.
-9. Verifică: `curl -sI https://energix.md` → 200, și `curl -sI https://energix.md/.env` → 403/404.
+5. `$PHP84 /usr/local/bin/composer install --no-dev --optimize-autoloader`
+6. `$PHP84 artisan key:generate` (o singură dată).
+7. `$PHP84 artisan config:cache && $PHP84 artisan route:cache && $PHP84 artisan view:cache`
+8. Permisiuni: `chmod -R 775 storage bootstrap/cache`
+9. **hPanel:** PHP-ul domeniului pe **8.4**. Fără asta, 500 garantat.
+10. Verifică: `curl -sI https://energix.md` → 200, și `curl -sI https://energix.md/.env` → 403/404.
 
 ⚠️ Ordinea contează: `config:cache` **după** ce `.env` e final. Un `.env` schimbat după
 `config:cache` nu are niciun efect — e capcana clasică pe shared hosting.

@@ -44,12 +44,39 @@ majoritatea traficului.
 **Ce se păstrează:** paleta electric-blue (`#00d4ff`) pe dark. E recognoscibilă și
 funcționează. Schimbarea e strict tipografică.
 
-**Ce se caută:** un grotesk cu caracter și autoritate pentru titluri, plus un sans neutru
-și lizibil pentru corp. Ambele **self-hostate** prin `laravel-vite-plugin/fonts` (Bunny),
-cu variabile de greutate reale — nu simulate de browser.
+### ✅ Perechea aleasă (implementată, verificată în browser)
 
-Alegerea concretă a perechii se face cu skill-ul `frontend-design`, cu 2–3 variante puse
-în fața clientului înainte de a scrie markup.
+| Rol | Font | Weight | Variabilă | Unde |
+|---|---|---|---|---|
+| Display | **Archivo** | 700 | `--font-display` | h1, h2, h3 |
+| Corp | **IBM Plex Sans** | 400, 500 | `--font-sans` | text |
+| Date / etichete | **IBM Plex Mono** | 500 | `--font-mono` | eyebrow, cifre, telefon, etichete de schemă |
+
+Archivo (Omnibus-Type) e un grotesk compact, desenat pentru titluri: x-height mare,
+terminații plate, autoritate fără sci-fi. IBM Plex e vocea documentației tehnice — se
+potrivește unui business care vinde corectitudine, iar Plex Mono în rol de *etichetă de
+schemă* e ce dă personalitate paginii, nu un al treilea grotesk decorativ.
+
+Un singur weight pe display: ierarhia o face **scara**, nu grosimea.
+
+### Diacritice — verificat, nu presupus
+
+Româna cere `ș` `ț` `Ș` `Ț` (U+0218–U+021B) cu **virgulă dedesubt**, nu sedilă.
+
+- **Bunny ignoră parametrul `subset`** și servește toate subseturile, fiecare cu propriul
+  `unicode-range`. Opțiunea `subsets` din plugin e un **no-op** pentru providerul `bunny`.
+  `latin-ext` (U+0100–02BA) vine automat.
+- Toate cele trei familii **conțin** glifele (verificat prin măsurare pe canvas, după
+  `document.fonts.load()` — `measureText` singur nu declanșează încărcarea fețelor).
+- Forma e cea corectă, cu virgulă detașată (verificat vizual la 120px).
+
+### Preload: dezactivat, intenționat
+
+`preload` nu poate filtra pe subset, doar pe weight. Cu `preload: true` browserul
+preîncărca **15 fișiere (~200 KB)**, inclusiv chirilică, greacă și vietnameză — niciodată
+folosite. CSS-ul cu `@font-face` e inline în `<head>`, deci descoperirea e oricum imediată
+și se descarcă doar subsetul necesar. Fallback-urile metrice (fontaine) rămân active, deci
+CLS e controlat.
 
 ## Reguli tehnice pentru implementare
 
@@ -69,8 +96,8 @@ Alegerea concretă a perechii se face cu skill-ul `frontend-design`, cu 2–3 va
 6. **Motion:** respectă `prefers-reduced-motion`. Site-ul vechi are linii electrice
    animate, scântei, contoare care numără — toate trebuie oprite pentru utilizatorii care
    au cerut mișcare redusă.
-7. **Contrast:** `--text-muted #6b7688` pe `--bg-primary #0a0e17` dă ~4.3:1 — **sub**
-   pragul WCAG AA de 4.5:1 pentru text mic. De corectat, nu de copiat.
+7. **Contrast:** vechiul `--text-muted #6b7688` pe `#0a0e17` dădea **4.30:1** — sub pragul
+   WCAG AA de 4.5:1. **Corectat:** `--color-paper-dim #94a3b8` dă **7.4:1**.
 8. **CTA telefon sticky pe mobil** — vezi `BUSINESS.md`, telefonul e conversia principală.
 
 ## Componente Blade de anticipat
