@@ -45,7 +45,13 @@ return [
             'port' => env('MAIL_PORT', 2525),
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
-            'timeout' => null,
+
+            /*
+             | Mailul pleaca SINCRON (shared hosting, fara worker), deci utilizatorul
+             | asteapta in fata formularului. Fara timeout, un SMTP lent tine procesul
+             | PHP ocupat pana la limita default si degradeaza tot site-ul.
+             */
+            'timeout' => env('MAIL_TIMEOUT', 10),
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
 

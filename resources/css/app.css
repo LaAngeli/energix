@@ -6,9 +6,11 @@
 /*
 | Energix — sistem de design
 |
-| Fonturile sunt servite self-hosted prin laravel-vite-plugin/fonts (Bunny).
-| Variabilele --font-archivo / --font-plex / --font-plex-mono sunt injectate
-| de `Vite::fonts()` in <head>. Aici doar le dam roluri semantice.
+| Fonturile sunt self-hosted prin laravel-vite-plugin/fonts (Bunny). Variabilele
+| --font-archivo / --font-plex / --font-plex-mono sunt injectate de `Vite::fonts()`.
+|
+| Paleta vine din LOGO, nu din site-ul vechi: becul auriu #F2D147 pe bleumarinul
+| #091A31. Cyan-ul nu exista in marca; e degradat la accent strict tehnic.
 */
 
 @theme {
@@ -17,31 +19,41 @@
     --font-sans: var(--font-plex);
     --font-mono: var(--font-plex-mono);
 
-    /* --- Culori ---
-     | Paleta electric-blue pastrata din identitatea existenta.
-     | Contrast pe --color-ink, calculat (WCAG 2.1):
-     |   paper      16.4:1   text principal
-     |   paper-dim   7.4:1   text secundar  (vechiul #6b7688 avea 4.30:1 = sub AA)
-     |   arc        10.9:1   accent
-     |   live       11.9:1   urgente / telefon
+    /* --- Suprafata de baza: bleumarinul de brand ---
+     | Contrast pe --color-ink (WCAG 2.1, calculat):
+     |   paper      15.4:1
+     |   paper-dim   7.0:1   (AA pentru text mic)
+     |   gold       11.6:1
+     |   cyan       10.8:1
      */
-    --color-ink: #0a0e17; /* fundal */
-    --color-ink-raised: #101624; /* carduri, suprafete ridicate */
-    --color-line: #1e2a3d; /* conductori, hairline, contururi */
-    --color-arc: #00d4ff; /* accent, brand */
-    --color-live: #ffb800; /* „sub tensiune”: telefon, urgente */
-    --color-paper: #e8edf5; /* text principal (nu alb pur: reduce halation) */
-    --color-paper-dim: #94a3b8; /* text secundar */
+    --color-ink: #091a31;
+    --color-ink-raised: #0f2540;
+    --color-line: #22395b;
+    --color-gold: #f2d147;
+    --color-cyan: #00d4ff;
+    --color-paper: #eaf1fb;
+    --color-paper-dim: #93a6c4;
+
+    /* --- Banda luminoasa, o singura aparitie pe site ---
+     | Contrast pe --color-sheet:
+     |   graphite      15.2:1
+     |   graphite-dim   6.6:1  (AA)
+     | Auriul pe foaie da 1.3:1 => NICIODATA text auriu aici, doar hairline.
+     | Cyan-ul nu apare deloc pe foaie.
+     */
+    --color-sheet: #edf1f6;
+    --color-graphite: #0e1b2e;
+    --color-graphite-dim: #47566c;
 
     /* --- Scara tipografica, fluida, mobile-first --- */
     --text-eyebrow: 0.75rem;
-    --text-body: 1.0625rem; /* 17px pe mobil */
+    --text-body: 1.0625rem;
     --text-body--line-height: 1.65;
     --text-lead: clamp(1.125rem, 1.02rem + 0.5vw, 1.375rem);
     --text-h3: clamp(1.25rem, 1.12rem + 0.6vw, 1.5rem);
-    --text-h2: clamp(1.875rem, 1.4rem + 2.2vw, 3rem);
-    --text-h1: clamp(2.5rem, 1.6rem + 4.4vw, 4.5rem);
-    --text-readout: clamp(2rem, 1.5rem + 2.4vw, 3rem);
+    --text-h2: clamp(1.75rem, 1.35rem + 2vw, 2.75rem);
+    --text-h1: clamp(2.25rem, 1.5rem + 4vw, 4.25rem);
+    --text-readout: clamp(1.75rem, 1.35rem + 2vw, 2.5rem);
 }
 
 @layer base {
@@ -56,9 +68,9 @@
         font-size: var(--text-body);
         line-height: var(--text-body--line-height);
         -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
     }
 
-    /* Titlurile poarta personalitatea: display, strans, fara aer inutil. */
     h1,
     h2,
     h3 {
@@ -71,16 +83,18 @@
 
     /* Focus vizibil, obligatoriu. Nu se scoate. */
     :focus-visible {
-        outline: 2px solid var(--color-arc);
+        outline: 2px solid var(--color-gold);
         outline-offset: 3px;
         border-radius: 2px;
     }
 
     ::selection {
-        background-color: var(--color-arc);
+        background-color: var(--color-gold);
         color: var(--color-ink);
     }
 }
+
+/* ---------------------------------------------------------------- utilitare */
 
 @utility eyebrow {
     font-family: var(--font-mono);
@@ -91,31 +105,52 @@
     color: var(--color-paper-dim);
 }
 
-/* Cifre de instrument: latime fixa, ca sa nu „danseze” la animatie. */
+/* Cifre de instrument: latime fixa, ca sa nu „danseze”. */
 @utility readout {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
-    font-size: var(--text-readout);
     font-weight: 500;
     letter-spacing: -0.02em;
-    color: var(--color-paper);
 }
 
-/*
-| Semnatura paginii: schema monofilara se „alimenteaza” la incarcare.
-| Un singur moment orchestrat — traseul se deseneaza, apoi LED-ul
-| diferentialului se aprinde. Nimic altceva nu se misca.
-*/
+/* Suprafata luminoasa. Regula: fara cyan, fara text auriu. */
+@utility sheet-surface {
+    background-color: var(--color-sheet);
+    color: var(--color-graphite);
+}
+
+/* ------------------------------------------------------------- componente */
+
 @layer components {
+    /*
+    | Semnatura: schema monofilara se alimenteaza la incarcare. Traseul se deseneaza,
+    | apoi nodul Y — conexiunea in stea din becul logo-ului — se aprinde auriu.
+    | Un singur moment orchestrat. Nimic nu se misca in bucla.
+    |
+    | `stroke-dashoffset` e paint-bound, nu GPU. E acceptabil pentru un singur path
+    | scurt care ruleaza o data. Regula: nu lega niciodata un draw de scroll.
+    */
+    /*
+    | Secventa: sursa (nodul Y) se aprinde -> curentul curge prin traseu ->
+    | diferentialul semnaleaza ca instalatia e sub tensiune. In ordinea asta,
+    | fiindca asa se intampla in realitate.
+    */
+    .schema-node {
+        opacity: 0;
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: schema-energize 0.6s cubic-bezier(0.34, 1.4, 0.64, 1) 0.15s forwards;
+    }
+
     .schema-path {
-        stroke-dasharray: 1200;
-        stroke-dashoffset: 1200;
-        animation: schema-draw 1.4s ease-out forwards;
+        stroke-dasharray: var(--schema-len, 1200);
+        stroke-dashoffset: var(--schema-len, 1200);
+        animation: schema-draw 1.4s cubic-bezier(0.65, 0, 0.35, 1) 0.4s forwards;
     }
 
     .schema-led {
         opacity: 0;
-        animation: schema-energize 0.4s ease-out 1.3s forwards;
+        animation: schema-fade 0.4s ease-out 1.75s forwards;
     }
 
     @keyframes schema-draw {
@@ -124,31 +159,82 @@
         }
     }
 
-    @keyframes schema-energize {
+    @keyframes schema-fade {
         to {
             opacity: 1;
         }
     }
-}
 
-/* Starea finala se randeaza instant pentru cine a cerut miscare redusa. */
-@media (prefers-reduced-motion: reduce) {
-    .schema-path {
-        stroke-dashoffset: 0;
+    @keyframes schema-energize {
+        0% {
+            opacity: 0;
+            transform: scale(0.7);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
     }
 
-    .schema-led {
+    /*
+    | Reveal la scroll. Starea initiala se aplica DOAR daca JS a marcat documentul,
+    | altfel continutul ramane invizibil cu JS dezactivat.
+    */
+    .js [data-reveal] {
+        opacity: 0;
+        transform: translateY(12px);
+        transition:
+            opacity 0.5s ease-out,
+            transform 0.5s ease-out;
+    }
+
+    .js [data-reveal].is-visible {
         opacity: 1;
+        transform: none;
+    }
+
+    /* Glyph-ul Y de la dividere: stins pana intra in cadru. */
+    .wye-glyph {
+        color: var(--color-line);
+        transition: color 0.5s ease-out;
+    }
+
+    .wye-glyph.is-live {
+        color: var(--color-gold);
     }
 }
 
+/*
+| Cine a cerut miscare redusa primeste starea finala instant. Nu o versiune
+| „mai lenta” — starea finala. Gardat si in JS, nu doar aici.
+*/
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
     *::after {
         animation-duration: 0.01ms !important;
+        animation-delay: 0ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
+    }
+
+    .schema-path {
+        stroke-dashoffset: 0;
+    }
+
+    .schema-led,
+    .schema-node {
+        opacity: 1;
+        transform: none;
+    }
+
+    .js [data-reveal] {
+        opacity: 1;
+        transform: none;
+    }
+
+    .wye-glyph {
+        color: var(--color-gold);
     }
 }
