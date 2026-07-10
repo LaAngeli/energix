@@ -53,7 +53,15 @@
 @endphp
 
 <div class="logo-build" data-logo-build aria-hidden="true">
-    <svg viewBox="0 0 1000 840" fill="none" focusable="false">
+    {{--
+    | viewBox strâns pe conținut, nu canvas-ul 1000×840 al sursei (proiectat lat
+    | pentru video). Marca+wordmark-ul ocupă ~800×736 din el, centrate; restul era
+    | spațiu gol — ~145 unități pe fiecare latură orizontală. Strângerea mărește
+    | sigla ~1.25× în aceeași cutie, cu margini simetrice de ~45 pe toate laturile.
+    | `overflow: visible` (în CSS) lasă bloom-ul și flash-ul să iasă în afară.
+    | `aspect-ratio` din `.logo-build` OGLINDEȘTE acest raport — se schimbă împreună.
+    --}}
+    <svg viewBox="101 45 800 736" fill="none" focusable="false">
         <defs>
             <radialGradient id="buildCore">
                 <stop offset="0%" stop-color="rgba(255,232,150,0.95)" />
@@ -124,7 +132,7 @@
                         data-build-letter
                         data-index="{{ $i }}"
                         x="0"
-                        y="530"
+                        y="494"
                         fill="#ffffff"
                         stroke="#afb8c0"
                         stroke-width="4"

@@ -898,7 +898,10 @@
     */
     .logo-build {
         width: 100%;
-        aspect-ratio: 1000 / 840;
+        /* Oglindeste viewBox-ul strans din `logo-build.blade.php` (800×736), nu
+           canvas-ul 1000×840 al sursei. Altfel `meet` ar aseza sigla intr-o cutie
+           mai lata si ar reaparea spatiul gol pe care tocmai l-am scos. */
+        aspect-ratio: 800 / 736;
     }
 
     .logo-build svg {

@@ -747,7 +747,9 @@ function initLogoBuild() {
     // Scanteia se naste in bec si aterizeaza pe „i”, pe o curba Bezier patratica.
     const FLY_FROM = { x: 322, y: 198 };
     const FLY_CTRL = { x: 448, y: 168 };
-    const DOT_Y = 408;
+    // 372, nu 408: wordmark-ul a urcat cu 36 (baseline-ul literelor e 494, nu 530),
+    // ca sa fie mai aproape de bec. Punctul ramane la 122 deasupra liniei de baza.
+    const DOT_Y = 372;
 
     const halo = root.querySelector('[data-build-halo]');
     const core = root.querySelector('[data-build-core]');
