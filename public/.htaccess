@@ -5,6 +5,35 @@
 
     RewriteEngine On
 
+    # =====================================================================
+    # Canonicalizarea domeniului: un singur site, o singura adresa.
+    #
+    # Astazi redirectarea exista, dar vine din `.htaccess`-ul SITE-ULUI VECHI,
+    # care traieste in `public_html/`. La cutover, `public_html` devine symlink
+    # catre `laravel/public` — iar fisierul acela dispare odata cu el. Fara
+    # regulile de mai jos, `https://www.energix.md/` ar raspunde 200 si am avea
+    # doua site-uri identice care isi impart semnalele de ranking.
+    #
+    # `<link rel="canonical">` atenueaza, dar nu inlocuieste un 301.
+    #
+    # Domeniul NU e scris in clar: `%1` si `%{HTTP_HOST}` il preiau din cerere,
+    # deci regulile supravietuiesc unei schimbari de domeniu.
+    # =====================================================================
+
+    # Provocarile ACME (reinnoirea certificatului) nu se redirectioneaza niciodata.
+    RewriteCond %{REQUEST_URI} ^/\.well-known/ [NC]
+    RewriteRule ^ - [L]
+
+    # www.energix.md -> energix.md. Intai gazda, ca sa nu iasa doua salturi.
+    RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+    RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+
+    # http -> https. `X-Forwarded-Proto` acopera cazul unui proxy in fata:
+    # daca oricare dintre cele doua spune „https”, nu redirectionam (altfel bucla).
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

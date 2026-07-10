@@ -127,11 +127,10 @@ autonome**. De aceea:
 
 ### În cod (se poate face de aici)
 
-1. 🔴 **`www` → non-`www` și `http` → `https` nu se forțează nicăieri.** `public/.htaccess`
-   nu are regulile, deși `DEPLOY-HOSTINGER.md` cere păstrarea lor de pe site-ul vechi.
-   Dacă `https://www.energix.md/` răspunde 200, avem două site-uri identice care își
-   împart semnalele. Canonical atenuează, nu înlocuiește un 301. **De verificat pe server
-   ce face Hostinger implicit, apoi de completat `.htaccess`.**
+1. ✅ **`www` → non-`www` și `http` → `https`** — **făcut** (2026-07-10) în
+   `public/.htaccess`, plus `URL::forceScheme('https')` în producție.
+   Redirectarea exista, dar venea din `.htaccess`-ul site-ului vechi, care dispare la
+   cutover. Detalii și matricea de verificare: `DEPLOY-HOSTINGER.md`.
 2. **Nume de fișiere de imagine**: `img1.webp`, `img5_flipped.webp`. `alt`-urile sunt
    deja descriptive; numele nu. Se redenumesc odată cu fotografiile reale.
 

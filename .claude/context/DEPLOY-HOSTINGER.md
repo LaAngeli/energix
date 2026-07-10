@@ -176,6 +176,19 @@ Prescurtare folosită mai jos: `PHP84=/opt/alt/php84/usr/bin/php`
 8. Permisiuni: `chmod -R 775 storage bootstrap/cache`
 9. **hPanel:** PHP-ul domeniului pe **8.4**. Fără asta, 500 garantat.
 10. Verifică: `curl -sI https://energix.md` → 200, și `curl -sI https://energix.md/.env` → 403/404.
+11. **Verifică canonicalizarea domeniului** — `public_html` nu mai are `.htaccess`-ul vechi,
+    deci de-abia acum se vede dacă regulile din `laravel/public/.htaccess` chiar rulează:
+
+    ```bash
+    curl -sI http://energix.md/servicii      | grep -i '^location'   # -> https://energix.md/servicii
+    curl -sI https://www.energix.md/servicii | grep -i '^location'   # -> https://energix.md/servicii
+    curl -s -o /dev/null -w '%{http_code}\n' https://energix.md/servicii   # -> 200, NU 301
+    ```
+
+    Al treilea `curl` e cel important: dacă dă 301, ai o **buclă de redirect** și site-ul e
+    căzut. Rollback imediat (vezi mai sus).
+    Verifică și canonical-ul: `curl -s https://energix.md/servicii | grep canonical` trebuie
+    să conțină `https://`, nu `http://`.
 
 ⚠️ Ordinea contează: `config:cache` **după** ce `.env` e final. Un `.env` schimbat după
 `config:cache` nu are niciun efect — e capcana clasică pe shared hosting.
@@ -196,10 +209,52 @@ Redirect-uri 301 obligatorii, altfel se pierde indexarea existentă:
 | `/cookie_policy.html` | `/politica-cookie` |
 
 De păstrat din site-ul vechi:
-- forțare HTTPS + non-`www` → `https://energix.md`;
+- ✅ **forțare HTTPS + non-`www`** — **făcut** (2026-07-10), în `public/.htaccess`.
 - header-ele de securitate: `X-Frame-Options`, `X-Content-Type-Options`,
   `Referrer-Policy`, `Strict-Transport-Security` (în Laravel: middleware, nu `.htaccess`);
 - `robots.txt` și `sitemap.xml` (sitemap-ul are `lastmod` din 2024 — se regenerează).
 
 ⚠️ `.htaccess`-ul vechi conține un comentariu-fosilă: „Redirecționează /index.html către
 `https://advista.marketing/`" — copy-paste de la alt proiect. Nu se preia.
+
+## 🔴 Canonicalizarea domeniului: de ce a trebuit rescrisă
+
+Redirectarea `www` → non-`www` **funcționa deja** înainte de cutover. Nu venea însă de la
+Hostinger, ci din `.htaccess`-ul **site-ului vechi**, aflat în `public_html/`. La cutover,
+`public_html` devine symlink către `laravel/public` — deci fișierul acela **dispare odată
+cu el**, iar `https://www.energix.md/` ar fi început să răspundă 200. Două site-uri
+identice care își împart semnalele de ranking. `<link rel="canonical">` atenuează, dar nu
+înlocuiește un 301.
+
+Regulile stau acum în `public/.htaccess`, înaintea front controller-ului:
+
+1. `/.well-known/` nu se redirectează niciodată — altfel se rupe reînnoirea certificatului.
+2. `www.*` → gazda fără `www`, un singur salt.
+3. `http` → `https`, cu gardă pe `X-Forwarded-Proto` ca să nu intre în buclă în spatele
+   unui proxy care termină TLS.
+
+Domeniul **nu e scris în clar**: `%1` și `%{HTTP_HOST}` îl preiau din cerere.
+
+**Verificat pe un Apache 2.4 real** (XAMPP, `httpd -X` pe un port liber), nu presupus —
+matrice: apex/www × http/`X-Forwarded-Proto: https`, ACME challenge, query string,
+gazdă cu majuscule, gazdă `wwwx.` (nu trebuie redirectată). Herd rulează nginx local, deci
+`.htaccess` nu se poate testa din Pest; `tests/Feature/HtaccessTest.php` apără doar
+prezența și **ordinea** regulilor — scheletul Laravel regenerează fișierul la upgrade.
+
+### `URL::forceScheme('https')` în producție
+
+`route()` ia schema din **cerere**, nu din `APP_URL`. Azi LiteSpeed servește direct și pune
+`HTTPS=on`. Dar `advista.marketing`, de pe **același cont**, rulează în spatele Cloudflare.
+Dacă `energix.md` ajunge vreodată acolo, proxy-ul termină TLS și trimite mai departe `http`,
+iar Laravel ar genera `canonical`, `hreflang` și `sitemap.xml` cu `http://` — exact opusul
+redirectărilor 301 de mai sus.
+
+**Nu** folosim `trustProxies(at: '*')`: ar face `X-Forwarded-For` demn de încredere, iar
+`throttle:5,1` de pe formular se cheiește pe IP. Oricine l-ar putea ocoli rotind antetul.
+
+### HSTS: `preload` a fost lăsat afară, intenționat
+
+Site-ul vechi trimitea `Strict-Transport-Security: … preload`. Middleware-ul nostru nu.
+`preload` nu face nimic dacă domeniul nu e înscris la hstspreload.org, iar înscrierea e o
+ușă cu sens unic: scoaterea din listă durează luni și trece prin release-urile browserelor.
+De activat doar dacă cineva chiar înscrie domeniul.
