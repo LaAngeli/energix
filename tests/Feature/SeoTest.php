@@ -45,6 +45,89 @@ it('publica BreadcrumbList doar pe paginile interioare', function (): void {
     $this->get('/servicii')->assertOk()->assertSee('BreadcrumbList');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Paginile de segment
+|--------------------------------------------------------------------------
+|
+| Regresie: cele trei segmente traiau ca tab-uri pe /servicii, sub un singur
+| <title> si un singur H1. Trei intentii comerciale nu incap intr-un URL, iar
+| un fragment (`#apartamente`) nu se rankeaza ca pagina.
+|
+*/
+
+it('da fiecarui segment un URL, un titlu si un H1 proprii', function (string $path, string $slug): void {
+    $html = $this->get($path)->assertOk()->getContent();
+
+    $title = trans('site.seo')["services.{$slug}"]['title'];
+    $h1 = trans("site.services.{$slug}.title");
+
+    expect($html)->toContain('<title>'.e($title).'</title>')
+        ->and($html)->toContain('<link rel="canonical" href="'.url($path).'">')
+        // Exact un H1, si acela e titlul segmentului.
+        ->and(preg_match_all('/<h1[ >]/', $html))->toBe(1)
+        ->and($html)->toContain('>'.e($h1).'</h1>');
+})->with([
+    ['/servicii/apartamente', 'apartamente'],
+    ['/servicii/case', 'case'],
+    ['/servicii/industriale', 'industriale'],
+    ['/ru/uslugi/kvartiry', 'apartamente'],
+    ['/ru/uslugi/doma', 'case'],
+    ['/ru/uslugi/promyshlennye', 'industriale'],
+]);
+
+it('leaga segmentele intre limbi prin hreflang', function (): void {
+    $html = $this->get('/servicii/apartamente')->assertOk()->getContent();
+
+    expect($html)->toContain('hreflang="ru-MD" href="'.url('/ru/uslugi/kvartiry').'"');
+});
+
+it('declara Service cu URL propriu si firimituri pe trei niveluri', function (): void {
+    $html = $this->get('/servicii/case')->assertOk()->getContent();
+
+    expect($html)->toContain('"@type":"Service"')
+        ->and($html)->toContain('"url":"'.url('/servicii/case').'"')
+        // Acasa > Servicii > Case
+        ->and($html)->toContain('"position":3')
+        // FAQ propriu segmentului, nu cel de pe homepage.
+        ->and($html)->toContain('"@type":"FAQPage"')
+        ->and($html)->toContain(trans('site.services.case.faq.0.q'));
+});
+
+it('nu duplica intrebarile de pe homepage pe paginile de segment', function (): void {
+    $homeQuestions = array_column(trans('site.faq'), 'q');
+
+    foreach (config('energix.services') as $service) {
+        foreach (trans("site.services.{$service['slug']}.faq") as $item) {
+            expect($homeQuestions)->not->toContain($item['q']);
+        }
+    }
+});
+
+/*
+|--------------------------------------------------------------------------
+| Legaturi interne
+|--------------------------------------------------------------------------
+*/
+
+it('foloseste text de ancora descriptiv catre paginile de segment', function (string $path): void {
+    $html = $this->get($path)->assertOk()->getContent();
+
+    foreach (config('energix.services') as $service) {
+        $anchor = trans("site.services.{$service['slug']}.anchor");
+
+        expect($html)->toContain(url('/servicii/'.$service['uri']['ro']))
+            ->and($html)->toContain(e($anchor));
+    }
+
+    /*
+     | „Detalii complete” era textul celui mai valoros link intern de pe site
+     | si nu spunea nimic despre pagina-tinta — nici lui Google, nici unui
+     | cititor de ecran care parcurge lista de linkuri.
+     */
+    expect($html)->not->toContain('Detalii complete');
+})->with(['/', '/servicii', '/galerie', '/despre']);
+
 it('declara zonele deservite in areaServed', function (): void {
     $html = $this->get('/')->assertOk()->getContent();
 
@@ -95,12 +178,35 @@ it('genereaza sitemap cu ambele limbi si alternative', function (): void {
 
     $xml = $response->getContent();
 
-    // 8 pagini × 2 limbi
-    expect(substr_count($xml, '<loc>'))->toBe(16)
+    // 11 pagini × 2 limbi (8 + cele trei segmente de servicii)
+    expect(substr_count($xml, '<loc>'))->toBe(22)
         ->and($xml)->toContain('xmlns:xhtml')
         ->and($xml)->toContain(url('/ru/uslugi'))
         ->and($xml)->toContain(url('/servicii'))
+        ->and($xml)->toContain(url('/servicii/apartamente'))
+        ->and($xml)->toContain(url('/ru/uslugi/promyshlennye'))
         ->and($xml)->toContain('hreflang="x-default"');
+});
+
+it('declara lastmod real, nu ora cererii', function (): void {
+    $xml = $this->get('/sitemap.xml')->assertOk()->getContent();
+
+    preg_match_all('#<lastmod>([^<]+)</lastmod>#', $xml, $matches);
+
+    expect($matches[1])->toHaveCount(22);
+
+    /*
+     | `lastmod` vine din mtime-ul surselor, deci e in trecut. Daca ar fi `now()`,
+     | s-ar schimba la fiecare cerere — iar Google, odata ce prinde asta, ignora
+     | `lastmod` pe tot site-ul.
+     */
+    foreach ($matches[1] as $stamp) {
+        expect(strtotime($stamp))->toBeLessThanOrEqual(time());
+    }
+
+    // Google ignora ambele de ani buni; nu le mai trimitem.
+    expect($xml)->not->toContain('<changefreq>')
+        ->and($xml)->not->toContain('<priority>');
 });
 
 it('redirectioneaza 301 vechile URL-uri .html', function (string $old, string $new): void {

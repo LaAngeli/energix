@@ -15,10 +15,11 @@
                     <p class="mt-6 max-w-xl text-lead text-paper-dim">{{ __('site.about_page.lead') }}</p>
                 </div>
 
-                {{-- Sigla se energizează o dată, la intrarea în cadru. Doar pe desktop:
-                     pe mobil coloana nu există, iar `loading="lazy"` ține imaginea nedescărcată. --}}
+                {{-- Sigla „Flux” rulează o dată, la intrarea în cadru, apoi îngheață.
+                     Doar pe desktop: pe mobil coloana nu există, deci nici SVG-ul, nici
+                     bucla rAF, nici fontul wordmark-ului nu costă nimic. --}}
                 <div class="hidden lg:block" data-reveal>
-                    <x-signature.logo-charge />
+                    <x-signature.logo-flux />
                 </div>
             </div>
         </div>
@@ -94,6 +95,8 @@
             </div>
         </div>
     </section>
+
+    <x-related-segments />
 
     <x-cta-band :title="__('site.about_page.cta')" />
 

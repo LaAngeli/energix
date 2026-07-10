@@ -196,7 +196,7 @@ Instrumentele per pagină:
   Hero: **contorul electromecanic** — cifre care se rostogolesc (odometru); alegerea
   segmentului **comandă filtrul real** al galeriei de sub el.
 - **Despre**: contor de vechime (cifra 10 pe scală gradată) + valorile ca „aparataj de
-  protecție". Hero: **sigla care se încarcă** (`<x-signature.logo-charge>`) — vezi mai jos.
+  protecție". Hero: **sigla „Flux"** (`<x-signature.logo-flux>`) — vezi mai jos.
 - **Contacte**: formularul e un circuit — fiecare câmp valid închide un segment; toate
   valide → nodul + butonul se armează. Pur vizual, validarea reală rămâne pe server.
   Hero: **starea liniei** — deschis/închis calculat live din program, cu „revenim {zi}
@@ -240,44 +240,71 @@ se umple auriu până la etapa selectată.
 - `requestAnimationFrame` îngheață în tab-uri de fundal — voltmetrul are un `setTimeout`
   de gardă care garantează valoarea finală.
 
-## Al doilea element-semnătură: SIGLA CARE SE ÎNCARCĂ (hero /despre)
+## Al doilea element-semnătură: SIGLA „FLUX" (hero /despre)
 
-`<x-signature.logo-charge>` — portul animației livrate de client (2026-07-10, folderul
-`Animație logo electricitate`, varianta „Energix Loop"). Un inel auriu se umple în jurul
-becului, un punct-cap orbitează cu umplerea, particule converg spre bec; la închiderea
-inelului becul dă un val de lumină, iar o fereastră de lumină traversează wordmark-ul.
+`<x-signature.logo-flux>` — **portarea vectorială** a animației livrate de client
+(2026-07-10, „Energix Loop B — Flux"). Bile de curent curg pe conturul becului, o mătură
+de lumină rotește razele, două surge-uri aprind filamentul și aruncă scântei, soclul
+licărește, iar o undă traversează literele.
 
-Trei abateri deliberate de la sursă:
+### 🔴 Portată, nu încorporată
 
-1. **Nu rulează în buclă.** Se energizează o dată, la intrarea în cadru
-   (`IntersectionObserver`), apoi rămâne aprinsă. Cursorul o reia (`pointerenter`,
-   doar `pointer: fine`). Regula „zero mișcare ambientală" de mai jos nu are excepții:
-   o buclă perpetuă lângă un `<h1>` obligă ochiul să lupte cu ea.
-2. **Culorile vin din tokenii de brand** (`--color-gold`), nu din auriul `#f5c23e` al
-   machetei. Cyan-ul nu apare deloc.
-3. **Decorativă**: `aria-hidden`, `alt=""`. „Energix" e deja în navbar și în `<h1>`.
+Clientul a trimis un **mp4 de 1.43 MB** (1000×840, H.264, fundal `#0a0a0a` ars în cadru).
+În aceeași arhivă era însă **sursa**: geometria vectorială a siglei și formulele scenei
+(`energix-logo.jsx`, `InnerB`). Am portat sursa, nu am încorporat videoul:
 
-Detalii de implementare care contează:
+| | mp4 | portare SVG |
+|---|---|---|
+| Greutate | 1.43 MB | ~7 KB (+15 KB font) |
+| Decodare | H.264, 6s | zero |
+| Fundal | negru, ars în cadru | transparent |
+| Claritate | raster | vectorial, orice DPI |
+| Culori | `#F1C232` al machetei | `--color-gold` de brand |
 
-- Coordonatele rămân **în spațiul machetei 940×800**. `--u: calc(100cqw / 940)` traduce
-  un pixel de machetă în lățimea containerului (`container-type: inline-size`), deci CSS-ul
-  se citește identic cu sursa și scalează fără nicio linie de JavaScript.
-- Inelul e SVG cu `pathLength="100"`, deci `stroke-dashoffset` **este** procentul de
-  încărcare. Rotația punctului-cap se pune din CSS (`transform-box: view-box`), niciodată
-  din atributul `transform` — vezi capcana de mai sus.
-- Starea de repaus **este** cadrul 100% al fiecărui keyframe, deci oprirea nu sare.
-- Sub `prefers-reduced-motion`, JS nu adaugă niciodată `.is-charging`: sigla stă aprinsă.
-- Cele trei `<img>` (sigla, becul decupat, wordmark-ul decupat) sunt **o singură cerere**;
-  `loading="lazy"` într-un părinte `hidden lg:block` înseamnă **zero octeți pe mobil**
-  (verificat: Chrome nu descarcă imagini lazy fără cutie de layout).
+Pe Windows nu există `ffmpeg`, deci mp4-ul **nu putea fi recomprimat**. Fundalul negru
+ars în cadru ar fi apărut ca un dreptunghi pe bleumarinul hero-ului.
+
+### Abateri deliberate de la sursă
+
+1. **Nu rulează în buclă.** Sursa e „Loop B", infinită. Aici rulează o dată, complet
+   (6s), la intrarea în cadru, apoi îngheață. Cerință explicită a clientului — și
+   regula „zero mișcare ambientală" nu are excepții lângă un `<h1>`.
+2. **Culorile vin din tokenii de brand** (`--color-gold`), nu din auriul `#F1C232` al
+   machetei.
+3. **Decorativă**: `aria-hidden`. „Energix" e deja în navbar, footer și `<h1>`.
+
+### Detalii de implementare care contează
+
+- Coordonatele rămân **în spațiul machetei**: `viewBox="0 0 1000 840"`, marca desenată în
+  spațiul 660×352, `translate(91 73) scale(1.24)` — identic cu sursa.
+- Timpii și formulele trăiesc în `initLogoFlux()`; CSS-ul ține doar cadrul.
+  `overflow: visible` pe SVG: bloom-ul și scânteile ies din viewBox.
+- **Wordmark-ul folosește Quicksand 600** — fontul din sursa clientului. Al patrulea
+  font pe site, dar se descarcă doar unde e folosit (~15 KB, subsetul latin).
+- ⚠️ `document.fonts.ready` **nu e suficient** înainte de `getComputedTextLength()`:
+  se rezolvă înainte ca o față încă nefolosită să intre în coadă, iar literele s-ar
+  așeza pe metricile fontului de rezervă. Se cere explicit fața:
+  `document.fonts.load('600 160px Quicksand', 'energıx')`.
+- ⚠️ **Garda de mobil e obligatorie.** Sub `lg` sigla e `display:none`, dar un
+  `fonts.load()` necondiționat descarcă totuși Quicksand pe fiecare telefon, ca să
+  măsoare litere invizibile. `matchMedia('(min-width: 64rem)')` oprește totul:
+  zero octeți de font, zero buclă rAF. Verificat la 360px.
+- `rAF` îngheață în tab-urile de fundal → un `setTimeout(6s + 250ms)` garantează cadrul
+  final. Verificat.
+- Sub `prefers-reduced-motion`: se randează `frame(0)` și nu pornește nicio buclă.
 
 ## Componente Blade (implementate)
 
 `layouts/app` · `partials/{navbar,footer,sticky-call,cookie-banner}` ·
-`seo/{head,json-ld}` · `signature/{wye,panel,stages,logo-charge}` ·
+`seo/{head,json-ld}` · `signature/{wye,panel,stages,logo-flux}` ·
 `hero-instrument/{circuits-calc,works-counter,line-status}` · `section-header` ·
-`service-card` · `answer-cote` · `promise-item` · `process-step` · `value-item` ·
-`gallery-grid` · `cta-band` · `contact-form`
+`job-sheet` · `faq` · `segment-row` · `segment-link` · `related-segments` ·
+`answer-cote` · `process-step` · `value-item` · `gallery-grid` · `cta-band` ·
+`contact-form` · `social-icon` · `social-links`
+
+`segment-link` și `related-segments` există pentru **textul ancorei**: link-ul către o
+pagină de segment scrie ce e acolo („Instalații electrice pentru apartamente în
+Chișinău"), nu „Detalii complete →". Vezi `SEO.md` § arhitectura de conținut.
 
 ## Motion
 

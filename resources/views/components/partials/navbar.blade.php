@@ -28,22 +28,29 @@
         {{-- Desktop: circuite cu LED --}}
         <ul class="hidden items-stretch lg:flex">
             @foreach ($links as $link)
+                {{--
+                | `$active` = chiar pagina asta. `$inSection` = si paginile ei copil
+                | (/servicii/apartamente). Circuitul se aprinde pentru toata sectiunea,
+                | dar `aria-current="page"` ramane doar pe pagina curenta — altfel am
+                | minti cititorul de ecran.
+                --}}
                 @php($active = request()->routeIs($ru.$link['route']))
+                @php($inSection = $active || request()->routeIs($ru.$link['route'].'.*'))
                 <li class="group border-l border-line/60 last:border-r">
                     <a
                         href="{{ URL::localized($link['route']) }}"
                         @class([
                             'flex h-full flex-col justify-center gap-1 px-4 py-1.5 transition-colors',
-                            'bg-ink-raised/70' => $active,
-                            'hover:bg-ink-raised/40' => ! $active,
+                            'bg-ink-raised/70' => $inSection,
+                            'hover:bg-ink-raised/40' => ! $inSection,
                         ])
                         @if ($active) aria-current="page" @endif
                     >
                         <span class="flex items-center gap-2">
-                            <span @class(['led', 'is-on' => $active]) aria-hidden="true"></span>
+                            <span @class(['led', 'is-on' => $inSection]) aria-hidden="true"></span>
                             <span class="font-mono text-[0.6rem] tracking-[0.16em] text-paper-dim uppercase">{{ $link['code'] }}</span>
                         </span>
-                        <span @class(['text-sm leading-none', 'text-gold' => $active, 'text-paper' => ! $active])>
+                        <span @class(['text-sm leading-none', 'text-gold' => $inSection, 'text-paper' => ! $inSection])>
                             {{ __('site.nav.'.$link['route']) }}
                         </span>
                     </a>
@@ -82,17 +89,18 @@
         <ul class="mx-auto max-w-6xl px-5 py-3 sm:px-8">
             @foreach ($links as $link)
                 @php($active = request()->routeIs($ru.$link['route']))
+                @php($inSection = $active || request()->routeIs($ru.$link['route'].'.*'))
                 <li class="border-b border-line/60">
-                    <a href="{{ URL::localized($link['route']) }}" class="flex items-center justify-between gap-4 py-4">
+                    <a href="{{ URL::localized($link['route']) }}" class="flex items-center justify-between gap-4 py-4" @if ($active) aria-current="page" @endif>
                         <span class="flex items-center gap-3.5">
-                            <span @class(['led', 'is-on' => $active]) aria-hidden="true"></span>
+                            <span @class(['led', 'is-on' => $inSection]) aria-hidden="true"></span>
                             <span class="font-mono text-[0.6rem] tracking-[0.16em] text-paper-dim uppercase">{{ $link['code'] }}</span>
-                            <span @class(['text-lg leading-none', 'text-gold' => $active, 'text-paper' => ! $active])>
+                            <span @class(['text-lg leading-none', 'text-gold' => $inSection, 'text-paper' => ! $inSection])>
                                 {{ __('site.nav.'.$link['route']) }}
                             </span>
                         </span>
-                        <span class="font-mono text-[0.6rem] tracking-[0.16em] uppercase {{ $active ? 'text-gold' : 'text-paper-dim' }}">
-                            {{ $active ? __('site.nav.active') : '—' }}
+                        <span class="font-mono text-[0.6rem] tracking-[0.16em] uppercase {{ $inSection ? 'text-gold' : 'text-paper-dim' }}">
+                            {{ $inSection ? __('site.nav.active') : '—' }}
                         </span>
                     </a>
                 </li>

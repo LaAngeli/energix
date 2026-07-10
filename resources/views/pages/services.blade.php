@@ -22,92 +22,69 @@
         </div>
     </header>
 
-    {{-- ================================ consola de segmente ================================ --}}
-    <section class="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-20" aria-label="{{ __('site.services_page.choose') }}" data-seg-switcher>
-        <div role="tablist" aria-label="{{ __('site.services_page.space_type') }}" class="grid gap-3 sm:grid-cols-3">
+    {{--
+    | Pagină-pilon: trimite mai departe, nu ține conținutul.
+    |
+    | Cele trei segmente aveau tab-uri aici. Un fragment (`#apartamente`) nu se
+    | rankează ca pagină, deci trei intenții comerciale se băteau pe un URL.
+    | Acum fiecare are pagina lui, iar aceasta le leagă.
+    --}}
+    <section class="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-20" aria-label="{{ __('site.services_page.space_type') }}" data-segment-hash>
+        <x-section-header
+            :eyebrow="__('site.services_page.segments_eyebrow')"
+            :title="__('site.services_page.segments_title')"
+            :intro="__('site.services_page.segments_intro')"
+        />
+
+        <div class="mt-12 grid gap-6 lg:grid-cols-3">
             @foreach (config('energix.services') as $i => $service)
-                <button
-                    type="button"
-                    role="tab"
-                    id="seg-tab-{{ $service['slug'] }}"
-                    aria-controls="seg-panel-{{ $service['slug'] }}"
-                    aria-selected="{{ $i === 0 ? 'true' : 'false' }}"
-                    tabindex="{{ $i === 0 ? '0' : '-1' }}"
-                    class="seg-switch"
+                @php($t = __("site.services.{$service['slug']}"))
+                <article
+                    class="group flex flex-col overflow-hidden rounded-sm border border-line bg-ink-raised/40 transition hover:border-gold"
+                    data-segment-card="{{ $service['slug'] }}"
+                    data-reveal
+                    style="--reveal-delay: {{ $i * 90 }}ms"
                 >
-                    <span class="led" aria-hidden="true"></span>
-                    <span>
-                        <span class="block font-mono text-[0.6rem] tracking-[0.16em] text-paper-dim uppercase">
-                            {{ __('site.services_page.circuit') }} {{ str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT) }}
-                        </span>
-                        <span class="mt-0.5 block font-display text-base text-paper">{{ __("site.services.{$service['slug']}.nav") }}</span>
-                    </span>
-                </button>
-            @endforeach
-        </div>
+                    <img
+                        src="{{ asset($service['image']) }}"
+                        alt="{{ $t['title'] }} — Energix, {{ __('site.common.city') }}"
+                        width="800"
+                        height="533"
+                        loading="lazy"
+                        decoding="async"
+                        class="h-48 w-full object-cover opacity-70 transition duration-500 group-hover:opacity-100"
+                    >
 
-        @foreach (config('energix.services') as $i => $service)
-            @php($t = __("site.services.{$service['slug']}"))
-            <div
-                role="tabpanel"
-                id="seg-panel-{{ $service['slug'] }}"
-                data-slug="{{ $service['slug'] }}"
-                aria-labelledby="seg-tab-{{ $service['slug'] }}"
-                @if ($i !== 0) hidden @endif
-                class="pt-10"
-            >
-                {{-- ancora (#apartamente etc.) ramane functionala --}}
-                <span id="{{ $service['slug'] }}" class="block" aria-hidden="true"></span>
-
-                <div class="grid items-start gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
-                    <div>
+                    <div class="flex flex-1 flex-col p-6">
                         <p class="eyebrow flex items-center gap-2.5">
-                            <x-signature.wye :size="13" :live="true" />
-                            {{ $t['tagline'] }}
+                            <x-signature.wye :size="12" :live="true" />
+                            {{ __('site.services_page.circuit') }} {{ str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT) }}
                         </p>
 
-                        <h2 class="mt-4 text-h2 text-paper">{{ $t['title'] }}</h2>
-                        <p class="mt-5 text-lead text-paper-dim">{{ $t['intro'] }}</p>
+                        <h3 class="mt-3 font-display text-h3 text-paper">{{ $t['title'] }}</h3>
+                        <p class="mt-4 text-paper-dim">{{ $t['intro'] }}</p>
 
-                        <ul class="mt-8 divide-y divide-line border-y border-line">
-                            @foreach ($t['features'] as $j => $feature)
-                                <li class="flex items-center gap-4 py-3.5">
-                                    <span class="readout text-xs text-gold">{{ str_pad((string) ($j + 1), 2, '0', STR_PAD_LEFT) }}</span>
-                                    <span class="text-paper">{{ $feature }}</span>
+                        <ul class="mt-6 grid gap-2 text-sm text-paper-dim">
+                            @foreach (array_slice($t['features'], 0, 3) as $feature)
+                                <li class="flex gap-3">
+                                    <span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-gold" aria-hidden="true"></span>
+                                    {{ $feature }}
                                 </li>
                             @endforeach
                         </ul>
 
-                        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-                            <a
-                                href="tel:{{ config('energix.contact.phone_href') }}"
-                                class="energize-sweep inline-flex items-center justify-center gap-3 rounded-sm bg-gold px-6 py-3.5 font-mono text-sm font-medium tracking-wider text-ink uppercase"
-                            >
-                                {{ __('site.common.call_now') }}
-                            </a>
-                            <a
-                                href="{{ URL::localized('contact') }}"
-                                class="inline-flex items-center justify-center rounded-sm border border-line px-6 py-3.5 font-mono text-sm tracking-wider text-paper uppercase transition hover:border-gold hover:text-gold"
-                            >
-                                {{ __('site.common.get_offer') }}
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="overflow-hidden rounded-sm border border-line" data-reveal>
-                        <img
-                            src="{{ asset($service['image']) }}"
-                            alt="{{ $t['title'] }} — Energix, {{ __('site.common.city') }}"
-                            width="800"
-                            height="533"
-                            loading="lazy"
-                            decoding="async"
-                            class="h-64 w-full object-cover opacity-70 sm:h-96"
+                        {{-- Textul ancorei descrie pagina-țintă, nu acțiunea. --}}
+                        <a
+                            href="{{ URL::localized("services.{$service['slug']}") }}"
+                            class="mt-auto inline-flex items-center gap-2 pt-8 font-mono text-sm tracking-wider text-gold uppercase transition hover:brightness-110"
                         >
+                            {{ $t['anchor'] }}
+                            <span aria-hidden="true">&rarr;</span>
+                        </a>
                     </div>
-                </div>
-            </div>
-        @endforeach
+                </article>
+            @endforeach
+        </div>
     </section>
 
     <section class="border-t border-line bg-ink-raised/40" aria-labelledby="stages-title">

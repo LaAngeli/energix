@@ -54,6 +54,26 @@ $views = [
     'legal.cookies' => ['pages.legal.page', ['doc' => 'cookies']],
 ];
 
+/*
+| Cate o pagina pentru fiecare segment, sub `/servicii`. Trei intentii comerciale
+| distincte au nevoie de trei URL-uri, trei <title> si trei H1 — un fragment
+| (`#apartamente`) nu se rankeaza separat.
+|
+| Numele rutei contine un punct (`services.apartamente`), la fel ca `legal.terms`.
+| `<x-seo.head>` citeste cheia direct din array, nu prin `data_get`, tocmai ca
+| punctul sa nu fie interpretat ca separator de nivel.
+*/
+foreach (config('energix.services') as $service) {
+    $name = 'services.'.$service['slug'];
+
+    $pages[$name] = [
+        'ro' => '/servicii/'.$service['uri']['ro'],
+        'ru' => '/ru/uslugi/'.$service['uri']['ru'],
+    ];
+
+    $views[$name] = ['pages.service-segment', ['segment' => $service['slug']]];
+}
+
 foreach (config('energix.locales') as $locale) {
     $prefix = $locale === 'ro' ? '' : $locale.'.';
 

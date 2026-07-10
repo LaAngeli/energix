@@ -465,62 +465,38 @@ function initSegmentRows() {
     });
 }
 
-/* ------------------------------------- consola de segmente (pagina servicii) */
+/* ------------------------------------------ ancorele vechi de pe /servicii */
 
-function initServicesSwitcher() {
-    const root = document.querySelector('[data-seg-switcher]');
+/**
+ * `/servicii#apartamente` -> `/servicii/apartamente`.
+ *
+ * Segmentele erau tab-uri pe o singura pagina. Fragmentul nu ajunge niciodata la
+ * server, deci un 301 e imposibil: singurul loc unde poate fi tradus e clientul.
+ * `replace()`, nu `assign()`, ca butonul „inapoi” sa nu se blocheze intre cele doua.
+ */
+function initLegacySegmentHash() {
+    const root = document.querySelector('[data-segment-hash]');
 
     if (! root) {
         return;
     }
 
-    const tabs = [...root.querySelectorAll('[role="tab"]')];
-    const panels = [...root.querySelectorAll('[role="tabpanel"]')];
-
-    function select(index, { focus = false } = {}) {
-        tabs.forEach((tab, i) => {
-            const active = i === index;
-            tab.setAttribute('aria-selected', String(active));
-            tab.tabIndex = active ? 0 : -1;
-            panels[i].hidden = ! active;
-        });
-
-        if (focus) {
-            tabs[index].focus();
-        }
-    }
-
-    tabs.forEach((tab, i) => {
-        tab.addEventListener('click', () => select(i));
-
-        tab.addEventListener('keydown', (event) => {
-            const delta = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 1, ArrowUp: -1 }[event.key];
-
-            if (! delta) {
-                return;
-            }
-
-            event.preventDefault();
-            select((i + delta + tabs.length) % tabs.length, { focus: true });
-        });
-    });
-
-    /** Ancorele vechi (#apartamente, #case, #industriale) selecteaza tab-ul. */
-    function selectFromHash() {
+    const jump = () => {
         const slug = window.location.hash.replace('#', '');
-        const index = panels.findIndex((panel) => panel.dataset.slug === slug);
 
-        if (index >= 0) {
-            select(index);
+        if (! slug) {
+            return;
         }
-    }
 
-    window.addEventListener('hashchange', selectFromHash);
-    selectFromHash();
+        const card = root.querySelector(`[data-segment-card="${CSS.escape(slug)}"] a[href]`);
 
-    if (! tabs.some((tab) => tab.getAttribute('aria-selected') === 'true')) {
-        select(0);
-    }
+        if (card) {
+            window.location.replace(card.href);
+        }
+    };
+
+    window.addEventListener('hashchange', jump);
+    jump();
 }
 
 /* --------------------------------------------- circuitul formularului */
@@ -662,51 +638,348 @@ function initWorksCounter() {
 }
 
 /**
- * /despre — sigla se energizeaza o data cand intra in cadru; cursorul o reia.
+ * /despre — sigla „Flux”: portarea vectoriala a animatiei livrate de client
+ * („Energix Loop B — Flux”).
  *
- * Fara bucla: in repaus, sigla ramane pur si simplu aprinsa. Durata se citeste
- * din `--nrg-cycle`, deci CSS-ul ramane singura sursa a timpilor.
+ * Formulele sunt copiate identic din sursa (`energix-logo.jsx`, scena InnerB):
+ * bilele de curent curg pe conturul becului, o matura de lumina roteste razele,
+ * doua surge-uri aprind filamentul si arunca scantei, soclul licareste, iar o unda
+ * traverseaza literele.
  *
- * `setTimeout`, nu `animationend`: pe elementul cu doua animatii, evenimentul
- * vine de doua ori, iar in tab-urile de fundal cadrele nu curg deloc.
+ * Ruleaza O SINGURA DATA, 6 secunde, la intrarea in cadru — apoi ingheata.
+ * Sursa e o bucla infinita; oprirea e ceruta explicit de client, iar `DESIGN.md`
+ * interzice oricum miscarea ambientala langa un `<h1>`.
  */
-function initLogoCharge() {
-    const root = document.querySelector('[data-logo-charge]');
+function initLogoFlux() {
+    const root = document.querySelector('[data-logo-flux]');
 
-    if (! root || prefersReducedMotion) {
+    if (! root) {
         return;
     }
 
-    const seconds = parseFloat(getComputedStyle(root).getPropertyValue('--nrg-cycle')) || 5;
-    const cycleMs = seconds * 1000 + 120;
+    const D = 6; // durata unui ciclu complet, ca in sursa
+    const TAU = Math.PI * 2;
+    const GOLD = '#f2d147'; // tokenul de brand, nu auriul #f1c232 al machetei
+    const BRIGHT = '#ffde6e';
+    const HOT = '#fff4c8';
 
-    const charge = () => {
-        // Un ciclu in curs nu se intrerupe: repornirea la mijloc ar sari cadre.
-        if (root.classList.contains('is-charging')) {
-            return;
-        }
+    const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
+    const cyc = (t, d) => ((t % d) + d) % d;
+    const seg = (t, a, b) => clamp01((t - a) / (b - a));
 
-        root.classList.add('is-charging');
-        window.setTimeout(() => root.classList.remove('is-charging'), cycleMs);
+    /** Cocoasa 0→1→0 care incepe la `t0`, ciclica pe perioada `d`. */
+    const bumpAt = (t, t0, dur, d) => {
+        const x = cyc(t - t0, d);
+
+        return x > 0 && x < dur ? Math.sin(Math.PI * (x / dur)) : 0;
     };
 
-    new IntersectionObserver(
-        (entries, observer) => {
-            entries.forEach((entry) => {
-                if (! entry.isIntersecting) {
+    const lerpHex = (a, b, k) => {
+        k = clamp01(k);
+        const pa = parseInt(a.slice(1), 16);
+        const pb = parseInt(b.slice(1), 16);
+        const ch = (sh) => Math.round(((pa >> sh) & 255) + (((pb >> sh) & 255) - ((pa >> sh) & 255)) * k);
+
+        return `rgb(${ch(16)},${ch(8)},${ch(0)})`;
+    };
+
+    const glow = (px, alpha) => `drop-shadow(0 0 ${px.toFixed(1)}px rgba(255,213,74,${alpha.toFixed(2)}))`;
+
+    // ---- geometria conturului becului, pentru pozitionarea bilelor ----
+    const CX = 322;
+    const CY = 178;
+    const R = 90;
+    const GAPX = 31;
+    const NECK_Y0 = 262.5;
+    const NECK_Y1 = 290;
+    const NECK_LEN = NECK_Y1 - NECK_Y0;
+    const ARC_A0 = 110.14;
+    const ARC_SPAN = 320.28;
+    const ARC_LEN = (ARC_SPAN / 360) * TAU * R;
+    const TOT_LEN = ARC_LEN + 2 * NECK_LEN;
+    const L1 = (NECK_LEN / TOT_LEN) * 100;
+    const L2 = 100 - L1;
+
+    /** Punctul de pe contur, la procentul `s` din lungimea traseului. */
+    function bulbPoint(s) {
+        if (s <= L1) {
+            return [CX - GAPX, NECK_Y1 - NECK_LEN * (s / L1)];
+        }
+
+        if (s >= L2) {
+            return [CX + GAPX, NECK_Y0 + NECK_LEN * ((s - L2) / L1)];
+        }
+
+        const th = ((ARC_A0 + ARC_SPAN * ((s - L1) / (L2 - L1))) * Math.PI) / 180;
+
+        return [CX + R * Math.cos(th), CY + R * Math.sin(th)];
+    }
+
+    const JX = 322;
+    const RAYS = [270, 315, 0, 45, 135, 180, 225];
+    const RIN = 120;
+    const ROUT = 157;
+
+    const halo = root.querySelector('[data-flux-halo]');
+    const core = root.querySelector('[data-flux-core]');
+    const bulb = root.querySelector('[data-flux-bulb]');
+    const filament = root.querySelector('[data-flux-filament]');
+    const rays = [...root.querySelectorAll('[data-flux-ray]')];
+    const bars = [...root.querySelectorAll('[data-flux-bar]')];
+    const letters = [...root.querySelectorAll('[data-flux-letter]')];
+    const dot = root.querySelector('[data-flux-dot]');
+
+    const NS = 'http://www.w3.org/2000/svg';
+    const makeCircle = (parent, fill, blur) => {
+        const c = document.createElementNS(NS, 'circle');
+        c.setAttribute('fill', fill);
+        c.setAttribute('opacity', '0');
+        c.style.filter = glow(blur, 0.95);
+        parent.appendChild(c);
+
+        return c;
+    };
+
+    // Cercurile se creeaza o data si se reutilizeaza: 12 bile, 6 scantei.
+    const beadsGroup = root.querySelector('[data-flux-beads]');
+    const sparksGroup = root.querySelector('[data-flux-sparks]');
+    const beadEls = Array.from({ length: 12 }, () => makeCircle(beadsGroup, '#fff3c4', 6));
+    const sparkEls = Array.from({ length: 6 }, () => makeCircle(sparksGroup, '#ffe9a0', 5));
+
+    /**
+     * Literele se aseaza dupa latimile lor REALE, masurate dupa ce fontul s-a
+     * incarcat. Punctul auriu sta deasupra lui „ı”, deci depinde de aceeasi masurare.
+     */
+    function layoutWord() {
+        const widths = letters.map((el) => el.getComputedTextLength());
+        const gap = 5;
+        const total = widths.reduce((a, b) => a + b, 0) + gap * (widths.length - 1);
+        let x = 330 - total / 2;
+
+        letters.forEach((el, i) => {
+            const cx = x + widths[i] / 2;
+            el.setAttribute('x', cx.toFixed(1));
+            el.dataset.cx = cx.toFixed(1);
+            x += widths[i] + gap;
+        });
+
+        if (letters[5]) {
+            dot.setAttribute('cx', letters[5].dataset.cx);
+            dot.setAttribute('cy', '408');
+        }
+    }
+
+    /** Un cadru la momentul `t`: exact formulele scenei B din sursa. */
+    function frame(t) {
+        // trei sinusoide — filamentul „respira” fara sa para un ceas
+        const n = (Math.sin((TAU * 5 * t) / D + 1) + Math.sin((TAU * 9 * t) / D + 2.4) + Math.sin((TAU * 13 * t) / D + 4.1)) / 3;
+        const surge = bumpAt(t, 1.2, 0.6, D) + bumpAt(t, 4.2, 0.6, D);
+
+        const filBright = 0.5 + 0.2 * n + 1.05 * surge;
+        const bloom = 0.2 + 0.07 * n + 0.55 * surge;
+        const bulbBright = 0.22 + 0.35 * surge;
+
+        halo.setAttribute('opacity', (clamp01(bloom) * 0.5).toFixed(3));
+        core.setAttribute('opacity', (clamp01(bloom) * 0.85).toFixed(3));
+
+        bulb.setAttribute('stroke', lerpHex(GOLD, BRIGHT, bulbBright));
+        bulb.style.filter = bulbBright > 0.03 ? glow(10 * bulbBright, 0.8 * bulbBright) : '';
+
+        filament.setAttribute('stroke', lerpHex(GOLD, HOT, Math.min(1, filBright)));
+        filament.style.filter = filBright > 0.03
+            ? glow(9 * Math.min(filBright, 1.7), Math.min(0.95, 0.7 * filBright))
+            : '';
+
+        // matura de lumina peste raze: un tur complet la fiecare 3 secunde
+        const om = (TAU * t) / 3;
+
+        rays.forEach((line, i) => {
+            const a = (RAYS[i] * Math.PI) / 180;
+            let k = 0.5 + 0.5 * Math.cos(a - om);
+            k = k * k * k;
+
+            const rEnd = RIN + (ROUT - RIN) * (1 + 0.15 * k);
+            const br = 0.9 * k;
+            const c = Math.cos(a);
+            const s = Math.sin(a);
+
+            line.setAttribute('x1', (CX + c * RIN).toFixed(1));
+            line.setAttribute('y1', (CY + s * RIN).toFixed(1));
+            line.setAttribute('x2', (CX + c * rEnd).toFixed(1));
+            line.setAttribute('y2', (CY + s * rEnd).toFixed(1));
+            line.setAttribute('stroke', lerpHex(GOLD, '#ffec9e', br));
+            line.style.filter = br > 0.03 ? glow(8 * br, 0.85 * br) : '';
+        });
+
+        // soclul licareste, fiecare bara cu un mic decalaj
+        bars.forEach((line, i) => {
+            let fl = 0;
+            [0, 1.5, 3, 4.5].forEach((L) => {
+                fl += bumpAt(t, L + 0.04 + i * 0.13, 0.45, D);
+            });
+            fl = 0.5 * Math.min(1, fl);
+
+            line.setAttribute('stroke', lerpHex('#ffffff', BRIGHT, fl));
+            line.style.filter = fl > 0.03 ? glow(7 * fl, 0.8 * fl) : '';
+        });
+
+        // bilele de curent: doua trenuri, defazate la jumatate de tur
+        let b = 0;
+
+        [0, 0.5].forEach((ph) => {
+            const s0 = cyc(t / 3 + ph, 1) * 100;
+
+            for (let k = 0; k < 6; k++) {
+                const s = s0 - k * 2.3;
+                const el = beadEls[b++];
+
+                if (s < 0 || s > 100) {
+                    el.setAttribute('opacity', '0');
+
+                    continue;
+                }
+
+                const edge = Math.min(seg(s, 0, 7), 1 - seg(s, 93, 100));
+                const [x, y] = bulbPoint(s);
+
+                el.setAttribute('cx', x.toFixed(1));
+                el.setAttribute('cy', y.toFixed(1));
+                el.setAttribute('r', (6.5 - k * 0.75).toFixed(2));
+                el.setAttribute('opacity', clamp01((1 - k * 0.15) * edge * 0.95).toFixed(3));
+            }
+        });
+
+        // scanteile: doua salve, traiectorie balistica
+        let sp = 0;
+
+        [1.25, 4.25].forEach((ts) => {
+            const life = 0.7;
+            const d = cyc(t - ts, D);
+
+            [[-2.05, 150], [-1.57, 178], [-1.05, 150]].forEach(([an, speed]) => {
+                const el = sparkEls[sp++];
+
+                if (d <= 0 || d >= life) {
+                    el.setAttribute('opacity', '0');
+
                     return;
                 }
 
-                charge();
-                observer.unobserve(entry.target);
+                el.setAttribute('cx', (JX + Math.cos(an) * speed * d).toFixed(1));
+                el.setAttribute('cy', (CY + Math.sin(an) * speed * d + 230 * d * d).toFixed(1));
+                el.setAttribute('r', Math.max(0.5, 4.5 - 3 * (d / life)).toFixed(2));
+                el.setAttribute('opacity', clamp01(1 - d / life).toFixed(3));
             });
-        },
-        { threshold: 0.35 },
-    ).observe(root);
+        });
 
-    if (finePointer) {
-        root.addEventListener('pointerenter', charge);
+        // unda de licarire care traverseaza literele
+        letters.forEach((el, i) => {
+            const k = Math.pow(Math.max(0, Math.sin((TAU * t) / D - i * 0.45)), 6) * 0.55;
+
+            el.setAttribute('transform', `translate(0 ${(-3 * k).toFixed(2)})`);
+            el.style.filter = k > 0.02 ? glow(16 * k, 0.85 * Math.min(1, k)) : '';
+        });
+
+        // punctul de pe „ı” pulseaza pe surge-uri
+        const dk = bumpAt(t, 1.55, 0.65, D) + bumpAt(t, 4.55, 0.65, D);
+
+        dot.setAttribute('opacity', '1');
+        dot.setAttribute('fill', lerpHex(GOLD, '#ffe99a', Math.min(1, dk)));
+        dot.setAttribute('r', (15 * (1 + 0.28 * dk)).toFixed(2));
+        dot.style.filter = dk > 0.02 ? glow(18 * dk, 0.9 * dk) : '';
     }
+
+    let started = false;
+
+    function play() {
+        if (started) {
+            return;
+        }
+
+        started = true;
+
+        // Miscare redusa: starea de repaus, instant. Nicio bucla rAF.
+        if (prefersReducedMotion) {
+            frame(0);
+
+            return;
+        }
+
+        const t0 = performance.now();
+        let raf = requestAnimationFrame(function tick(now) {
+            const t = (now - t0) / 1000;
+
+            if (t >= D) {
+                frame(D); // ultimul cadru = primul; bucla se inchide curat, apoi ingheata
+
+                return;
+            }
+
+            frame(t);
+            raf = requestAnimationFrame(tick);
+        });
+
+        /*
+         | rAF ingheata in tab-urile de fundal. Garantam starea finala chiar daca
+         | vizitatorul a deschis pagina intr-un tab din spate.
+         */
+        setTimeout(() => {
+            cancelAnimationFrame(raf);
+            frame(D);
+        }, D * 1000 + 250);
+    }
+
+    function boot() {
+        /*
+         | Fontul schimba latimile literelor, deci wordmark-ul se aseaza abia dupa ce
+         | fata e incarcata.
+         |
+         | `document.fonts.ready` NU e suficient: se rezolva inainte ca o fata inca
+         | nefolosita sa intre in coada de incarcare, iar `getComputedTextLength()` ar
+         | masura atunci metricile fontului de rezerva. Cerem explicit fata, cu textul
+         | care ne intereseaza — aceeasi capcana ca la verificarea diacriticelor.
+         */
+        const wordmark = document.fonts?.load('600 160px Quicksand', 'energıx') ?? Promise.resolve();
+
+        wordmark.catch(() => {}).then(() => {
+            layoutWord();
+            frame(0);
+
+            const io = new IntersectionObserver(
+                ([entry]) => {
+                    if (! entry.isIntersecting) {
+                        return;
+                    }
+
+                    io.disconnect();
+                    play();
+                },
+                { threshold: 0.35 },
+            );
+
+            io.observe(root);
+        });
+    }
+
+    /*
+     | Sub `lg` sigla e `display: none`, deci nu are ce anima. Fara garda, apelul
+     | `fonts.load()` ar descarca totusi Quicksand (~15 KB) pe fiecare telefon, ca
+     | sa masoare litere invizibile. Pornim doar cand coloana chiar exista.
+     */
+    const desktop = window.matchMedia('(min-width: 64rem)');
+
+    if (desktop.matches) {
+        boot();
+
+        return;
+    }
+
+    desktop.addEventListener('change', function once(event) {
+        if (event.matches) {
+            desktop.removeEventListener('change', once);
+            boot();
+        }
+    });
 }
 
 /** /contacte — starea liniei: deschis ACUM sau cand revenim, plus testul ceremonial. */
@@ -959,10 +1232,10 @@ function boot() {
     initPanel();
     initStages();
     initSegmentRows();
-    initServicesSwitcher();
+    initLegacySegmentHash();
     initCircuitsCalc();
     initWorksCounter();
-    initLogoCharge();
+    initLogoFlux();
     initLineStatus();
     initFormCircuit();
     initArmSwitch();

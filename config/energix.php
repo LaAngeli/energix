@@ -72,11 +72,30 @@ return [
 
     /*
      | Cele trei segmente. Textul lor: lang `site.services.{slug}`.
+     |
+     | Fiecare are PAGINA LUI. Anterior traiau ca trei tab-uri pe `/servicii`, deci
+     | trei intentii comerciale distincte („instalatie electrica apartament”,
+     | „…casa”, „…industriale”) concurau pentru acelasi <title>, acelasi H1 si
+     | acelasi URL. Google nu rankeaza fragmente (`#apartamente`) ca pagini.
+     |
+     | `uri` e segmentul de URL, per limba: /servicii/apartamente, /ru/uslugi/kvartiry.
      */
     'services' => [
-        ['slug' => 'apartamente', 'image' => 'images/content/img1.webp'],
-        ['slug' => 'case', 'image' => 'images/content/img6.webp'],
-        ['slug' => 'industriale', 'image' => 'images/content/img4.webp'],
+        [
+            'slug' => 'apartamente',
+            'image' => 'images/content/img1.webp',
+            'uri' => ['ro' => 'apartamente', 'ru' => 'kvartiry'],
+        ],
+        [
+            'slug' => 'case',
+            'image' => 'images/content/img6.webp',
+            'uri' => ['ro' => 'case', 'ru' => 'doma'],
+        ],
+        [
+            'slug' => 'industriale',
+            'image' => 'images/content/img4.webp',
+            'uri' => ['ro' => 'industriale', 'ru' => 'promyshlennye'],
+        ],
     ],
 
     /*

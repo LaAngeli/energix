@@ -35,6 +35,8 @@
         <x-gallery-grid />
     </section>
 
+    <x-related-segments />
+
     <x-cta-band :title="__('site.gallery_page.cta')" />
 
 @endsection

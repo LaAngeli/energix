@@ -6,8 +6,7 @@
 @foreach ($url['alternates'] as $hreflang => $href)
         <xhtml:link rel="alternate" hreflang="{{ $hreflang }}" href="{{ $href }}"/>
 @endforeach
-        <changefreq>monthly</changefreq>
-        <priority>{{ $url['priority'] }}</priority>
+        <lastmod>{{ $url['lastmod'] }}</lastmod>
     </url>
 @endforeach
 </urlset>

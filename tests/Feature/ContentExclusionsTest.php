@@ -34,6 +34,9 @@ $pages = [
     // română
     '/',
     '/servicii',
+    '/servicii/apartamente',
+    '/servicii/case',
+    '/servicii/industriale',
     '/galerie',
     '/despre',
     '/contacte',
@@ -45,6 +48,9 @@ $pages = [
     // русский
     '/ru',
     '/ru/uslugi',
+    '/ru/uslugi/kvartiry',
+    '/ru/uslugi/doma',
+    '/ru/uslugi/promyshlennye',
     '/ru/raboty',
     '/ru/o-nas',
     '/ru/kontakty',

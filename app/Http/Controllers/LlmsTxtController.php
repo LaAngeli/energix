@@ -24,7 +24,16 @@ use Illuminate\Support\Facades\URL;
 class LlmsTxtController extends Controller
 {
     /** @var list<string> */
-    private const PAGES = ['home', 'services', 'gallery', 'about', 'contact'];
+    private const PAGES = [
+        'home',
+        'services',
+        'services.apartamente',
+        'services.case',
+        'services.industriale',
+        'gallery',
+        'about',
+        'contact',
+    ];
 
     public function __invoke(): Response
     {
@@ -84,7 +93,7 @@ class LlmsTxtController extends Controller
         foreach (config('energix.services') as $service) {
             foreach (['ro', 'ru'] as $locale) {
                 $text = trans("site.services.{$service['slug']}", [], $locale);
-                $url = URL::inLocale($locale, 'services').'#'.$service['slug'];
+                $url = URL::inLocale($locale, "services.{$service['slug']}");
 
                 $items[] = "[{$text['title']}]({$url}): {$text['intro']}";
             }
@@ -110,14 +119,19 @@ class LlmsTxtController extends Controller
         ]);
     }
 
+    /**
+     * Acces direct pe cheie, NU `trans('site.seo.services.apartamente.title')`:
+     * cheia contine un punct, iar `trans()` l-ar lua drept separator de nivel.
+     */
     private function pages(string $locale): string
     {
         $heading = $locale === 'ro' ? 'Pagini (română)' : 'Страницы (русский)';
+        $seo = trans('site.seo', [], $locale);
 
         $items = array_map(
-            static fn (string $page): string => '['.trans("site.seo.{$page}.title", [], $locale).']('
+            static fn (string $page): string => '['.$seo[$page]['title'].']('
                 .URL::inLocale($locale, $page).'): '
-                .trans("site.seo.{$page}.description", [], $locale),
+                .$seo[$page]['description'],
             self::PAGES,
         );
 

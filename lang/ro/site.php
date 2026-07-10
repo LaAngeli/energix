@@ -41,8 +41,8 @@ return [
     'common' => [
         'call_now' => 'Sună acum',
         'get_offer' => 'Cere o ofertă',
-        'details' => 'Detalii complete',
         'see_details' => 'Vezi detaliile',
+        'related_title' => 'Instalații electrice, pe tipuri de spațiu',
         'phone' => 'Telefon',
         'email' => 'Email',
         'schedule' => 'Program',
@@ -76,11 +76,17 @@ return [
 
     /*
      | Cele trei segmente. Fiecare descrie ACELAȘI ciclu complet, adaptat.
+     |
+     | Fiecare are pagina lui (`/servicii/{uri}`), deci are nevoie de text propriu:
+     | `anchor` (textul link-ului către ea — cel mai valoros text de ancoră de pe
+     | site), `body` (corpul paginii) și `faq` (întrebări specifice segmentului,
+     | diferite de cele de pe homepage, ca să nu duplicăm marcajul FAQPage).
      */
     'services' => [
         'apartamente' => [
             'nav' => 'Apartamente',
             'title' => 'Instalații electrice pentru apartamente',
+            'anchor' => 'Instalații electrice pentru apartamente în Chișinău',
             'tagline' => 'Bloc nou sau renovare completă.',
             'intro' => 'Executăm instalația electrică a apartamentului cap-coadă: schema pe circuite, traseele, tabloul, prizele și iluminatul. Un singur responsabil pentru toate etapele, în Chișinău și în toată Moldova.',
             'features' => [
@@ -90,10 +96,26 @@ return [
                 'Prize, întrerupătoare, corpuri de iluminat',
                 'Verificări, măsurători, punere sub tensiune',
             ],
+            'body' => [
+                'Într-un apartament, instalația electrică se face o singură dată — înainte de tencuială. De aceea începem cu schema: câte circuite, ce secțiune de cablu pe fiecare, unde stau dozele și la ce cotă vin prizele. Nimic nu intră în perete până nu știi ce intră și de ce.',
+                'Fiecare consumator mare — plita, boilerul, mașina de spălat, climatizarea — primește circuitul lui, protejat separat în tabloul electric. Așa, un scurtcircuit la mașina de spălat nu stinge lumina din tot apartamentul, iar cablul nu se încălzește niciodată peste ce poate duce.',
+                'Lucrăm în blocuri noi, primite la recepție, și în apartamente aflate în renovare completă, unde instalația veche se scoate integral. Montăm totul de la zero: numai așa putem răspunde pentru fiecare metru de cablu din perete.',
+            ],
+            'faq' => [
+                [
+                    'q' => 'De câte circuite are nevoie un apartament de trei camere?',
+                    'a' => 'Minimum trei — unul de iluminat și două de prize — plus câte un circuit dedicat pentru plită, boiler, mașină de spălat și climatizare. În practică, un apartament de trei camere ajunge la șapte–nouă circuite.',
+                ],
+                [
+                    'q' => 'Ce se întâmplă cu instalația veche din apartament?',
+                    'a' => 'O scoatem integral. Montăm cablu nou, pe trasee noi, cu tablou nou. Nu legăm conductori de cupru noi la conductori vechi de aluminiu — acolo apar, peste zece ani, cele mai multe probleme.',
+                ],
+            ],
         ],
         'case' => [
             'nav' => 'Case',
             'title' => 'Instalații electrice pentru case',
+            'anchor' => 'Instalații electrice pentru case și vile',
             'tagline' => 'De la fundație până la predare.',
             'intro' => 'O casă are branșament, exterior, etaje și consumatori mari. Proiectăm și montăm instalația electrică completă, cu împământare și măsurători la predare.',
             'features' => [
@@ -103,10 +125,26 @@ return [
                 'Consumatori mari: plită, boiler, climatizare',
                 'Împământare, măsurători, predare cu schemă',
             ],
+            'body' => [
+                'O casă nu e un apartament mai mare. Are un branșament propriu, un tablou general și, de obicei, tablouri secundare pe etaje. Are consumatori pe care un apartament nu-i are: pompa din fântână, poarta, centrala, priza din garaj, iluminatul curții.',
+                'Proiectăm instalația pe etaje și separat pentru exterior, cu cablu potrivit pentru montaj îngropat acolo unde iese din casă. Împământarea se execută și se măsoară, nu se presupune: o priză de pământ bună este singura protecție care funcționează atunci când toate celelalte au cedat.',
+                'Intrăm pe șantier când structura e ridicată și pereții sunt încă goi, sau într-o casă aflată în renovare completă. La predare primești schema tabloului, valorile măsurate ale izolației și ale prizei de pământ, plus lista circuitelor.',
+            ],
+            'faq' => [
+                [
+                    'q' => 'Cine face racordul de la branșament la tabloul general?',
+                    'a' => 'Noi executăm traseul de la firida de branșament până la tabloul general al casei, cu secțiunea calculată pentru puterea contractată. Contorul și branșamentul propriu-zis rămân în sarcina furnizorului.',
+                ],
+                [
+                    'q' => 'Instalația exterioară intră în aceeași lucrare?',
+                    'a' => 'Da. Iluminatul curții, priza din garaj, alimentarea porții și a pompei fac parte din același proiect, cu cablu pentru montaj îngropat și cu protecții separate în tablou.',
+                ],
+            ],
         ],
         'industriale' => [
             'nav' => 'Industriale',
             'title' => 'Instalații electrice industriale',
+            'anchor' => 'Instalații electrice industriale și comerciale',
             'tagline' => 'Hale, depozite, spații comerciale.',
             'intro' => 'Distribuția electrică completă a spațiului de lucru: tablouri, trasee de cabluri, alimentarea utilajelor și iluminatul industrial, predate cu documentație.',
             'features' => [
@@ -116,7 +154,34 @@ return [
                 'Iluminat industrial și de spații comerciale',
                 'Măsurători și documentație la predare',
             ],
+            'body' => [
+                'Într-o hală, cablul nu intră în perete: merge pe jgheaburi și poduri de cabluri, la vedere, unde poate fi urmărit și completat. Traseele se gândesc de la început în funcție de unde vor sta utilajele, nu invers.',
+                'Dimensionăm tabloul general și tablourile de forță după puterea instalată și după curentul de pornire al fiecărui utilaj. Circuitele trifazate primesc protecții calculate separat, iar iluminatul halei se proiectează pe nivelul de iluminare cerut de tipul de activitate.',
+                'Executăm instalații electrice noi în hale, depozite, ateliere și spații comerciale în amenajare. La predare primești schema monofilară a tablourilor, buletinele de măsurători și lista circuitelor, etichetate ca oricine să le poată citi.',
+            ],
+            'faq' => [
+                [
+                    'q' => 'Puteți alimenta utilaje trifazate?',
+                    'a' => 'Da. Dimensionăm tabloul de forță și cablurile după puterea și curentul de pornire al fiecărui utilaj, cu protecție proprie pe fiecare. La predare primești schema tabloului și valorile măsurate.',
+                ],
+                [
+                    'q' => 'Cum se planifică lucrarea pe un șantier industrial?',
+                    'a' => 'Stabilim etapele împreună cu tine și cu ceilalți executanți, ca montajul traseelor să nu blocheze restul șantierului. Lucrăm pe spații în amenajare, nu pe instalații deja aflate în exploatare.',
+                ],
+            ],
         ],
+    ],
+
+    /*
+     | Etichetele comune ale paginilor de segment.
+     */
+    'segment_page' => [
+        'includes' => 'Ce include lucrarea',
+        'faq_title' => 'Întrebări despre acest tip de lucrare',
+        'others_title' => 'Celelalte tipuri de instalații',
+        'stages_note' => 'Indiferent de spațiu, executăm aceleași cinci etape.',
+        'stages_link' => 'Vezi cele cinci etape ale unei instalații electrice',
+        'gallery_link' => 'Vezi lucrări de instalații electrice executate',
     ],
 
     'stages' => [
@@ -295,6 +360,9 @@ return [
         'circuit' => 'Circuit',
         'choose' => 'Alege tipul de spațiu',
         'space_type' => 'Tipul de spațiu',
+        'segments_eyebrow' => 'Trei tipuri de spațiu',
+        'segments_title' => 'Fiecare spațiu, cu instalația lui.',
+        'segments_intro' => 'Un apartament, o casă și o hală au aceleași cinci etape, dar altă schemă, alte secțiuni de cablu și alt tablou. Alege spațiul tău.',
         'stages_eyebrow' => 'Execuția',
         'stages_title' => 'Cinci etape, indiferent de spațiu.',
         'process_eyebrow' => 'Cum lucrăm',
@@ -437,6 +505,24 @@ return [
             'title' => 'Servicii instalații electrice în Chișinău | Energix',
             'description' => 'Instalația electrică de la zero: proiectare, cablare, tablou electric, montaj final, verificări. Apartamente, case și spații industriale în toată Moldova.',
         ],
+
+        /*
+         | Cheile conțin un punct. `<x-seo.head>` le citește direct din array,
+         | nu prin `data_get`, tocmai ca punctul să nu fie luat drept separator.
+         */
+        'services.apartamente' => [
+            'title' => 'Instalație electrică apartament Chișinău | Energix',
+            'description' => 'Instalație electrică completă pentru apartament: schemă pe circuite, cablare, tablou electric, prize, verificări. Preț fix și garanție, în Chișinău.',
+        ],
+        'services.case' => [
+            'title' => 'Instalații electrice pentru case | Energix',
+            'description' => 'Instalația electrică a casei, de la branșament la ultima priză: proiect pe etaje, cablare interioară și exterioară, împământare, măsurători la predare.',
+        ],
+        'services.industriale' => [
+            'title' => 'Instalații electrice industriale Chișinău | Energix',
+            'description' => 'Distribuție electrică pentru hale, depozite și spații comerciale: tablouri de forță, poduri de cabluri, alimentarea utilajelor, documentație la predare.',
+        ],
+
         'gallery' => [
             'title' => 'Lucrări de instalații electrice | Energix',
             'description' => 'Tipurile de lucrări pe care le executăm: instalații electrice complete pentru apartamente, case și spații industriale, în Chișinău și toată Moldova.',

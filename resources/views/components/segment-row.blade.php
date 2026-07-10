@@ -34,11 +34,16 @@
                             </li>
                         @endforeach
                     </ul>
+                    {{--
+                    | Textul ancorei descrie pagina-țintă, nu acțiunea. „Detalii complete”
+                    | era cel mai valoros link intern de pe site și nu spunea nimic despre
+                    | nimic — nici lui Google, nici unui cititor de ecran.
+                    --}}
                     <a
-                        href="{{ URL::localized('services') }}#{{ $service['slug'] }}"
+                        href="{{ URL::localized("services.{$service['slug']}") }}"
                         class="mt-6 inline-flex items-center gap-2 font-mono text-sm tracking-wider text-gold uppercase transition hover:brightness-110"
                     >
-                        {{ __('site.common.details') }}
+                        {{ $t['anchor'] }}
                         <span aria-hidden="true">&rarr;</span>
                     </a>
                 </div>

@@ -89,6 +89,18 @@ export default defineConfig({
                     weights: [500],
                     preload: false,
                 }),
+                /*
+                 | Doar pentru wordmark-ul din sigla animata de pe /despre. E fontul
+                 | pe care il foloseste chiar sursa animatiei livrate de client.
+                 | Se descarca doar unde e folosit (~15 KB, subsetul latin), adica
+                 | pe /despre pe desktop — pe mobil sigla nu se randeaza deloc.
+                 */
+                bunny('Quicksand', {
+                    alias: 'quicksand',
+                    variable: '--font-quicksand',
+                    weights: [600],
+                    preload: false,
+                }),
             ],
         }),
         tailwindcss(),

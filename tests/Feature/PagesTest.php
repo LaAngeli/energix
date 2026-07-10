@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * Smoke test pentru cele opt pagini publice HTML.
+ * Smoke test pentru cele unsprezece pagini publice HTML (× 2 limbi).
  *
  * DECIZIE Vite (capcana a): folosim `withoutVite()` in beforeEach. Directiva
  * `@vite(...)` din layout arunca `ViteException` (=> 500) daca manifestul de build
@@ -34,6 +34,9 @@ it('raspunde 200, e HTML si expune telefonul la un tap', function (string $path)
     // română
     'home' => ['/'],
     'servicii' => ['/servicii'],
+    'servicii/apartamente' => ['/servicii/apartamente'],
+    'servicii/case' => ['/servicii/case'],
+    'servicii/industriale' => ['/servicii/industriale'],
     'galerie' => ['/galerie'],
     'despre' => ['/despre'],
     'contacte' => ['/contacte'],
@@ -44,6 +47,9 @@ it('raspunde 200, e HTML si expune telefonul la un tap', function (string $path)
     // русский
     'ru home' => ['/ru'],
     'ru uslugi' => ['/ru/uslugi'],
+    'ru uslugi/kvartiry' => ['/ru/uslugi/kvartiry'],
+    'ru uslugi/doma' => ['/ru/uslugi/doma'],
+    'ru uslugi/promyshlennye' => ['/ru/uslugi/promyshlennye'],
     'ru raboty' => ['/ru/raboty'],
     'ru o-nas' => ['/ru/o-nas'],
     'ru kontakty' => ['/ru/kontakty'],
@@ -60,7 +66,12 @@ it('nu randeaza chei de traducere brute', function (string $path): void {
     $html = $this->get($path)->assertOk()->getContent();
 
     expect($html)->not->toMatch('/>\s*site\.[a-z_.]+\s*</');
-})->with(['/', '/servicii', '/galerie', '/despre', '/contacte', '/ru', '/ru/uslugi', '/ru/raboty', '/ru/o-nas', '/ru/kontakty']);
+})->with([
+    '/', '/servicii', '/servicii/apartamente', '/servicii/case', '/servicii/industriale',
+    '/galerie', '/despre', '/contacte',
+    '/ru', '/ru/uslugi', '/ru/uslugi/kvartiry', '/ru/uslugi/doma', '/ru/uslugi/promyshlennye',
+    '/ru/raboty', '/ru/o-nas', '/ru/kontakty',
+]);
 
 it('comuta limba catre pagina sora, nu catre homepage', function (): void {
     $this->get('/servicii')->assertOk()->assertSee(url('/ru/uslugi'), escape: false);

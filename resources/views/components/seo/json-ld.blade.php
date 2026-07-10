@@ -56,7 +56,7 @@
             array_column(config('energix.social'), 'url'),
             fn (string $url): bool => str_starts_with($url, 'https://'),
         )),
-        // Cele trei segmente, ca oferta structurata.
+        // Cele trei segmente, ca oferta structurata. Fiecare arata spre pagina lui.
         'hasOfferCatalog' => [
             '@type' => 'OfferCatalog',
             'name' => trans('site.home.services_title'),
@@ -65,8 +65,10 @@
                     '@type' => 'Offer',
                     'itemOffered' => [
                         '@type' => 'Service',
+                        '@id' => URL::localized("services.{$service['slug']}").'#service',
                         'name' => trans("site.services.{$service['slug']}.title"),
                         'description' => trans("site.services.{$service['slug']}.intro"),
+                        'url' => URL::localized("services.{$service['slug']}"),
                         'areaServed' => trans('site.common.area_served'),
                     ],
                 ],
@@ -98,15 +100,70 @@
         ];
     }
 
+    /*
+     | Paginile de segment (`services.apartamente` …) declara serviciul cu URL-ul
+     | LUI, legat de firma prin `@id`. Fara `url`, cele trei Service-uri din
+     | `hasOfferCatalog` erau entitati fara adresa: Google nu avea unde sa le trimita.
+     */
+    if (str_starts_with($page, 'services.')) {
+        $slug = substr($page, strlen('services.'));
+
+        $graph[] = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Service',
+            '@id' => URL::localized($page).'#service',
+            'name' => trans("site.services.{$slug}.title"),
+            'description' => trans("site.services.{$slug}.intro"),
+            'url' => URL::localized($page),
+            'serviceType' => trans("site.services.{$slug}.title"),
+            'areaServed' => array_map(
+                fn (string $city): array => ['@type' => 'City', 'name' => $city],
+                config('energix.areas.cities'),
+            ),
+            'provider' => ['@id' => $base.'/#business'],
+            'inLanguage' => $locale,
+        ];
+
+        /*
+         | Intrebarile de pe pagina de segment, marcate FAQPage. Sunt DIFERITE de
+         | cele de pe homepage: acelasi Q&A marcat pe doua URL-uri e continut
+         | duplicat in ochii lui Google, iar el alege singur pe care sa-l ignore.
+         */
+        $graph[] = [
+            '@context' => 'https://schema.org',
+            '@type' => 'FAQPage',
+            'inLanguage' => $locale,
+            'mainEntity' => array_map(
+                fn (array $item): array => [
+                    '@type' => 'Question',
+                    'name' => $item['q'],
+                    'acceptedAnswer' => ['@type' => 'Answer', 'text' => $item['a']],
+                ],
+                trans("site.services.{$slug}.faq"),
+            ),
+        ];
+    }
+
     // Firimituri: doar pe paginile interioare — homepage-ul e radacina.
     if ($page !== 'home' && $page !== '404') {
+        $crumbs = [
+            ['@type' => 'ListItem', 'position' => 1, 'name' => trans('site.nav.home'), 'item' => URL::localized('home')],
+        ];
+
+        // Segmentele stau sub /servicii, deci firimitura are trei niveluri, nu doua.
+        if (str_starts_with($page, 'services.')) {
+            $slug = substr($page, strlen('services.'));
+
+            $crumbs[] = ['@type' => 'ListItem', 'position' => 2, 'name' => trans('site.nav.services'), 'item' => URL::localized('services')];
+            $crumbs[] = ['@type' => 'ListItem', 'position' => 3, 'name' => trans("site.services.{$slug}.title")];
+        } else {
+            $crumbs[] = ['@type' => 'ListItem', 'position' => 2, 'name' => trans('site.seo')[$page]['title']];
+        }
+
         $graph[] = [
             '@context' => 'https://schema.org',
             '@type' => 'BreadcrumbList',
-            'itemListElement' => [
-                ['@type' => 'ListItem', 'position' => 1, 'name' => trans('site.nav.home'), 'item' => URL::localized('home')],
-                ['@type' => 'ListItem', 'position' => 2, 'name' => trans("site.seo")[$page]['title']],
-            ],
+            'itemListElement' => $crumbs,
         ];
     }
 @endphp

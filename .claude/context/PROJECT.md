@@ -51,6 +51,9 @@ Servit de Herd la `https://energix.test` (vezi `APP_URL`). Nu porni `php artisan
 |---|---|---|
 | `/` | `/ru` | `index.html` |
 | `/servicii` | `/ru/uslugi` | `services.html` |
+| `/servicii/apartamente` | `/ru/uslugi/kvartiry` | — |
+| `/servicii/case` | `/ru/uslugi/doma` | — |
+| `/servicii/industriale` | `/ru/uslugi/promyshlennye` | — |
 | `/galerie` | `/ru/raboty` | `galery.html` |
 | `/despre` | `/ru/o-nas` | `about.html` |
 | `/contacte` | `/ru/kontakty` | `contacts.html` |
@@ -67,6 +70,10 @@ Notă: vechiul URL era `galery.html` (typo). Redirect 301 din `/galery.html`.
 - **Rutele** sunt înregistrate de două ori: `services` (RO) și `ru.services` (RU).
   Vederile nu știu asta — folosesc `URL::localized('services')`, un macro definit în
   `AppServiceProvider`. Pentru cealaltă limbă: `URL::inLocale('ru', 'services')`.
+- Cele trei segmente au rute generate din `config('energix.services')`, cu nume care
+  conțin un punct: `services.apartamente`, `ru.services.case`. **Cheile cu punct se
+  citesc cu acces direct pe array**, nu cu `data_get()` / `trans('a.b.c')` — punctul
+  ar fi luat drept separator de nivel. Aceeași capcană ca la `legal.terms`.
 - **Limba NU se ghicește din `Accept-Language`.** Fiecare limbă are URL-ul ei, iar o
   redirectare automată ar sparge indexarea: Googlebot crawlează cu un singur set de headere.
 - `canonical`, `hreflang` și `sitemap.xml` se generează toate din tabela de rute, deci

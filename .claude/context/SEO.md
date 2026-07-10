@@ -39,6 +39,30 @@ Două goluri exploatabile:
 `reparații electrice`, `electrician urgent`, `ремонт электрики`, `аварийный электрик`.
 Sunt cuvintele concurenței, dar contrazic modelul de business. Vezi `BUSINESS.md`.
 
+## Arhitectura de conținut: o pagină pe intenție
+
+Decis 2026-07-10, după auditul al doilea. Cele trei segmente trăiau ca **tab-uri** pe
+`/servicii`: un singur `<title>`, un singur `<h1>`, un singur URL pentru trei intenții
+comerciale distincte. **Google nu rankează fragmente** (`#apartamente`) ca pagini.
+
+Acum:
+
+| Pagină | Rol |
+|---|---|
+| `/servicii` | pilon — trimite mai departe, nu ține conținutul |
+| `/servicii/apartamente` · `/case` · `/industriale` | câte o intenție, ~500 cuvinte fiecare |
+
+Fiecare segment are `<title>`, `<h1>`, `description`, `Service` cu `url` propriu,
+firimituri pe trei niveluri și **FAQ propriu** — diferit de cel de pe homepage, fiindcă
+același Q&A marcat `FAQPage` pe două URL-uri e conținut duplicat.
+
+Ancorele vechi `#apartamente` nu pot fi redirectate 301 (fragmentul nu ajunge la server).
+`initLegacySegmentHash()` le traduce pe client, cu `location.replace`.
+
+⚠️ **Textul ancorei e semnal de ranking.** Link-ul către fiecare segment scrie
+„Instalații electrice pentru apartamente în Chișinău", nu „Detalii complete →".
+`SeoTest` interzice explicit șirul „Detalii complete".
+
 ## SEO — ce s-a făcut
 
 - `<title>` ≤ 60 caractere, `description` ≤ 158, **unice pe fiecare pagină și limbă**
@@ -48,7 +72,13 @@ Sunt cuvintele concurenței, dar contrazic modelul de business. Vezi `BUSINESS.m
 - `alt` descriptiv pe imaginile de conținut, cu localitatea. Imaginile decorative rămân
   `alt=""` + `aria-hidden` — corect, nu o omisiune.
 - Canonical, `hreflang` (`ro-MD`, `ru-MD`, `x-default` → RO) și sitemap generate din
-  **aceeași** tabelă de rute. Sitemap cu `xhtml:link` per URL.
+  **aceeași** tabelă de rute. Sitemap cu `xhtml:link` per URL, 22 de URL-uri.
+- **`lastmod` din mtime-ul surselor** (vederea + fișierul de limbă), niciodată `now()`:
+  o dată care se schimbă la fiecare cerere e o minciună, iar Google, odată ce o prinde,
+  ignoră `lastmod` pe tot site-ul. `rsync -a` păstrează mtime-urile la deploy.
+- **`changefreq` și `priority` au fost scoase.** Google le ignoră declarat de ani buni.
+- Legături contextuale în corpul paginilor (`<x-related-segments>`), nu doar navbar și
+  footer — acelea apar identic pe fiecare pagină, deci nu spun nimic despre relații.
 - 404: fără canonical, cu `noindex, follow`.
 - Redirect-uri 301 de la vechile `.html`.
 - **Open Graph complet**: cartonaș social 1200×630 PNG **pe fiecare limbă**, cu
@@ -93,15 +123,35 @@ autonome**. De aceea:
   în schema.
 - `BreadcrumbList` pe paginile interioare.
 
-## Ce rămâne de făcut (nu s-a putut de aici)
+## Ce rămâne de făcut
 
-1. **Conectează Ahrefs / Search Console.** Fără ele nu avem volume, poziții, nici date
-   despre ce aduce trafic. E prima investiție.
-2. **Google Business Profile** — pentru un business local e adesea mai important decât
-   site-ul. Nu se poate face din cod.
-3. **Fotografii reale**, cu `alt` descriptiv. Galeria stock e un pasiv, nu un activ.
-4. **Recenzii** — `AggregateRating` în JSON-LD e permis doar dacă sunt reale și vizibile
+### În cod (se poate face de aici)
+
+1. 🔴 **`www` → non-`www` și `http` → `https` nu se forțează nicăieri.** `public/.htaccess`
+   nu are regulile, deși `DEPLOY-HOSTINGER.md` cere păstrarea lor de pe site-ul vechi.
+   Dacă `https://www.energix.md/` răspunde 200, avem două site-uri identice care își
+   împart semnalele. Canonical atenuează, nu înlocuiește un 301. **De verificat pe server
+   ce face Hostinger implicit, apoi de completat `.htaccess`.**
+2. **Nume de fișiere de imagine**: `img1.webp`, `img5_flipped.webp`. `alt`-urile sunt
+   deja descriptive; numele nu. Se redenumesc odată cu fotografiile reale.
+
+### Blocate pe date de la client
+
+3. **Conectează Ahrefs / Search Console.** Fără ele nu avem volume, poziții, nici date
+   despre ce aduce trafic. E prima investiție — fără ea nu putem măsura dacă separarea
+   paginilor de servicii a funcționat.
+4. **Google Business Profile** — pentru un business local apare deasupra rezultatelor
+   organice și aduce, de regulă, mai multe apeluri decât site-ul. Nu se poate face din cod.
+5. **`streetAddress`, `geo`, `priceRange` în JSON-LD.** Lipsesc pentru că nu avem adresa
+   și coordonatele. **Nu se inventează.** Schema declară doar `addressLocality: Chișinău`.
+6. **Fotografii reale**, cu `alt` descriptiv. Galeria stock e un pasiv, nu un activ.
+7. **Recenzii** — `AggregateRating` în JSON-LD e permis doar dacă sunt reale și vizibile
    pe site. Nu inventa.
-5. **Handle vanity de Facebook** (acum e `profile.php?id=…`) — semnal `sameAs` mai curat.
-6. Un blog / ghiduri (`Câte circuite are nevoie o bucătărie`, `Ce secțiune de cablu`)
-   ar acoperi long-tail-ul informațional. Efort mare, câștig pe termen lung.
+8. **Handle vanity de Facebook** (acum e `profile.php?id=…`) — semnal `sameAs` mai curat.
+
+### Deliberat amânate
+
+9. **Pagini pe localități** („instalații electrice Bălți"). Dacă textul e același cu numele
+   orașului schimbat, sunt *doorway pages* — tratate ca spam. Merită doar cu lucrări reale
+   și conținut propriu. Până atunci, secțiunea „Unde lucrăm" de pe homepage e răspunsul.
+10. **Blog / ghiduri.** Prematur: fără Search Console am scrie la nimereală. Întâi datele.

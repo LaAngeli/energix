@@ -17,6 +17,9 @@ it('serveste titlul propriu pe fiecare pagina', function (string $path, string $
     // română
     ['/', 'Instalații electrice Chișinău — montaj complet | Energix'],
     ['/servicii', 'Servicii instalații electrice în Chișinău | Energix'],
+    ['/servicii/apartamente', 'Instalație electrică apartament Chișinău | Energix'],
+    ['/servicii/case', 'Instalații electrice pentru case | Energix'],
+    ['/servicii/industriale', 'Instalații electrice industriale Chișinău | Energix'],
     ['/galerie', 'Lucrări de instalații electrice | Energix'],
     ['/despre', 'Despre Energix — 10 ani de instalații electrice'],
     ['/contacte', 'Contact — cere ofertă instalații electrice | Energix'],
@@ -25,6 +28,9 @@ it('serveste titlul propriu pe fiecare pagina', function (string $path, string $
     // русский
     ['/ru', 'Электромонтажные работы в Кишинёве | Energix'],
     ['/ru/uslugi', 'Услуги: электромонтаж под ключ в Кишинёве | Energix'],
+    ['/ru/uslugi/kvartiry', 'Электромонтаж квартиры в Кишинёве | Energix'],
+    ['/ru/uslugi/doma', 'Электромонтаж дома под ключ | Energix'],
+    ['/ru/uslugi/promyshlennye', 'Промышленный электромонтаж в Кишинёве | Energix'],
     ['/ru/raboty', 'Работы по электромонтажу | Energix'],
     ['/ru/o-nas', 'О нас — 10 лет электромонтажа в Кишинёве | Energix'],
     ['/ru/kontakty', 'Контакты — заказать электромонтаж | Energix'],
@@ -42,8 +48,10 @@ it('are titluri sub 60 de caractere si descrieri sub 158', function (string $loc
 
 it('are descrieri unice pe fiecare pagina, in fiecare limba', function (): void {
     $paths = [
-        '/', '/servicii', '/galerie', '/despre', '/contacte',
-        '/ru', '/ru/uslugi', '/ru/raboty', '/ru/o-nas', '/ru/kontakty',
+        '/', '/servicii', '/servicii/apartamente', '/servicii/case', '/servicii/industriale',
+        '/galerie', '/despre', '/contacte',
+        '/ru', '/ru/uslugi', '/ru/uslugi/kvartiry', '/ru/uslugi/doma', '/ru/uslugi/promyshlennye',
+        '/ru/raboty', '/ru/o-nas', '/ru/kontakty',
     ];
 
     $descriptions = [];

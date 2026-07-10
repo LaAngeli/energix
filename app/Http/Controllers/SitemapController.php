@@ -19,30 +19,36 @@ use Illuminate\Support\Facades\URL;
  */
 class SitemapController extends Controller
 {
+    private const HREFLANG = ['ro' => 'ro-MD', 'ru' => 'ru-MD'];
+
     /**
-     * Ruta => prioritate.
+     * Ruta => vederea care o randeaza. Ordinea da si ordinea din sitemap.
+     *
+     * `changefreq` si `priority` au disparut: Google le ignora declarat de ani buni,
+     * iar `priority` sugereaza o ierarhie pe care crawler-ul nu o citeste.
      *
      * @var array<string, string>
      */
     private const PAGES = [
-        'home' => '1.0',
-        'services' => '0.9',
-        'contact' => '0.9',
-        'gallery' => '0.7',
-        'about' => '0.7',
-        'legal.terms' => '0.1',
-        'legal.privacy' => '0.1',
-        'legal.cookies' => '0.1',
+        'home' => 'pages/home.blade.php',
+        'services' => 'pages/services.blade.php',
+        'services.apartamente' => 'pages/service-segment.blade.php',
+        'services.case' => 'pages/service-segment.blade.php',
+        'services.industriale' => 'pages/service-segment.blade.php',
+        'contact' => 'pages/contact.blade.php',
+        'gallery' => 'pages/gallery.blade.php',
+        'about' => 'pages/about.blade.php',
+        'legal.terms' => 'pages/legal/page.blade.php',
+        'legal.privacy' => 'pages/legal/page.blade.php',
+        'legal.cookies' => 'pages/legal/page.blade.php',
     ];
-
-    private const HREFLANG = ['ro' => 'ro-MD', 'ru' => 'ru-MD'];
 
     public function __invoke(): Response
     {
         $urls = [];
 
         foreach (config('energix.locales') as $locale) {
-            foreach (self::PAGES as $name => $priority) {
+            foreach (self::PAGES as $name => $view) {
                 $alternates = [];
 
                 foreach (config('energix.locales') as $alt) {
@@ -53,7 +59,7 @@ class SitemapController extends Controller
 
                 $urls[] = [
                     'loc' => URL::inLocale($locale, $name),
-                    'priority' => $priority,
+                    'lastmod' => $this->lastModified($view, $locale),
                     'alternates' => $alternates,
                 ];
             }
@@ -62,5 +68,24 @@ class SitemapController extends Controller
         return response()
             ->view('sitemap', ['urls' => $urls])
             ->header('Content-Type', 'application/xml');
+    }
+
+    /**
+     * Cand s-a schimbat ultima data continutul acestei pagini, in aceasta limba.
+     *
+     * Sursa e mtime-ul fisierelor din care se compune pagina — vederea ei si
+     * fisierul de limba. NU `now()`: o data care se schimba la fiecare cerere e
+     * o minciuna, iar Google, odata ce o prinde, ignora `lastmod` pe tot site-ul.
+     *
+     * `rsync -a` pastreaza mtime-urile la deploy, deci valoarea supravietuieste.
+     */
+    private function lastModified(string $view, string $locale): string
+    {
+        $times = array_filter([
+            @filemtime(resource_path('views/'.$view)),
+            @filemtime(lang_path($locale.'/site.php')),
+        ]);
+
+        return date(DATE_ATOM, $times === [] ? time() : max($times));
     }
 }
