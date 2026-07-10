@@ -23,16 +23,29 @@
                 </p>
             </div>
 
-            <div class="grid gap-x-10 gap-y-8 pt-4 md:grid-cols-3">
-                <div>
-                    <h2 class="eyebrow">{{ __('site.common.object') }}</h2>
-                    <p class="mt-3 text-sm text-paper-dim">{{ __('site.about_page.lead') }}</p>
-                    <x-social-links class="mt-5" />
-                </div>
+            {{--
+            | Trei campuri de spec-plate, echilibrate. Paragraful „Obiect” a iesit:
+            | era lead-ul de pe /despre, repetat pe fiecare pagina (continut duplicat
+            | site-wide) si dezechilibra coloanele. In loc — navigare functionala.
+            | Iconitele sociale stau langa contact, fiindca SUNT canale de contact.
+            --}}
+            <div class="grid gap-x-10 gap-y-9 pt-4 sm:grid-cols-2 lg:grid-cols-3">
+                <nav aria-label="{{ __('site.common.sitemap') }}">
+                    <h2 class="eyebrow">{{ __('site.common.sitemap') }}</h2>
+                    <ul class="mt-4 space-y-2.5 text-sm">
+                        @foreach (['home', 'services', 'gallery', 'about', 'contact'] as $route)
+                            <li>
+                                <a href="{{ URL::localized($route) }}" class="text-paper-dim transition-colors hover:text-gold">
+                                    {{ __('site.nav.'.$route) }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </nav>
 
                 <div>
                     <h2 class="eyebrow">{{ __('site.nav.contact') }}</h2>
-                    <ul class="mt-3 space-y-2.5">
+                    <ul class="mt-4 space-y-2.5">
                         <li>
                             <a href="tel:{{ $contact['phone_href'] }}" class="readout text-lg text-gold transition hover:brightness-110">
                                 {{ $contact['phone'] }}
@@ -45,19 +58,22 @@
                         </li>
                         <li class="text-sm text-paper-dim">{{ __('site.common.area_served') }}</li>
                     </ul>
+
+                    <p class="mt-6 mb-3 eyebrow">{{ __('site.common.find_us') }}</p>
+                    <x-social-links />
                 </div>
 
-                <div>
+                <div class="sm:col-span-2 lg:col-span-1">
                     <h2 class="eyebrow">{{ __('site.common.schedule') }}</h2>
-                    <ul class="mt-3 space-y-1.5 text-sm">
+                    <ul class="mt-4 space-y-1.5 text-sm">
                         @foreach (__('site.hours') as $slot)
-                            <li class="flex justify-between gap-4">
+                            <li class="flex justify-between gap-6">
                                 <span class="text-paper-dim">{{ $slot['days'] }}</span>
                                 <span class="readout text-paper">{{ $slot['time'] }}</span>
                             </li>
                         @endforeach
                     </ul>
-                    <p class="mt-3 text-xs text-paper-dim">{{ __('site.common.response_time') }}</p>
+                    <p class="mt-4 border-t border-line pt-3 text-xs text-paper-dim">{{ __('site.common.response_time') }}</p>
                 </div>
             </div>
         </div>

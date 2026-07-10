@@ -54,6 +54,7 @@ return [
         'emergency_free' => 'Evaluare gratuită',
         'find_us' => 'Ne găsești și pe',
         'legal' => 'Pagini legale',
+        'sitemap' => 'Navigare',
         'rights' => 'Toate drepturile rezervate.',
         'legal_terms' => 'Termeni și condiții',
         'legal_privacy' => 'Confidențialitate',
