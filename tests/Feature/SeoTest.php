@@ -25,6 +25,78 @@ it('declara ElectricalContractor, nu Electrician', function (): void {
         ->and($html)->not->toContain('"@type":"Electrician"');
 });
 
+it('emite JSON-LD valid, fara noduri neparsabile', function (string $path, int $status): void {
+    $html = $this->get($path)->assertStatus($status)->getContent();
+
+    preg_match_all('#<script type="application/ld\+json">(.*?)</script>#s', $html, $blocks);
+
+    expect($blocks[1])->not->toBeEmpty();
+
+    foreach ($blocks[1] as $json) {
+        expect(json_decode($json, true))->toBeArray("JSON-LD invalid pe {$path}");
+    }
+})->with([
+    ['/', 200],
+    ['/servicii', 200],
+    ['/servicii/apartamente', 200],
+    ['/despre', 200],
+    ['/ru/uslugi/doma', 200],
+    // 404 randeaza tot layout-ul, deci si nodul de business — trebuie sa ramana valid.
+    ['/inexistent', 404],
+]);
+
+it('nu declara valori in conflict pe acelasi @id', function (string $path): void {
+    /*
+     | Regresie: `Service`-ul aparea si in `hasOfferCatalog`, si ca nod de sine
+     | statator, cu ACELASI `@id` dar cu `areaServed` de tipuri diferite (text vs
+     | lista de City). Nodurile cu acelasi `@id` se contopesc in ochii lui Google,
+     | iar doua valori pe aceeasi proprietate a aceleiasi entitati e un conflict.
+     */
+    $html = $this->get($path)->assertOk()->getContent();
+
+    preg_match_all('#<script type="application/ld\+json">(.*?)</script>#s', $html, $blocks);
+
+    // Aduna toate nodurile complete (mai mult decat o simpla referinta `{@id}`), grupate pe @id.
+    $byId = [];
+    $walk = function (mixed $node) use (&$walk, &$byId): void {
+        if (! is_array($node)) {
+            return;
+        }
+
+        if (isset($node['@id']) && count($node) > 1) {
+            $byId[$node['@id']][] = $node;
+        }
+
+        foreach ($node as $value) {
+            $walk($value);
+        }
+    };
+
+    foreach ($blocks[1] as $json) {
+        $walk(json_decode($json, true));
+    }
+
+    foreach ($byId as $id => $nodes) {
+        $keys = array_unique(array_merge(...array_map('array_keys', $nodes)));
+
+        foreach ($keys as $key) {
+            if ($key === '@id' || $key === '@context') {
+                continue;
+            }
+
+            $values = [];
+
+            foreach ($nodes as $node) {
+                if (isset($node[$key])) {
+                    $values[json_encode($node[$key])] = true;
+                }
+            }
+
+            expect(count($values))->toBeLessThanOrEqual(1, "Conflict pe `{$key}` la {$id} ({$path})");
+        }
+    }
+})->with(['/', '/servicii/apartamente', '/servicii/case', '/ru/uslugi/promyshlennye']);
+
 it('publica FAQPage pe homepage, in ambele limbi', function (string $path, string $question): void {
     $html = $this->get($path)->assertOk()->getContent();
 

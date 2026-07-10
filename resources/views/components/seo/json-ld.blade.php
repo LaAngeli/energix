@@ -56,7 +56,16 @@
             array_column(config('energix.social'), 'url'),
             fn (string $url): bool => str_starts_with($url, 'https://'),
         )),
-        // Cele trei segmente, ca oferta structurata. Fiecare arata spre pagina lui.
+        /*
+         | Cele trei segmente, ca oferta structurata. Fiecare `itemOffered` e ACEEASI
+         | entitate ca `Service`-ul complet de pe pagina de segment: acelasi `@id`.
+         |
+         | De aceea aici NU repetam `areaServed`. Nodurile cu acelasi `@id` se contopesc
+         | in ochii consumatorului (Google), iar `areaServed` difera intre ele — text aici,
+         | lista de `City` pe nodul canonic. Doua valori pe aceeasi proprietate a aceleiasi
+         | entitati = conflict. `areaServed` traieste o singura data, pe nodul canonic;
+         | `name`/`description`/`url` sunt identice, deci se contopesc curat.
+         */
         'hasOfferCatalog' => [
             '@type' => 'OfferCatalog',
             'name' => trans('site.home.services_title'),
@@ -69,7 +78,6 @@
                         'name' => trans("site.services.{$service['slug']}.title"),
                         'description' => trans("site.services.{$service['slug']}.intro"),
                         'url' => URL::localized("services.{$service['slug']}"),
-                        'areaServed' => trans('site.common.area_served'),
                     ],
                 ],
                 config('energix.services'),
