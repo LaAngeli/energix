@@ -6,7 +6,8 @@
         <div class="absolute top-11 bottom-0 left-[1.375rem] w-px bg-line" aria-hidden="true"></div>
     @endunless
 
-    <div class="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-sm border border-line bg-ink-raised">
+    {{-- `step-tile`: comutatorul de proces de pe /servicii incalzeste tile-ul pasului selectat. --}}
+    <div class="step-tile relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-sm border border-line bg-ink-raised">
         <span class="readout text-sm text-gold">{{ str_pad((string) $index, 2, '0', STR_PAD_LEFT) }}</span>
     </div>
 

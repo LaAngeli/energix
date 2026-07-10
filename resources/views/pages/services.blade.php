@@ -107,15 +107,16 @@
             />
 
             <div class="mt-12 grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
-                <ol>
+                {{-- `data-process-list`: comutatorul de alături țintește pașii de aici. --}}
+                <ol data-process-list>
                     @foreach (__('site.process') as $i => $step)
                         <x-process-step :step="$step" :index="$i + 1" :last="$loop->last" />
                     @endforeach
                 </ol>
 
-                {{-- Ilustrația trăiește doar unde există golul: coloana din dreapta pe lg+. --}}
+                {{-- Aparatul trăiește doar unde există golul: coloana din dreapta pe lg+. --}}
                 <div class="hidden lg:block" data-reveal>
-                    <x-process-flow />
+                    <x-process-switch />
                 </div>
             </div>
         </div>
