@@ -103,6 +103,13 @@
             <li><strong class="font-normal text-paper">opoziție</strong> — să nu mai folosim datele într-un anumit scop.</li>
         </ul>
 
+        <p class="mt-4 text-paper-dim">
+            Dacă îți refuzăm o cerere sau nu ești mulțumit de răspunsul nostru, ai dreptul să
+            depui o plângere la <strong class="font-normal text-paper">Centrul Național pentru
+            Protecția Datelor cu Caracter Personal</strong> — str. Serghei Lazo 48, Chișinău,
+            <a href="mailto:centru@datepersonale.md" class="text-gold underline-offset-4 hover:underline">centru@datepersonale.md</a>.
+        </p>
+
         {{-- ---------------------------------------------------------------- --}}
         <h2 class="text-h3 text-paper mt-12">Cum îți exerciți drepturile</h2>
         <p class="mt-4 text-paper-dim">

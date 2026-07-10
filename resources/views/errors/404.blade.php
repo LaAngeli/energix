@@ -1,4 +1,4 @@
-@php($page = 'home')
+@php($page = '404')
 @extends('layouts.app')
 
 @section('content')

@@ -9,9 +9,15 @@
     data-cookie-banner
     data-gtm-id="{{ config('energix.gtm_id') }}"
     hidden
+    tabindex="-1"
     role="dialog"
     aria-labelledby="cookie-title"
-    class="fixed inset-x-3 bottom-24 z-50 rounded-sm border border-line bg-ink-raised p-5 shadow-2xl sm:inset-x-auto sm:right-6 sm:bottom-6 sm:max-w-md lg:bottom-6"
+    {{--
+    | `bottom-24` pana la `lg`, fiindca bara sticky de apel e vizibila pana la `lg`.
+    | Cu `sm:bottom-6` banner-ul acoperea butonul de telefon pe tablete (640–1023px),
+    | adica exact conversia principala a site-ului.
+    --}}
+    class="fixed inset-x-3 bottom-24 z-50 rounded-sm border border-line bg-ink-raised p-5 shadow-2xl sm:inset-x-auto sm:right-6 sm:max-w-md lg:bottom-6"
 >
     <h2 id="cookie-title" class="font-display text-base text-paper">Cookie-uri</h2>
 

@@ -187,6 +187,13 @@ function initCookieBanner() {
 
     banner.hidden = false;
 
+    /*
+     | Are role="dialog", deci focusul trebuie sa ajunga in el. Altfel un utilizator
+     | de tastatura ar trebui sa tabuleze prin toata pagina pana la Accept/Refuz.
+     | Nu e modal si nu prindem focusul: nu blocam pe nimeni in banner.
+     */
+    banner.focus({ preventScroll: true });
+
     banner.querySelector('[data-cookie-accept]')?.addEventListener('click', () => {
         localStorage.setItem(CONSENT_KEY, 'accepted');
         banner.hidden = true;

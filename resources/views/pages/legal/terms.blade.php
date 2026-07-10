@@ -79,7 +79,8 @@
 
         <h2 class="text-h3 text-paper mt-12">Legea aplicabilă</h2>
         <p class="mt-4 text-paper-dim">
-            Acești termeni sunt guvernați de legislația {{ config('energix.contact.country') }}.
+            {{-- Genitiv. Valoarea din config e la nominativ, deci nu se poate interpola aici. --}}
+            Acești termeni sunt guvernați de legislația Republicii Moldova.
             Orice neînțelegere legată de folosirea site-ului încercăm mai întâi să o rezolvăm direct,
             pe cale amiabilă. Dacă nu reușim, ea se soluționează de instanțele competente din
             {{ config('energix.contact.country') }}.

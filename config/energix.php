@@ -229,6 +229,10 @@ return [
                 'title' => 'Politica de cookie | Energix',
                 'description' => 'Ce cookie-uri folosim pe energix.md și cum îți poți exprima consimțământul.',
             ],
+            '404' => [
+                'title' => 'Pagina nu a fost găsită | Energix',
+                'description' => 'Pagina căutată nu există sau s-a mutat.',
+            ],
         ],
     ],
 

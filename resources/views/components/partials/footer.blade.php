@@ -9,7 +9,7 @@
 
             <div class="lg:col-span-2">
                 <div class="flex items-center gap-2.5">
-                    <img src="{{ asset('images/logo/mark-180.png') }}" alt="" width="32" height="32" class="h-8 w-8" aria-hidden="true">
+                    <img src="{{ asset('images/logo/mark-64.png') }}" alt="" width="32" height="32" class="h-8 w-8" aria-hidden="true">
                     <span class="font-display text-lg tracking-tight text-paper">Energix</span>
                 </div>
                 <p class="mt-4 max-w-sm text-paper-dim">

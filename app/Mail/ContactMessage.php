@@ -35,10 +35,18 @@ class ContactMessage extends Mailable
         );
     }
 
+    /**
+     * HTML + text, NU markdown.
+     *
+     * Un sablon Markdown ar interpreta continutul campului `message` ca sintaxa:
+     * `[click](http://evil.example)` din mesajul unui vizitator devenea un link real
+     * in emailul primit de firma. Cu `view:`, Blade escapeaza si nu se parseaza nimic.
+     */
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.contact',
+            view: 'emails.contact',
+            text: 'emails.contact-text',
             with: ['data' => $this->data],
         );
     }

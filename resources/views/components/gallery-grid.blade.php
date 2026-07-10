@@ -7,7 +7,7 @@
                 type="button"
                 data-filter="{{ $slug }}"
                 aria-pressed="{{ $slug === 'toate' ? 'true' : 'false' }}"
-                class="rounded-sm border border-line px-4 py-2.5 font-mono text-xs tracking-wider uppercase transition aria-pressed:border-gold aria-pressed:bg-gold aria-pressed:text-ink text-paper-dim hover:border-gold hover:text-gold"
+                class="inline-flex min-h-11 items-center rounded-sm border border-line px-4 font-mono text-xs tracking-wider uppercase transition aria-pressed:border-gold aria-pressed:bg-gold aria-pressed:text-ink text-paper-dim hover:border-gold hover:text-gold"
             >{{ $label }}</button>
         @endforeach
     </div>

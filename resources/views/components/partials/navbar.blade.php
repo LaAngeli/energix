@@ -16,7 +16,8 @@
 >
     <nav class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4 sm:px-8" aria-label="Navigare principală">
         <a href="{{ route('home') }}" class="flex items-center gap-2.5" @if (request()->routeIs('home')) aria-current="page" @endif>
-            <img src="{{ asset('images/logo/mark-180.png') }}" alt="" width="32" height="32" class="h-8 w-8" aria-hidden="true">
+            {{-- mark-64: 32px afisati, 2x pentru ecrane retina. mark-180 e doar apple-touch-icon. --}}
+            <img src="{{ asset('images/logo/mark-64.png') }}" alt="" width="32" height="32" class="h-8 w-8" aria-hidden="true">
             <span class="font-display text-lg tracking-tight text-paper">Energix</span>
         </a>
 

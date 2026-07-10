@@ -2,7 +2,14 @@
 
 @php
     $seo = config('energix.seo');
-    $meta = data_get($seo, "pages.{$page}", $seo['pages']['home']);
+
+    /*
+     | Acces direct pe cheie, NU data_get(): cheile 'legal.terms' / 'legal.privacy' /
+     | 'legal.cookies' contin un punct, iar data_get l-ar interpreta ca separator de
+     | nivel si ar cauta $seo['pages']['legal']['terms'] — inexistent. Rezultatul era
+     | ca cele trei pagini legale serveau titlul si descrierea homepage-ului.
+     */
+    $meta = $seo['pages'][$page] ?? $seo['pages']['home'];
     $canonical = rtrim($seo['canonical'], '/').request()->getPathInfo();
     $canonical = rtrim($canonical, '/') ?: $seo['canonical'];
     $ogImage = rtrim($seo['canonical'], '/').'/'.ltrim($seo['og_image'], '/');
