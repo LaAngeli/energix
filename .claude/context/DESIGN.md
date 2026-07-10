@@ -196,7 +196,7 @@ Instrumentele per pagină:
   Hero: **contorul electromecanic** — cifre care se rostogolesc (odometru); alegerea
   segmentului **comandă filtrul real** al galeriei de sub el.
 - **Despre**: contor de vechime (cifra 10 pe scală gradată) + valorile ca „aparataj de
-  protecție". Hero: **sigla „Flux"** (`<x-signature.logo-flux>`) — vezi mai jos.
+  protecție". Hero: **sigla „Construcție"** (`<x-signature.logo-build>`) — vezi mai jos.
 - **Contacte**: formularul e un circuit — fiecare câmp valid închide un segment; toate
   valide → nodul + butonul se armează. Pur vizual, validarea reală rămâne pe server.
   Hero: **starea liniei** — deschis/închis calculat live din program, cu „revenim {zi}
@@ -240,22 +240,26 @@ se umple auriu până la etapa selectată.
 - `requestAnimationFrame` îngheață în tab-uri de fundal — voltmetrul are un `setTimeout`
   de gardă care garantează valoarea finală.
 
-## Al doilea element-semnătură: SIGLA „FLUX" (hero /despre)
+## Al doilea element-semnătură: SIGLA „CONSTRUCȚIE" (hero /despre)
 
-`<x-signature.logo-flux>` — **portarea vectorială** a animației livrate de client
-(2026-07-10, „Energix Loop B — Flux"). Bile de curent curg pe conturul becului, o mătură
-de lumină rotește razele, două surge-uri aprind filamentul și aruncă scântei, soclul
-licărește, iar o undă traversează literele.
+`<x-signature.logo-build>` — **portarea vectorială** a animației livrate de client
+(2026-07-10, „Energix Loop C — Construcție"). Conturul becului se trasează cu o bilă de
+curent în vârf, filamentul „Y" crește din soclu, barele soclului sar la loc, razele ies
+în evantai, un flash aprinde totul, literele urcă în cadru — iar la final o scânteie se
+naște în bec și zboară pe o curbă până devine punctul de pe „ı".
+
+Varianta C a înlocuit varianta B („Flux") la cererea clientului. Se potrivește mai bine
+paginii: firma **construiește instalații de la zero**, iar sigla se construiește la fel.
 
 ### 🔴 Portată, nu încorporată
 
 Clientul a trimis un **mp4 de 1.43 MB** (1000×840, H.264, fundal `#0a0a0a` ars în cadru).
 În aceeași arhivă era însă **sursa**: geometria vectorială a siglei și formulele scenei
-(`energix-logo.jsx`, `InnerB`). Am portat sursa, nu am încorporat videoul:
+(`energix-logo.jsx`, `InnerC`). Am portat sursa, nu am încorporat videoul:
 
 | | mp4 | portare SVG |
 |---|---|---|
-| Greutate | 1.43 MB | ~7 KB (+15 KB font) |
+| Greutate | 1.43 MB | ~8 KB (+15 KB font) |
 | Decodare | H.264, 6s | zero |
 | Fundal | negru, ars în cadru | transparent |
 | Claritate | raster | vectorial, orice DPI |
@@ -266,9 +270,14 @@ ars în cadru ar fi apărut ca un dreptunghi pe bleumarinul hero-ului.
 
 ### Abateri deliberate de la sursă
 
-1. **Nu rulează în buclă.** Sursa e „Loop B", infinită. Aici rulează o dată, complet
-   (6s), la intrarea în cadru, apoi îngheață. Cerință explicită a clientului — și
-   regula „zero mișcare ambientală" nu are excepții lângă un `<h1>`.
+1. **Nu rulează în buclă, și se oprește ÎNAINTE de finalul sursei.** „Loop C" e un ciclu
+   de 7s a cărui ultimă secundă și jumătate (t = 5.95…6.95) **dezasamblează** logo-ul —
+   literele coboară, razele se retrag, conturul se șterge — exact ca să poată reporni din
+   nimic. Dacă am rula ciclul întreg și am îngheța, hero-ul ar rămâne **gol**. Deci rulăm
+   construcția integral (0 → **5.5s**, până se stinge unda punctului) și înghețăm pe sigla
+   aprinsă. Nu e o aproximare: fiecare factor de demontare din sursă e de forma
+   `1 - seg(t, a, b)` cu `a >= 5.95`, deci pe `[0, 5.5]` valorează **exact 1**. Termenii
+   aceia sunt omiși din portare fiindcă sunt constanți, nu ignorați.
 2. **Culorile vin din tokenii de brand** (`--color-gold`), nu din auriul `#F1C232` al
    machetei.
 3. **Decorativă**: `aria-hidden`. „Energix" e deja în navbar, footer și `<h1>`.
@@ -277,8 +286,12 @@ ars în cadru ar fi apărut ca un dreptunghi pe bleumarinul hero-ului.
 
 - Coordonatele rămân **în spațiul machetei**: `viewBox="0 0 1000 840"`, marca desenată în
   spațiul 660×352, `translate(91 73) scale(1.24)` — identic cu sursa.
-- Timpii și formulele trăiesc în `initLogoFlux()`; CSS-ul ține doar cadrul.
-  `overflow: visible` pe SVG: bloom-ul și scânteile ies din viewBox.
+- Timpii și formulele trăiesc în `initLogoBuild()`; CSS-ul ține doar cadrul.
+  `overflow: visible` pe SVG: bloom-ul, flash-ul și scânteile ies din viewBox.
+- Trasajul se face cu `pathLength="100"` + `stroke-dasharray`, deci procentul desenat nu
+  depinde de lungimea reală a traseului.
+- Unda de aterizare a punctului crește prin **rază**, nu prin `scale`: un `scale` ar fi
+  îngroșat și conturul, iar o undă de șoc nu se îngroașă.
 - **Wordmark-ul folosește Quicksand 600** — fontul din sursa clientului. Al patrulea
   font pe site, dar se descarcă doar unde e folosit (~15 KB, subsetul latin).
 - ⚠️ `document.fonts.ready` **nu e suficient** înainte de `getComputedTextLength()`:
@@ -289,14 +302,16 @@ ars în cadru ar fi apărut ca un dreptunghi pe bleumarinul hero-ului.
   `fonts.load()` necondiționat descarcă totuși Quicksand pe fiecare telefon, ca să
   măsoare litere invizibile. `matchMedia('(min-width: 64rem)')` oprește totul:
   zero octeți de font, zero buclă rAF. Verificat la 360px.
-- `rAF` îngheață în tab-urile de fundal → un `setTimeout(6s + 250ms)` garantează cadrul
-  final. Verificat.
-- Sub `prefers-reduced-motion`: se randează `frame(0)` și nu pornește nicio buclă.
+- `rAF` îngheață în tab-urile de fundal → un `setTimeout(5.5s + 250ms)` garantează cadrul
+  final. Verificat: cu tabul în fundal, rAF livrează 0 cadre, iar garda aduce `frame(5.5)`.
+- Sub `prefers-reduced-motion`: se randează direct `frame(5.5)` — starea finală, instant.
+  (La varianta „Flux” era `frame(0)`, fiindcă acolo cadrul zero era deja sigla completă.
+  Aici cadrul zero e o pagină goală.)
 
 ## Componente Blade (implementate)
 
 `layouts/app` · `partials/{navbar,footer,sticky-call,cookie-banner}` ·
-`seo/{head,json-ld}` · `signature/{wye,panel,stages,logo-flux}` ·
+`seo/{head,json-ld}` · `signature/{wye,panel,stages,logo-build}` ·
 `hero-instrument/{circuits-calc,works-counter,line-status}` · `section-header` ·
 `job-sheet` · `breadcrumbs` · `faq` · `segment-row` · `segment-link` · `related-segments` ·
 `answer-cote` · `process-step` · `value-item` · `gallery-grid` · `cta-band` ·
