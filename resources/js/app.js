@@ -298,28 +298,81 @@ function initPanel() {
 
 /* ------------------------------------------------------ etapele pe cablu */
 
+/** Cat dureaza unda de curent: o baza, plus un timp pentru fiecare etapa sarita. */
+const STAGE_BASE_MS = 260;
+const STAGE_STEP_MS = 140;
+
 function initStages() {
-    const root = document.querySelector('[data-stages]');
+    document.querySelectorAll('[data-stages]').forEach(setupStages);
+}
 
-    if (! root) {
-        return;
-    }
-
+function setupStages(root) {
     const tabs = [...root.querySelectorAll('[role="tab"]')];
     const panels = [...root.querySelectorAll('[role="tabpanel"]')];
     const fill = root.querySelector('[data-stage-fill]');
 
-    function select(index, { focus = false } = {}) {
+    if (! tabs.length || ! fill) {
+        return;
+    }
+
+    const track = fill.parentElement;
+    let current = 0;
+
+    // Cat timp cablul n-a fost trasat, nimic nu are voie sa-i repicteze latimea.
+    let drawn = prefersReducedMotion;
+
+    /**
+     * Latimea barei = distanta pana la centrul REAL al cifrei tinta.
+     *
+     * Nu un procent: nodurile sunt centrate in coloanele grilei, la `(i + 0.5) / n`,
+     * nu la capetele cablului. Masurarea ramane corecta si daca se schimba `gap`-ul
+     * sau numarul de etape.
+     *
+     * Se masoara din <button>, nu din nod: nodul selectat are `scale(1.06)`, care ii
+     * deformeaza dreptunghiul. Butonul nu se scaleaza, iar nodul e centrat in el.
+     */
+    function fillWidthFor(index) {
+        const tab = tabs[index].getBoundingClientRect();
+
+        return tab.left + tab.width / 2 - track.getBoundingClientRect().left;
+    }
+
+    function paint(index, duration) {
+        fill.style.transitionDuration = `${duration}ms`;
+        fill.style.width = `${Math.round(fillWidthFor(index))}px`;
+    }
+
+    function select(index, { focus = false, animate = true } = {}) {
+        const from = current;
+        const steps = Math.abs(index - from);
+        drawn = true;
+
+        // Un salt de la 01 la 05 dureaza mai mult decat un pas — unda se vede trecand.
+        const duration = ! animate || prefersReducedMotion
+            ? 0
+            : STAGE_BASE_MS + steps * STAGE_STEP_MS;
+
+        paint(index, duration);
+
         tabs.forEach((tab, i) => {
             const active = i === index;
+
             tab.setAttribute('aria-selected', String(active));
             tab.tabIndex = active ? 0 : -1;
             panels[i].hidden = ! active;
+
+            /*
+             | Fiecare nod dintre punctul de plecare si tinta se aprinde (sau se stinge)
+             | exact cand unda ajunge la el. Nodurile din afara traseului comuta imediat.
+             */
+            const peTraseu = steps > 0 && (i - from) * (i - index) <= 0 && i !== from;
+            const delay = peTraseu ? (Math.abs(i - from) / steps) * duration : 0;
+
+            tab.style.setProperty('--node-delay', `${Math.round(delay)}ms`);
+            tab.classList.toggle('is-passed', i <= index);
         });
 
-        if (fill) {
-            fill.style.width = `${(index / Math.max(tabs.length - 1, 1)) * 100}%`;
-        }
+        current = index;
 
         if (focus) {
             tabs[index].focus();
@@ -341,7 +394,56 @@ function initStages() {
         });
     });
 
-    select(0);
+    select(0, { animate: false });
+
+    /*
+     | Prima trasare a cablului se face cand sectiunea intra in cadru — acelasi
+     | limbaj ca restul site-ului: energizare la intrare, o data.
+     */
+    if (! prefersReducedMotion) {
+        drawn = false;
+        fill.style.width = '0px';
+
+        const starter = new IntersectionObserver(
+            ([entry]) => {
+                if (! entry.isIntersecting) {
+                    return;
+                }
+
+                starter.disconnect();
+                setTimeout(() => {
+                    drawn = true;
+                    paint(current, 600);
+                }, 200);
+            },
+            { threshold: 0.3 },
+        );
+
+        starter.observe(root);
+    }
+
+    /*
+     | Latimea e in pixeli, deci trebuie recalculata cand se schimba latimea paginii
+     | sau cand fonturile se incarca si nodurile isi schimba pozitia. Dar niciodata
+     | inainte ca sectiunea sa fi fost vazuta — altfel cablul apare deja trasat.
+     */
+    const reflow = () => {
+        if (drawn) {
+            paint(current, 0);
+        }
+    };
+
+    let resizeTimer = null;
+    window.addEventListener(
+        'resize',
+        () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(reflow, 120);
+        },
+        { passive: true },
+    );
+
+    document.fonts?.ready.then(reflow);
 }
 
 /* --------------------------------------- rânduri-segment expandabile (home) */

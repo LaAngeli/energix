@@ -791,13 +791,28 @@
 
     /* ============================= etapele pe cablu ============================= */
 
+    /*
+    | Latimea se seteaza in px din JS, masurand centrul REAL al cifrei tinta —
+    | nu dintr-un procent. Procentul `index / (n-1)` presupunea ca nodurile stau
+    | la capetele cablului, dar ele sunt centrate in coloanele grilei, la
+    | `(i + 0.5) / n`. Bara se oprea cu ~53px inaintea cifrei.
+    |
+    | Durata vine tot din JS: un salt de la 01 la 05 dureaza mai mult decat unul
+    | de un pas, ca unda de curent sa se vada trecand.
+    */
     .stage-fill {
         background: var(--color-gold);
         box-shadow: 0 0 10px -2px var(--color-gold);
-        width: 0%;
-        transition: width 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+        width: 0;
+        transition-property: width;
+        transition-duration: 0.5s;
+        transition-timing-function: cubic-bezier(0.5, 0, 0.35, 1);
     }
 
+    /*
+    | `--node-delay` (setat din JS pe .stage-tab) intarzie aprinderea fiecarui nod
+    | pana cand unda ajunge la el. Asa, un salt 01 -> 05 aprinde 02, 03 si 04 pe rand.
+    */
     .stage-node {
         display: flex;
         align-items: center;
@@ -808,20 +823,41 @@
         border-radius: 9999px;
         background: var(--color-ink);
         color: var(--color-paper-dim);
-        transition:
-            border-color 0.25s ease-out,
-            color 0.25s ease-out,
-            box-shadow 0.25s ease-out;
+        transition-property: border-color, color, box-shadow, transform;
+        transition-duration: 0.28s;
+        transition-timing-function: ease-out;
+        transition-delay: var(--node-delay, 0ms);
+    }
+
+    .stage-label {
+        color: var(--color-paper-dim);
+        transition: color 0.28s ease-out;
+        transition-delay: var(--node-delay, 0ms);
     }
 
     .stage-tab:hover .stage-node {
         border-color: color-mix(in srgb, var(--color-gold) 60%, transparent);
     }
 
+    /* Etapele deja parcurse raman aprinse, dar fara halo — doar cea curenta straluceste. */
+    .stage-tab.is-passed .stage-node {
+        border-color: color-mix(in srgb, var(--color-gold) 70%, transparent);
+        color: var(--color-gold);
+    }
+
+    .stage-tab.is-passed .stage-label {
+        color: var(--color-paper);
+    }
+
     .stage-tab[aria-selected='true'] .stage-node {
         border-color: var(--color-gold);
         color: var(--color-gold);
         box-shadow: 0 0 14px -4px var(--color-gold);
+        transform: scale(1.06);
+    }
+
+    .stage-tab[aria-selected='true'] .stage-label {
+        color: var(--color-gold);
     }
 
     /* ============================ intrari one-shot ============================ */

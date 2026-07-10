@@ -24,7 +24,7 @@
                     class="stage-tab group flex flex-col items-center gap-2.5 pb-1"
                 >
                     <span class="stage-node readout text-sm" aria-hidden="true">{{ str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT) }}</span>
-                    <span class="hidden font-mono text-[0.62rem] tracking-[0.1em] uppercase transition-colors sm:block group-aria-selected:text-gold text-paper-dim">
+                    <span class="stage-label hidden font-mono text-[0.62rem] tracking-[0.1em] uppercase sm:block">
                         {{ $stage['title'] }}
                     </span>
                 </button>
