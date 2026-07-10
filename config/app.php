@@ -60,12 +60,16 @@ return [
     |--------------------------------------------------------------------------
     |
     | Here you may specify the default timezone for your application, which
-    | will be used by the PHP date and date-time functions. The timezone
-    | is set to "UTC" by default as it is suitable for most use cases.
+    | will be used by the PHP date and date-time functions.
+    |
+    | Europe/Chisinau, nu UTC: firma si tot publicul ei sunt in Moldova (UTC+2,
+    | UTC+3 vara). Pe UTC, `date('Y')` din footer ar fi aratat inca anul vechi in
+    | primele doua ore ale lui 1 ianuarie, ora locala. Acelasi lucru pentru
+    | marcajele de timp din loguri si din emailurile formularului.
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => env('APP_TIMEZONE', 'Europe/Chisinau'),
 
     /*
     |--------------------------------------------------------------------------

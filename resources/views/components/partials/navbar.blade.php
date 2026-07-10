@@ -20,9 +20,14 @@
     class="sticky top-0 z-50 border-b border-line/60 bg-ink/80 backdrop-blur transition-colors duration-300 [&.is-scrolled]:border-line [&.is-scrolled]:bg-ink/95"
 >
     <nav class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3.5 sm:px-8" aria-label="{{ __('site.nav.main') }}">
-        <a href="{{ URL::localized('home') }}" class="flex items-center gap-2.5" @if (request()->routeIs($ru.'home')) aria-current="page" @endif>
-            <img src="{{ asset('images/logo/mark-64.png') }}" alt="" width="32" height="32" class="h-8 w-8" aria-hidden="true">
-            <span class="font-display text-lg tracking-tight text-paper">Energix</span>
+        {{--
+        | Sigla ocupa 44px. Inaltimea barei o dicteaza linkul de circuit (46px), nu
+        | sigla, deci cresterea incape in marja existenta: bara ramane la 74px.
+        | mark-96 pentru ca un slot de 44px cere 88px pe ecrane retina.
+        --}}
+        <a href="{{ URL::localized('home') }}" class="flex items-center gap-3" @if (request()->routeIs($ru.'home')) aria-current="page" @endif>
+            <img src="{{ asset('images/logo/mark-96.png') }}" alt="" width="44" height="44" class="h-11 w-11" aria-hidden="true">
+            <span class="font-display text-2xl leading-none tracking-tight text-paper">Energix</span>
         </a>
 
         {{-- Desktop: circuite cu LED --}}

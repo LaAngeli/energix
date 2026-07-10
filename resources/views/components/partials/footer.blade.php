@@ -7,10 +7,15 @@
 <footer class="border-t border-line bg-ink-deep">
     <div class="mx-auto max-w-6xl px-5 py-14 sm:px-8">
         <div class="nameplate p-6 sm:p-8">
+            {{--
+            | Aici sigla ESTE elementul cel mai inalt al randului, deci cresterea ei
+            | ar impinge footer-ul in jos. Cei 12px castigati (32 -> 44) se iau inapoi
+            | din `pt-7` -> `pt-4` al grilei de mai jos: inaltimea totala ramane 468px.
+            --}}
             <div class="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-5">
-                <div class="flex items-center gap-2.5">
-                    <img src="{{ asset('images/logo/mark-64.png') }}" alt="" width="32" height="32" class="h-8 w-8" aria-hidden="true">
-                    <span class="font-display text-lg tracking-tight text-paper">Energix</span>
+                <div class="flex items-center gap-3">
+                    <img src="{{ asset('images/logo/mark-96.png') }}" alt="" width="44" height="44" class="h-11 w-11" aria-hidden="true">
+                    <span class="font-display text-2xl leading-none tracking-tight text-paper">Energix</span>
                 </div>
                 <p class="flex items-center gap-2.5 font-mono text-[0.65rem] tracking-[0.16em] text-gold uppercase">
                     <x-signature.wye :size="12" :live="true" />
@@ -18,7 +23,7 @@
                 </p>
             </div>
 
-            <div class="grid gap-x-10 gap-y-8 pt-7 md:grid-cols-3">
+            <div class="grid gap-x-10 gap-y-8 pt-4 md:grid-cols-3">
                 <div>
                     <h2 class="eyebrow">{{ __('site.common.object') }}</h2>
                     <p class="mt-3 text-sm text-paper-dim">{{ __('site.about_page.lead') }}</p>
@@ -60,9 +65,12 @@
         <div class="mt-6 flex flex-col gap-3 text-xs text-paper-dim sm:flex-row sm:items-center sm:justify-between">
             <p>&copy; {{ date('Y') }} Energix. {{ __('site.common.rights') }}</p>
 
-            {{-- Creditul agentiei care a facut site-ul. URL-ul e in CONTACT.md. --}}
+            {{--
+            | Creditul agentiei. NU se traduce: e semnatura ei, la fel ca numele
+            | „AdVista” — deci nu trece prin `lang/`. Cerinta explicita a clientului.
+            --}}
             <p>
-                {{ __('site.common.credit') }}
+                Created by
                 <a
                     href="https://advista.marketing"
                     target="_blank"
