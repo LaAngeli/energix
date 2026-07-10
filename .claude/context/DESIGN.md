@@ -142,11 +142,24 @@ Instrumentele per pagină:
   (pur ceremonial — telefonul e apelabil oricând, nu se gate-uiește conversia).
 - **Servicii**: consolă cu 3 comutatoare de segment (tablist) care schimbă conținutul;
   ancorele vechi `#apartamente/#case/#industriale` selectează tab-ul (hashchange).
+  Hero: **calculatorul de circuite** — comuți consumatorii (plită, boiler, climă…),
+  instrumentul numără circuitele dedicate și modulele de tablou (`+4` = separator +
+  diferențial). Estimare declarată orientativă.
 - **Lucrări**: filtrele ca disjunctoare cu LED + contor „N lucrări pe circuit".
+  Hero: **contorul electromecanic** — cifre care se rostogolesc (odometru); alegerea
+  segmentului **comandă filtrul real** al galeriei de sub el.
 - **Despre**: contor de vechime (cifra 10 pe scală gradată) + valorile ca „aparataj de
-  protecție" (module cu LED, hover le ridică).
+  protecție". Hero: **nivela cu bulă** — bula urmărește cursorul; adusă la centru,
+  confirmă „Drept — la cotă". Pe tactil/reduced-motion stă fixă la zero.
 - **Contacte**: formularul e un circuit — fiecare câmp valid închide un segment; toate
   valide → nodul + butonul se armează. Pur vizual, validarea reală rămâne pe server.
+  Hero: **starea liniei** — deschis/închis calculat live din program, cu „revenim {zi}
+  la {oră}" și buton „Testează linia" (verificare ceremonială cu LED-uri).
+  ⚠️ Orarul din `line-status.blade.php` oglindește `config('energix.hours')` — la
+  schimbarea programului se actualizează amândouă.
+
+Instrumentele din hero apar doar pe `lg+` (spațiul gol există doar pe desktop);
+pe mobil hero-urile rămân text, fără cost.
 
 ⚠️ Lecție de mediu: rAF **și** evenimentele de scroll îngheață în tab-uri de fundal
 (cadrele vin doar la screenshot în automatizare). Orice stare care contează folosește

@@ -9,12 +9,20 @@
         <div class="relative mx-auto max-w-6xl px-5 pt-8 pb-14 sm:px-8 sm:pb-18">
             <x-job-sheet code="DSP-04" name="Despre" index="04/05" />
 
-            <h1 class="mt-10 max-w-3xl text-h1 text-paper">Un singur lucru, făcut bine, de zece ani.</h1>
-            <p class="mt-6 max-w-2xl text-lead text-paper-dim">
-                Energix e o echipă de electricieni din {{ config('energix.contact.city') }}.
-                Montăm instalații electrice complete pentru construcții: apartamente, case,
-                spații industriale. Doar asta.
-            </p>
+            <div class="mt-10 grid gap-10 lg:grid-cols-[1.1fr_auto] lg:items-center">
+                <div>
+                    <h1 class="max-w-3xl text-h1 text-paper">Un singur lucru, făcut bine, de zece ani.</h1>
+                    <p class="mt-6 max-w-2xl text-lead text-paper-dim">
+                        Energix e o echipă de electricieni din {{ config('energix.contact.city') }}.
+                        Montăm instalații electrice complete pentru construcții: apartamente, case,
+                        spații industriale. Doar asta.
+                    </p>
+                </div>
+
+                <div class="hidden lg:block" data-reveal>
+                    <x-hero-instrument.level />
+                </div>
+            </div>
         </div>
     </header>
 

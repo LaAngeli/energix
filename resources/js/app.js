@@ -587,6 +587,240 @@ function initArmSwitch() {
     });
 }
 
+/* ---------------------------------------------- instrumentele din hero */
+
+/** /servicii — comuti consumatorii, instrumentul numara circuitele si modulele. */
+function initCircuitsCalc() {
+    const root = document.querySelector('[data-circuits-calc]');
+
+    if (! root) {
+        return;
+    }
+
+    const base = parseInt(root.dataset.base, 10) || 0;
+    const toggles = [...root.querySelectorAll('[data-calc-toggle]')];
+    const circuitsOut = root.querySelector('[data-calc-circuits]');
+    const modulesOut = root.querySelector('[data-calc-modules]');
+
+    const recount = () => {
+        const extra = toggles.filter((t) => t.getAttribute('aria-checked') === 'true').length;
+        const circuits = base + extra;
+
+        circuitsOut.textContent = String(circuits);
+        // separator (2 module) + diferential (2) + cate un modul pe circuit
+        modulesOut.textContent = String(circuits + 4);
+    };
+
+    toggles.forEach((toggle) => {
+        toggle.addEventListener('click', () => {
+            toggle.setAttribute('aria-checked', String(toggle.getAttribute('aria-checked') !== 'true'));
+            recount();
+        });
+    });
+
+    recount();
+}
+
+/** /galerie — contorul cu cifre rostogolite; alegerea filtreaza si galeria. */
+function initWorksCounter() {
+    const root = document.querySelector('[data-works-counter]');
+
+    if (! root) {
+        return;
+    }
+
+    const counts = JSON.parse(root.dataset.counts || '{}');
+    const digits = [...root.querySelectorAll('[data-odo-digit]')];
+    const picks = [...root.querySelectorAll('[data-works-pick]')];
+    const status = root.querySelector('[data-works-status]');
+
+    const roll = (value) => {
+        const text = String(value).padStart(digits.length, '0');
+
+        digits.forEach((strip, i) => {
+            strip.style.transform = `translateY(${-Number(text[i]) * 2.2}rem)`;
+        });
+    };
+
+    picks.forEach((pick) => {
+        pick.addEventListener('click', () => {
+            const slug = pick.dataset.worksPick;
+
+            picks.forEach((other) => other.setAttribute('aria-pressed', String(other === pick)));
+            roll(counts[slug] ?? 0);
+
+            if (status) {
+                status.textContent = `${counts[slug] ?? 0} lucrări pe circuitul ${pick.textContent.trim()}.`;
+            }
+
+            // Instrumentul comanda pagina: filtrul real al galeriei se comuta si el.
+            document.querySelector(`[data-gallery] [data-filter="${slug}"]`)?.click();
+        });
+    });
+
+    roll(counts.toate ?? 0);
+}
+
+/** /despre — nivela: bula fuge dupa cursor; la centru, instrumentul confirma. */
+function initLevel() {
+    const root = document.querySelector('[data-level]');
+
+    if (! root) {
+        return;
+    }
+
+    const bubble = root.querySelector('[data-bubble]');
+    const led = root.querySelector('[data-level-led]');
+    const label = root.querySelector('[data-level-label]');
+    const degOut = root.querySelector('[data-level-deg]');
+
+    const setLevel = (isLevel, deg) => {
+        root.classList.toggle('is-level', isLevel);
+        led.classList.toggle('is-on', isLevel);
+        degOut.textContent = deg.toFixed(1);
+        label.textContent = isLevel ? 'Drept — la cotă' : 'Adu bula la centru';
+    };
+
+    // Tactil sau miscare redusa: nivela sta perfect dreapta, ca pe santier.
+    if (! finePointer || prefersReducedMotion) {
+        setLevel(true, 0);
+
+        return;
+    }
+
+    const maxShift = 70; // px de alunecare a bulei
+    let ticking = false;
+
+    window.addEventListener(
+        'pointermove',
+        (event) => {
+            if (ticking) {
+                return;
+            }
+
+            ticking = true;
+            requestAnimationFrame(() => {
+                ticking = false;
+
+                const box = root.getBoundingClientRect();
+
+                // In afara vecinatatii instrumentului, bula se aseaza singura.
+                if (event.clientY < box.top - 240 || event.clientY > box.bottom + 240) {
+                    bubble.style.transform = 'translateX(0px)';
+                    setLevel(true, 0);
+
+                    return;
+                }
+
+                const center = box.left + box.width / 2;
+                const ratio = Math.max(-1, Math.min(1, (event.clientX - center) / (box.width / 2)));
+                const shift = ratio * maxShift;
+
+                bubble.style.transform = `translateX(${shift.toFixed(1)}px)`;
+                setLevel(Math.abs(shift) < 6, Math.abs(ratio * 2));
+            });
+        },
+        { passive: true },
+    );
+
+    setLevel(true, 0);
+}
+
+/** /contacte — starea liniei: deschis ACUM sau cand revenim, plus testul ceremonial. */
+function initLineStatus() {
+    const root = document.querySelector('[data-line-status]');
+
+    if (! root) {
+        return;
+    }
+
+    const schedule = JSON.parse(root.dataset.schedule || '[]');
+    const headline = root.querySelector('[data-line-headline]');
+    const detail = root.querySelector('[data-line-detail]');
+    const leds = root.querySelector('[data-line-leds]');
+    const test = root.querySelector('[data-line-test]');
+
+    const days = ['duminică', 'luni', 'marți', 'miercuri', 'joi', 'vineri', 'sâmbătă'];
+    const pad = (n) => String(n).padStart(2, '0');
+
+    function compute(now = new Date()) {
+        const today = schedule[now.getDay()];
+        const hour = now.getHours() + now.getMinutes() / 60;
+
+        if (today && hour >= today[0] && hour < today[1]) {
+            return {
+                open: true,
+                headline: 'Linie liberă — sună acum',
+                detail: `Suntem deschiși până la ${pad(today[1])}:00.`,
+            };
+        }
+
+        // Cautam urmatoarea deschidere, incepand cu azi (daca inca n-am deschis).
+        for (let offset = 0; offset <= 7; offset++) {
+            const day = (now.getDay() + offset) % 7;
+            const slot = schedule[day];
+
+            if (! slot || (offset === 0 && hour >= slot[0])) {
+                continue;
+            }
+
+            const when = offset === 0 ? 'azi' : (offset === 1 ? 'mâine' : days[day]);
+
+            return {
+                open: false,
+                headline: 'Momentan închis',
+                detail: `Revenim ${when} la ${pad(slot[0])}:00. Scrie-ne — te sunăm noi.`,
+            };
+        }
+
+        return { open: false, headline: 'Momentan închis', detail: 'Scrie-ne — te sunăm noi.' };
+    }
+
+    function render(state) {
+        headline.textContent = state.headline;
+        headline.classList.toggle('text-gold', state.open);
+        headline.classList.toggle('text-paper', ! state.open);
+        detail.textContent = state.detail;
+
+        [...leds.children].forEach((led, i) => {
+            led.classList.toggle('is-on', state.open || i === 0);
+        });
+    }
+
+    render(compute());
+
+    /*
+     | Testul e ceremonial: LED-urile fac o verificare scurta, apoi starea se
+     | reafiseaza (recalculata — poate intre timp s-a facut ora inchiderii).
+     */
+    let testing = false;
+
+    test?.addEventListener('click', () => {
+        if (testing) {
+            return;
+        }
+
+        testing = true;
+
+        if (prefersReducedMotion) {
+            render(compute());
+            testing = false;
+
+            return;
+        }
+
+        leds.classList.add('line-chase');
+        headline.textContent = 'Verific linia…';
+        detail.textContent = ' ';
+
+        setTimeout(() => {
+            leds.classList.remove('line-chase');
+            render(compute());
+            testing = false;
+        }, 650);
+    });
+}
+
 /* ------------------------------------------------------------- meniu mobil */
 
 function initNav() {
@@ -741,6 +975,10 @@ function boot() {
     initStages();
     initSegmentRows();
     initServicesSwitcher();
+    initCircuitsCalc();
+    initWorksCounter();
+    initLevel();
+    initLineStatus();
     initFormCircuit();
     initArmSwitch();
     initNav();

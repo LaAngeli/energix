@@ -10,10 +10,18 @@
         <div class="relative mx-auto max-w-6xl px-5 pt-8 pb-14 sm:px-8 sm:pb-18">
             <x-job-sheet code="CNT-05" name="Contact" index="05/05" />
 
-            <h1 class="mt-10 max-w-3xl text-h1 text-paper">Sună. E cel mai rapid.</h1>
-            <p class="mt-6 max-w-2xl text-lead text-paper-dim">
-                {{ config('energix.response_time') }}
-            </p>
+            <div class="mt-10 grid gap-10 lg:grid-cols-[1.1fr_auto] lg:items-center">
+                <div>
+                    <h1 class="max-w-3xl text-h1 text-paper">Sună. E cel mai rapid.</h1>
+                    <p class="mt-6 max-w-2xl text-lead text-paper-dim">
+                        {{ config('energix.response_time') }}
+                    </p>
+                </div>
+
+                <div class="hidden lg:block" data-reveal>
+                    <x-hero-instrument.line-status />
+                </div>
+            </div>
         </div>
     </header>
 

@@ -860,6 +860,132 @@
         color: var(--color-gold);
     }
 
+    /* ===================== instrumentele din hero (per pagina) ===================== */
+
+    /*
+    | Rama comuna: o placuta de aparat, cu antet mono si LED de stare.
+    | Fiecare pagina isi monteaza instrumentul ei in coloana dreapta a hero-ului.
+    */
+    .instrument {
+        border: 1px solid var(--color-line);
+        border-radius: 3px;
+        background: color-mix(in srgb, var(--color-ink-raised) 75%, transparent);
+        backdrop-filter: blur(2px);
+    }
+
+    .instrument-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding: 0.7rem 1rem;
+        border-bottom: 1px solid var(--color-line);
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-paper-dim);
+    }
+
+    /* --- contorul electromecanic (Lucrari): cifre care se rostogolesc --- */
+
+    .odo {
+        display: inline-flex;
+        overflow: hidden;
+        border: 1px solid var(--color-line);
+        border-radius: 3px;
+        background: var(--color-ink);
+        padding: 0.15rem 0.3rem;
+    }
+
+    .odo-digit {
+        height: 2.2rem;
+        overflow: hidden;
+    }
+
+    .odo-strip {
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.55s cubic-bezier(0.5, 0, 0.3, 1);
+    }
+
+    .odo-strip span {
+        height: 2.2rem;
+        line-height: 2.2rem;
+        text-align: center;
+        min-width: 1.4rem;
+    }
+
+    /* --- nivela cu bula (Despre) --- */
+
+    .vial {
+        position: relative;
+        height: 2.2rem;
+        border: 1px solid var(--color-line);
+        border-radius: 9999px;
+        background: linear-gradient(to bottom, var(--color-ink), var(--color-ink-raised));
+        overflow: hidden;
+    }
+
+    /* reperele de centru */
+    .vial::before,
+    .vial::after {
+        content: '';
+        position: absolute;
+        top: 3px;
+        bottom: 3px;
+        width: 1px;
+        background: var(--color-paper-dim);
+        opacity: 0.7;
+    }
+
+    .vial::before {
+        left: calc(50% - 14px);
+    }
+
+    .vial::after {
+        left: calc(50% + 14px);
+    }
+
+    .bubble {
+        position: absolute;
+        top: 4px;
+        bottom: 4px;
+        left: 50%;
+        width: 22px;
+        margin-left: -11px;
+        border-radius: 9999px;
+        background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--color-gold) 85%, white), var(--color-gold) 60%);
+        box-shadow: 0 0 10px -2px var(--color-gold);
+        transition: transform 0.18s ease-out;
+        will-change: transform;
+    }
+
+    [data-level].is-level .bubble {
+        box-shadow: 0 0 16px 0 var(--color-gold);
+    }
+
+    /* --- verificarea liniei (Contacte) --- */
+
+    .line-chase .led {
+        animation: chase-blink 0.16s ease-in-out;
+    }
+
+    .line-chase .led:nth-child(2) {
+        animation-delay: 0.14s;
+    }
+
+    .line-chase .led:nth-child(3) {
+        animation-delay: 0.28s;
+    }
+
+    @keyframes chase-blink {
+        50% {
+            background: var(--color-gold);
+            box-shadow: 0 0 8px 0 var(--color-gold);
+        }
+    }
+
     /* ============================ intrari one-shot ============================ */
 
     /* Bara de apel de pe mobil urca o singura data, la incarcare. */

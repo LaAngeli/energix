@@ -9,11 +9,19 @@
         <div class="relative mx-auto max-w-6xl px-5 pt-8 pb-14 sm:px-8 sm:pb-18">
             <x-job-sheet code="SRV-02" name="Servicii" index="02/05" />
 
-            <h1 class="mt-10 max-w-3xl text-h1 text-paper">Instalația completă, pentru spațiul tău.</h1>
-            <p class="mt-6 max-w-2xl text-lead text-paper-dim">
-                Același ciclu complet — proiect, cablare, tablou, montaj, verificare —
-                adaptat la tipul construcției. Alege circuitul.
-            </p>
+            <div class="mt-10 grid gap-10 lg:grid-cols-[1.1fr_auto] lg:items-center">
+                <div>
+                    <h1 class="max-w-3xl text-h1 text-paper">Instalația completă, pentru spațiul tău.</h1>
+                    <p class="mt-6 max-w-2xl text-lead text-paper-dim">
+                        Același ciclu complet — proiect, cablare, tablou, montaj, verificare —
+                        adaptat la tipul construcției. Alege circuitul.
+                    </p>
+                </div>
+
+                <div class="hidden lg:block" data-reveal>
+                    <x-hero-instrument.circuits-calc />
+                </div>
+            </div>
         </div>
     </header>
 
