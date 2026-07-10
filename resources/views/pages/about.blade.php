@@ -9,28 +9,34 @@
                 <x-signature.wye :size="13" :live="true" />
                 Despre
             </p>
-            <h1 class="mt-6 max-w-3xl text-h1 text-paper">Oameni care își pun numele pe lucrare.</h1>
+            <h1 class="mt-6 max-w-3xl text-h1 text-paper">Un singur lucru, făcut bine, de zece ani.</h1>
             <p class="mt-6 max-w-2xl text-lead text-paper-dim">
-                Energix e o echipă mică de electricieni din {{ config('energix.contact.city') }}.
-                Facem instalații, reparăm ce s-a stricat și întreținem ce am montat.
+                Energix e o echipă de electricieni din {{ config('energix.contact.city') }}.
+                Montăm instalații electrice complete pentru construcții: apartamente, case,
+                spații industriale. Doar asta.
             </p>
         </div>
     </header>
 
-    {{-- Semnalul uman: raspundere cu nume. Nicio afirmatie de certificare. --}}
-    <section class="border-b border-line" aria-labelledby="founder-title">
+    {{-- Semnalul de incredere: vechimea. Fara nume, fara afirmatii de certificare. --}}
+    <section class="border-b border-line" aria-labelledby="experience-title">
         <div class="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
             <div class="grid gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
                 <div data-reveal>
-                    <p class="eyebrow">Cine răspunde</p>
-                    <h2 id="founder-title" class="mt-4 text-h2 text-paper">{{ config('energix.founder.name') }}</h2>
-                    <p class="mt-2 font-mono text-sm tracking-wide text-gold">{{ config('energix.founder.role') }}</p>
+                    <p class="eyebrow">Cât timp facem asta</p>
+                    <h2 id="experience-title" class="mt-4 text-h2 text-paper">
+                        <span class="readout text-gold">{{ config('energix.experience.years') }}</span>
+                        {{ config('energix.experience.label') }}
+                    </h2>
+                    <p class="mt-3 font-mono text-sm tracking-wide text-paper-dim">
+                        Chișinău și toată Republica Moldova
+                    </p>
                 </div>
 
                 <div class="space-y-5 text-lead text-paper-dim" data-reveal>
                     <p>
                         Când suni la Energix, nu ajungi la un call-center. Ajungi la echipa care
-                        vine efectiv la tine acasă.
+                        vine efectiv pe șantierul tău.
                     </p>
                     <p>
                         Am pornit de la o idee simplă: o instalație electrică se face o dată, bine.
@@ -39,8 +45,8 @@
                         cineva ar urma să deschidă peretele mâine.
                     </p>
                     <p class="text-paper">
-                        Îți arătăm ce am găsit, îți explicăm de ce trebuie schimbat și cât costă.
-                        Apoi facem exact ce am spus.
+                        Îți arătăm schema înainte să începem, îți explicăm fiecare alegere și cât
+                        costă. Apoi facem exact ce am spus.
                     </p>
                 </div>
             </div>

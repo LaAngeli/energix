@@ -217,8 +217,10 @@ nici după un task reușit. Doar la cerere explicită.
 1. **`php` din unealta Bash este 8.3 (Laragon) și crapă.** Rulează `php` / `artisan` /
    `pint` **prin unealta PowerShell**, unde se rezolvă la Herd PHP 8.4.
 2. Site de **prezentare**: fără autentificare, fără cabinet, fără vânzări online.
-3. Se exclud complet **„Electricieni Autorizați"** și **„Automatizări și Smart Home"** —
-   detalii și listă de locuri afectate în `BUSINESS.md`.
+3. Se exclud complet: orice **certificare/autorizare**, **„Smart Home"/automatizări**,
+   **„Audit Energetic"** și orice **serviciu de reparații/mentenanță/urgențe** — site-ul
+   vinde DOAR instalații complete de la zero. Detalii și grep-uri în `BUSINESS.md`;
+   garda automată e `tests/Feature/ContentExclusionsTest.php`.
 4. Datele de contact se citesc din config (`config/energix.php`), nu se hardcodează în Blade.
 5. Mobile-first. Clientul a cerut explicit accent pe design și responsivitate.
 6. Site-ul vechi (`C:\xampp\htdocs\energix`) e **doar referință de conținut**. Codul lui

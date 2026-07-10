@@ -9,10 +9,10 @@
                 <x-signature.wye :size="13" :live="true" />
                 Servicii
             </p>
-            <h1 class="mt-6 max-w-3xl text-h1 text-paper">Ce facem, pe îndelete.</h1>
+            <h1 class="mt-6 max-w-3xl text-h1 text-paper">Instalația completă, pentru spațiul tău.</h1>
             <p class="mt-6 max-w-2xl text-lead text-paper-dim">
-                Trei servicii, duse până la capăt. Fiecare lucrare pleacă de la o evaluare
-                gratuită și se termină cu o instalație pe care o poți înțelege.
+                Același ciclu complet — proiect, cablare, tablou, montaj, verificare — adaptat
+                la apartament, casă sau spațiu industrial. De la zero până la predare.
             </p>
         </div>
     </header>

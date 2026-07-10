@@ -5,10 +5,12 @@ declare(strict_types=1);
 /**
  * Garda de conformitate.
  *
- * Clientul a exclus explicit trei lucruri (.claude/context/BUSINESS.md):
+ * Clientul a exclus explicit patru lucruri (.claude/context/BUSINESS.md):
  *   1. orice afirmatie de certificare / autorizare;
  *   2. serviciul „Smart Home” si orice mentiune de automatizare;
- *   3. serviciul „Audit Energetic”.
+ *   3. serviciul „Audit Energetic”;
+ *   4. orice serviciu de tip service: reparatii, mentenanta, interventii
+ *      urgente / non-stop — business-ul face DOAR instalatii complete de la zero.
  *
  * A le lasa intr-un singur loc uitat — un `<meta keywords>`, un link din footer —
  * e o problema de conformitate, nu de copywriting. Testul asta le vaneaza in HTML-ul
@@ -28,9 +30,18 @@ $forbidden = [
     'automatiz',
     'inteligent',
 
-    // 3. audit energetic — atentie: „consum” ramane permis („monitorizare consum”)
+    // 3. audit energetic — atentie: „consum” ramane permis
     'audit',
     'energetic',
+
+    // 4. service / reparatii / urgente
+    'reparat',
+    'reparaț',
+    'mentenan',
+    'urgen',
+    'non-stop',
+    '24/7',
+    'depan',
 ];
 
 $pages = [
@@ -56,7 +67,7 @@ it('nu randeaza niciun cuvant exclus', function (string $page) use ($forbidden):
     expect($found)->toBe([], "Pagina {$page} contine cuvinte excluse: ".implode(', ', $found));
 })->with($pages);
 
-it('nu ofera decat trei servicii', function (): void {
+it('nu ofera decat trei segmente de instalatii complete', function (): void {
     $services = config('energix.services');
 
     expect($services)->toHaveCount(3);
@@ -64,5 +75,7 @@ it('nu ofera decat trei servicii', function (): void {
     $titles = mb_strtolower(implode(' ', array_column($services, 'title')));
 
     expect($titles)->not->toContain('smart')
-        ->and($titles)->not->toContain('audit');
+        ->and($titles)->not->toContain('audit')
+        ->and($titles)->not->toContain('reparat')
+        ->and($titles)->not->toContain('mentenan');
 });

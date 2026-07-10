@@ -1,8 +1,9 @@
 /*
 | Energix — interacțiuni.
 |
-| Fără librării. Tot ce se mișcă folosește doar opacity/transform (GPU) și se
-| declanșează prin IntersectionObserver, niciodată legat de poziția scroll-ului.
+| Fără librării. Tot ce se mișcă folosește doar opacity/transform/culoare (GPU)
+| și se declanșează prin IntersectionObserver sau prin acțiunea utilizatorului —
+| niciodată legat de poziția scroll-ului.
 */
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -61,6 +62,222 @@ function observeReveals() {
     glyphs.forEach((el) => glyphObserver.observe(el));
 }
 
+/* ------------------------------------------------- tabloul interactiv */
+
+function initPanel() {
+    const panel = document.querySelector('[data-panel]');
+
+    if (! panel) {
+        return;
+    }
+
+    const master = panel.querySelector('[data-master]');
+    const masterState = panel.querySelector('[data-master-state]');
+    const circuits = [...panel.querySelectorAll('[data-circuit]')];
+    const voltmeter = panel.querySelector('[data-voltmeter]');
+    const status = panel.querySelector('[data-panel-status]');
+    const rcdTest = panel.querySelector('[data-rcd-test]');
+
+    let voltFrame = null;
+    let voltFallback = null;
+
+    const isLive = () => panel.dataset.live === 'true';
+    const breakerOf = (circuit) => circuit.querySelector('[data-breaker]');
+    const breakerOn = (circuit) => breakerOf(circuit).getAttribute('aria-checked') === 'true';
+
+    const announce = (text) => {
+        if (status) {
+            status.textContent = text;
+        }
+    };
+
+    /** Voltmetrul numara pana la tinta. 230 V e o constanta fizica, nu marketing. */
+    function setVoltage(target) {
+        cancelAnimationFrame(voltFrame);
+        clearTimeout(voltFallback);
+
+        const from = parseInt(voltmeter.textContent, 10) || 0;
+
+        if (prefersReducedMotion || from === target) {
+            voltmeter.textContent = String(target);
+
+            return;
+        }
+
+        const started = performance.now();
+        const duration = 650;
+
+        const tick = (now) => {
+            const t = Math.min((now - started) / duration, 1);
+            const eased = 1 - Math.pow(1 - t, 3);
+            voltmeter.textContent = String(Math.round(from + (target - from) * eased));
+
+            if (t < 1) {
+                voltFrame = requestAnimationFrame(tick);
+            }
+        };
+
+        voltFrame = requestAnimationFrame(tick);
+
+        /*
+         | rAF e inghetat in tab-urile din fundal. Valoarea finala e starea
+         | corecta a instrumentului, deci o garantam indiferent de throttling.
+         */
+        voltFallback = setTimeout(() => {
+            cancelAnimationFrame(voltFrame);
+            voltmeter.textContent = String(target);
+        }, duration + 150);
+    }
+
+    /** Aplica starea „sub tensiune” pe fiecare circuit, dupa topologie. */
+    function refresh({ pulse = false } = {}) {
+        const live = isLive();
+
+        circuits.forEach((circuit) => {
+            const on = live && breakerOn(circuit);
+            const wasOn = circuit.classList.contains('is-live');
+            circuit.classList.toggle('is-live', on);
+
+            if (pulse && on && ! wasOn && ! prefersReducedMotion) {
+                circuit.classList.remove('just-on');
+                void circuit.offsetWidth; // reporneste animatia
+                circuit.classList.add('just-on');
+            }
+        });
+
+        setVoltage(live ? 230 : 0);
+
+        if (masterState) {
+            masterState.textContent = live ? 'Pornit' : 'Oprit';
+        }
+    }
+
+    function setMaster(on, { pulse = true } = {}) {
+        master.setAttribute('aria-checked', String(on));
+        panel.dataset.live = String(on);
+        refresh({ pulse });
+        announce(on ? 'Tabloul este sub tensiune.' : 'Tabloul este scos de sub tensiune.');
+    }
+
+    master.addEventListener('click', () => setMaster(! isLive()));
+
+    circuits.forEach((circuit) => {
+        const breaker = breakerOf(circuit);
+
+        breaker.addEventListener('click', () => {
+            const next = ! breakerOn(circuit);
+            breaker.setAttribute('aria-checked', String(next));
+            refresh({ pulse: true });
+
+            const name = breaker.getAttribute('aria-label');
+            announce(next ? `${name}: pornit.` : `${name}: oprit.`);
+        });
+    });
+
+    /*
+     | Butonul TEST al diferentialului face exact ce face pe un tablou real:
+     | declanseaza (totul cade), apoi se reanclanseaza. Starile disjunctoarelor
+     | individuale se pastreaza.
+     */
+    let tripping = false;
+
+    rcdTest?.addEventListener('click', () => {
+        if (! isLive() || tripping) {
+            announce('Testul funcționează doar cu separatorul pornit.');
+
+            return;
+        }
+
+        tripping = true;
+        panel.classList.add('is-tripped');
+        panel.dataset.live = 'false';
+        refresh();
+        announce('Test diferențial: declanșat.');
+
+        setTimeout(() => {
+            panel.classList.remove('is-tripped');
+            panel.dataset.live = 'true';
+            refresh({ pulse: true });
+            announce('Test diferențial: OK. Reanclanșat.');
+            tripping = false;
+        }, prefersReducedMotion ? 350 : 950);
+    });
+
+    /*
+     | Prima energizare: o singura data, cand tabloul intra in cadru.
+     | Sub prefers-reduced-motion: direct starea finala.
+     */
+    if (prefersReducedMotion) {
+        setMaster(true, { pulse: false });
+
+        return;
+    }
+
+    const starter = new IntersectionObserver(
+        ([entry]) => {
+            if (! entry.isIntersecting) {
+                return;
+            }
+
+            starter.disconnect();
+
+            setTimeout(() => setMaster(true), 350);
+        },
+        { threshold: 0.35 },
+    );
+
+    starter.observe(panel);
+}
+
+/* ------------------------------------------------------ etapele pe cablu */
+
+function initStages() {
+    const root = document.querySelector('[data-stages]');
+
+    if (! root) {
+        return;
+    }
+
+    const tabs = [...root.querySelectorAll('[role="tab"]')];
+    const panels = [...root.querySelectorAll('[role="tabpanel"]')];
+    const fill = root.querySelector('[data-stage-fill]');
+
+    function select(index, { focus = false } = {}) {
+        tabs.forEach((tab, i) => {
+            const active = i === index;
+            tab.setAttribute('aria-selected', String(active));
+            tab.tabIndex = active ? 0 : -1;
+            panels[i].hidden = ! active;
+        });
+
+        if (fill) {
+            // Cablul se umple pana la nodul activ.
+            fill.style.width = `${(index / Math.max(tabs.length - 1, 1)) * 100}%`;
+        }
+
+        if (focus) {
+            tabs[index].focus();
+        }
+    }
+
+    tabs.forEach((tab, i) => {
+        tab.addEventListener('click', () => select(i));
+
+        tab.addEventListener('keydown', (event) => {
+            const delta = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
+
+            if (! delta) {
+                return;
+            }
+
+            event.preventDefault();
+            select((i + delta + tabs.length) % tabs.length, { focus: true });
+        });
+    });
+
+    select(0);
+}
+
 /* ------------------------------------------------------------- meniu mobil */
 
 function initNav() {
@@ -81,7 +298,6 @@ function initNav() {
         setOpen(toggle.getAttribute('aria-expanded') !== 'true');
     });
 
-    // Escape inchide meniul si redă focusul butonului.
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
             setOpen(false);
@@ -105,7 +321,6 @@ function initNavbarScroll() {
         return;
     }
 
-    // Un sentinel de 1px evita ascultarea evenimentului `scroll`.
     const sentinel = document.createElement('div');
     sentinel.setAttribute('aria-hidden', 'true');
     sentinel.style.cssText = 'position:absolute;top:0;height:1px;width:1px;pointer-events:none';
@@ -188,9 +403,8 @@ function initCookieBanner() {
     banner.hidden = false;
 
     /*
-     | Are role="dialog", deci focusul trebuie sa ajunga in el. Altfel un utilizator
-     | de tastatura ar trebui sa tabuleze prin toata pagina pana la Accept/Refuz.
-     | Nu e modal si nu prindem focusul: nu blocam pe nimeni in banner.
+     | Are role="dialog", deci focusul trebuie sa ajunga in el. Nu e modal si
+     | nu prindem focusul: nu blocam pe nimeni in banner.
      */
     banner.focus({ preventScroll: true });
 
@@ -211,6 +425,8 @@ function initCookieBanner() {
 
 function boot() {
     observeReveals();
+    initPanel();
+    initStages();
     initNav();
     initNavbarScroll();
     initGalleryFilters();

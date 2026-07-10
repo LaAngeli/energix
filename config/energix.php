@@ -10,9 +10,16 @@ declare(strict_types=1);
 | Site de prezentare, fara baza de date. Continutul editabil sta aici, nu in
 | Blade. Datele de contact sunt documentate in .claude/context/CONTACT.md.
 |
-| EXCLUDERI OBLIGATORII (.claude/context/BUSINESS.md): nicaieri in acest fisier
-| sau in vreo vedere nu apar afirmatii de certificare/autorizare, serviciul
-| „Smart Home” / orice „automatizare”, sau „Audit Energetic”.
+| CE VINDE BUSINESS-UL (decis de client 2026-07-10): instalatii electrice
+| COMPLETE, de la zero, in constructii — toate etapele, pentru apartamente,
+| case si spatii industriale.
+|
+| EXCLUDERI OBLIGATORII (.claude/context/BUSINESS.md):
+|   - orice afirmatie de certificare / autorizare;
+|   - „Smart Home” si orice „automatizare”;
+|   - „Audit Energetic”;
+|   - reparatii izolate, mentenanta, interventii urgente / non-stop / 24-din-7,
+|     depanari — business-ul NU face service, doar instalatii de la zero.
 |
 */
 
@@ -40,22 +47,20 @@ return [
         ['days' => 'Duminică', 'time' => 'Închis'],
     ],
 
-    'emergency' => 'Intervenții urgente: 24/7',
+    /*
+     | O singura promisiune de raspuns, folosita peste tot. Fara referiri la
+     | interventii rapide: nu facem service, facem proiecte.
+     */
+    'response_time' => 'Te sunăm înapoi în aceeași zi lucrătoare.',
 
     /*
-     | Site-ul vechi se contrazicea: homepage promitea „răspuns în 1 oră”, formularul
-     | „maxim 24 de ore”. O singura valoare, folosita peste tot.
+     | Semnalul de incredere care inlocuieste numele fondatorului (eliminat la
+     | cererea clientului) si afirmatia de certificare (exclusa). 10 ani —
+     | singura cifra confirmata de client.
      */
-    'response_time' => 'În aceeași zi la urgențe. Altfel, te sunăm în cel mult 24 de ore.',
-
-    /*
-     | Raspundere cu nume. Nu e o afirmatie de certificare — e o persoana care isi pune
-     | numele pe lucrare, ceea ce conteaza mai mult la B2C decat o insigna.
-     | De confirmat cu clientul: „Sandulescu” sau „Săndulescu”?
-     */
-    'founder' => [
-        'name' => 'Dima Sandulescu',
-        'role' => 'Fondator și electrician principal',
+    'experience' => [
+        'years' => 10,
+        'label' => 'ani de instalații electrice',
     ],
 
     /*
@@ -65,7 +70,7 @@ return [
     'answers' => [
         ['q' => 'Cât costă?', 'a' => 'Evaluare gratuită, apoi preț fix în ofertă.'],
         ['q' => 'Cât durează?', 'a' => 'Termen clar, în scris, înainte să începem.'],
-        ['q' => 'Veniți azi?', 'a' => 'Da — la urgențe, non-stop.'],
+        ['q' => 'Când puteți începe?', 'a' => 'De regulă în aceeași săptămână. Data exactă o stabilim la telefon.'],
     ],
 
     'social' => [
@@ -77,59 +82,102 @@ return [
     ],
 
     /*
-     | Trei servicii. Erau cinci pe site-ul vechi; „Smart Home” si
-     | „Audit Energetic” au fost excluse de client.
+     | Un singur serviciu — instalatia electrica completa — pentru trei tipuri
+     | de spatii. Fiecare intrare descrie acelasi ciclu complet, adaptat.
      */
     'services' => [
         [
-            'slug' => 'rezidentiale',
-            'title' => 'Instalații rezidențiale',
-            'tagline' => 'Case și apartamente, de la zero sau la renovare.',
-            'intro' => 'Punem la punct instalația electrică a locuinței: tablou, circuite, prize, iluminat. Lucrăm curat și lăsăm în urmă o schemă pe care o înțelege orice electrician care vine după noi.',
+            'slug' => 'apartamente',
+            'title' => 'Instalații electrice pentru apartamente',
+            'tagline' => 'Bloc nou sau renovare completă.',
+            'intro' => 'Executăm instalația apartamentului cap-coadă: schema pe circuite, traseele, tabloul, prizele și iluminatul. Un singur responsabil pentru toate etapele.',
             'features' => [
-                'Montaj și configurare tablou electric',
-                'Prize, întrerupătoare și corpuri de iluminat',
-                'Cablare completă, conform normelor',
-                'Verificări și măsurători la final',
+                'Schema instalației și împărțirea pe circuite',
+                'Trasee, doze și cablare completă',
+                'Tabloul electric, echipat și etichetat',
+                'Prize, întrerupătoare, corpuri de iluminat',
+                'Verificări, măsurători, punere sub tensiune',
             ],
             'image' => 'images/content/img1.webp',
         ],
         [
-            'slug' => 'industriale',
-            'title' => 'Instalații industriale',
-            'tagline' => 'Spații comerciale, hale, depozite.',
-            'intro' => 'Proiectăm și executăm instalații pentru spații comerciale și industriale, de la tabloul de distribuție până la alimentarea utilajelor.',
+            'slug' => 'case',
+            'title' => 'Instalații electrice pentru case',
+            'tagline' => 'De la fundație până la predare.',
+            'intro' => 'O casă are branșament, exterior, etaje și consumatori mari. Proiectăm și montăm instalația completă, cu împământare și măsurători la predare.',
             'features' => [
-                'Tablouri de distribuție',
-                'Cablare și alimentare utilaje',
-                'Monitorizare consum',
-                'Punere în funcțiune și documentație',
+                'Proiectul instalației, pe etaje și exterior',
+                'Racord de la branșament la tabloul general',
+                'Cablare interioară și exterioară',
+                'Consumatori mari: plită, boiler, climatizare',
+                'Împământare, măsurători, predare cu schemă',
             ],
-            'image' => 'images/content/img4.webp',
+            'image' => 'images/content/img6.webp',
         ],
         [
-            'slug' => 'reparatii',
-            'title' => 'Reparații și mentenanță',
-            'tagline' => 'Când s-a stricat. Inclusiv noaptea.',
-            'intro' => 'Găsim defectul, îți spunem ce l-a cauzat și îl reparăm. Pentru instalațiile pe care le întreținem periodic, ajungem înainte să se strice.',
+            'slug' => 'industriale',
+            'title' => 'Instalații pentru spații industriale',
+            'tagline' => 'Hale, depozite, spații comerciale.',
+            'intro' => 'Distribuția completă a spațiului de lucru: tablouri, trasee de cabluri, alimentarea utilajelor și iluminatul, predate cu documentație.',
             'features' => [
-                'Intervenții urgente, 24/7',
-                'Diagnosticare cu aparat, nu din ochi',
-                'Reparații cu materiale de calitate',
-                'Mentenanță preventivă programată',
+                'Tablouri de distribuție și de forță',
+                'Jgheaburi și poduri de cabluri',
+                'Alimentarea utilajelor și echipamentelor',
+                'Iluminat industrial și de spații comerciale',
+                'Măsurători și documentație la predare',
             ],
-            'image' => 'images/content/img5_flipped.webp',
+            'image' => 'images/content/img4.webp',
         ],
     ],
 
     /*
-     | Pasii au ordine reala, deci numerotarea lor poarta informatie.
+     | Etapele tehnice ale unei instalatii — continutul sectiunii interactive
+     | de pe homepage. Ordinea e cea reala de pe santier.
+     */
+    'stages' => [
+        [
+            'title' => 'Proiectare',
+            'body' => 'Desenăm schema instalației: circuite, secțiuni de cablu, protecții. Știi de la început ce intră în perete și de ce.',
+        ],
+        [
+            'title' => 'Trasee și cablare',
+            'body' => 'Șanțuri, tuburi, doze și cablul tras pe fiecare circuit. E etapa care nu se mai vede — de aceea o facem cel mai atent.',
+        ],
+        [
+            'title' => 'Tabloul electric',
+            'body' => 'Echipăm tabloul: separator general, diferențial, câte un disjunctor pe circuit. Totul etichetat, ca schema să fie citită de oricine.',
+        ],
+        [
+            'title' => 'Montajul final',
+            'body' => 'Prize, întrerupătoare și corpuri de iluminat, montate la cotele stabilite împreună cu tine.',
+        ],
+        [
+            'title' => 'Verificare și predare',
+            'body' => 'Măsurăm izolația și împământarea, punem instalația sub tensiune și predăm lucrarea împreună cu schema ei.',
+        ],
+    ],
+
+    /*
+     | Circuitele tabloului interactiv din hero. Amperaje realiste per tip de
+     | circuit — tabloul e demonstratia de competenta, deci datele sunt corecte.
+     */
+    'panel_circuits' => [
+        ['name' => 'Iluminat', 'amps' => '10 A', 'icon' => 'bulb'],
+        ['name' => 'Prize', 'amps' => '16 A', 'icon' => 'socket'],
+        ['name' => 'Bucătărie', 'amps' => '20 A', 'icon' => 'stove'],
+        ['name' => 'Boiler', 'amps' => '16 A', 'icon' => 'boiler'],
+        ['name' => 'Climă', 'amps' => '16 A', 'icon' => 'ac'],
+        ['name' => 'Forță', 'amps' => '25 A', 'icon' => 'motor'],
+    ],
+
+    /*
+     | Drumul clientului, de la telefon la predare.
      */
     'process' => [
-        ['title' => 'Ne suni', 'body' => 'Ne spui ce ai nevoie. Dacă e urgent, venim azi.'],
-        ['title' => 'Venim și ne uităm', 'body' => 'Evaluăm la fața locului. Deplasarea pentru evaluare e gratuită.'],
-        ['title' => 'Primești oferta', 'body' => 'Preț fix, în scris, cu termen. Nu apar costuri la final.'],
-        ['title' => 'Executăm', 'body' => 'Lucrăm curat, în termenul stabilit, și lăsăm în urmă documentația.'],
+        ['title' => 'Ne suni', 'body' => 'Ne spui despre proiect: apartament, casă sau spațiu industrial.'],
+        ['title' => 'Venim și ne uităm', 'body' => 'La fața locului sau direct pe planurile tale. Evaluarea e gratuită.'],
+        ['title' => 'Primești oferta', 'body' => 'Preț fix, în scris, cu termen și etape. Nu apar costuri la final.'],
+        ['title' => 'Executăm și predăm', 'body' => 'Toate etapele, în ordinea corectă. La final: măsurători și schema tabloului.'],
     ],
 
     /*
@@ -139,44 +187,43 @@ return [
     'promises' => [
         ['label' => 'Garanție pentru lucrări', 'body' => 'Dacă cedează ceva din ce am montat, ne întoarcem pe cheltuiala noastră.'],
         ['label' => 'Preț fix în ofertă', 'body' => 'Prețul din ofertă este prețul final. Fără costuri descoperite pe parcurs.'],
-        ['label' => 'Intervenții urgente 24/7', 'body' => 'Pentru pene de curent și defecte periculoase, răspundem non-stop.'],
-        ['label' => 'Evaluare gratuită', 'body' => 'Venim, ne uităm, îți spunem ce e de făcut. Fără obligații.'],
+        ['label' => 'Evaluare gratuită', 'body' => 'Venim la fața locului sau ne uităm pe planuri. Fără obligații.'],
+        ['label' => 'Predare cu măsurători', 'body' => 'Primești instalația verificată și schema tabloului. Știi exact ce ai în perete.'],
     ],
 
     'values' => [
         ['title' => 'Siguranță', 'body' => 'Nu improvizăm. O instalație electrică greșită nu se vede până când e prea târziu.'],
-        ['title' => 'Transparență', 'body' => 'Îți arătăm ce am găsit, îți explicăm de ce trebuie schimbat și cât costă.'],
-        ['title' => 'Curățenie', 'body' => 'Plecăm din casa ta lăsând-o cum am găsit-o. Fără moloz, fără praf.'],
+        ['title' => 'Transparență', 'body' => 'Îți arătăm schema, îți explicăm fiecare alegere și îți spunem cât costă. Înainte să începem.'],
+        ['title' => 'Curățenie', 'body' => 'Plecăm de pe șantier lăsându-l cum l-am găsit. Fără moloz, fără praf.'],
         ['title' => 'Punctualitate', 'body' => 'Dacă am zis ora zece, la ora zece suntem acolo.'],
     ],
 
     /*
      | Galerie de umplutura pana la fotografii reale ale lucrarilor.
-     | Vezi intrebarea deschisa din .claude/context/BUSINESS.md.
+     | Categoriile urmeaza cele trei segmente de business.
      */
     'gallery' => [
-        ['image' => 'images/content/img1.webp', 'title' => 'Instalație completă apartament', 'category' => 'rezidentiale'],
-        ['image' => 'images/content/img3.webp', 'title' => 'Cablare casă nouă', 'category' => 'rezidentiale'],
-        ['image' => 'images/content/img6.webp', 'title' => 'Instalație vilă', 'category' => 'rezidentiale'],
+        ['image' => 'images/content/img1.webp', 'title' => 'Instalație completă în apartament', 'category' => 'apartamente'],
+        ['image' => 'images/content/img2.webp', 'title' => 'Iluminat montat în apartament', 'category' => 'apartamente'],
+        ['image' => 'images/content/img3.webp', 'title' => 'Cablare în apartament nou', 'category' => 'apartamente'],
+        ['image' => 'images/content/img6.webp', 'title' => 'Instalație completă de casă', 'category' => 'case'],
+        ['image' => 'images/content/img5_flipped.webp', 'title' => 'Tabloul electric al unei case', 'category' => 'case'],
+        ['image' => 'images/content/img8.webp', 'title' => 'Cablare pe șantier de casă', 'category' => 'case'],
         ['image' => 'images/content/img4.webp', 'title' => 'Tablou de distribuție', 'category' => 'industriale'],
-        ['image' => 'images/content/img7.webp', 'title' => 'Cablare hală de producție', 'category' => 'industriale'],
-        ['image' => 'images/content/img9.webp', 'title' => 'Instalație spațiu comercial', 'category' => 'industriale'],
-        ['image' => 'images/content/img5_flipped.webp', 'title' => 'Modernizare tablou electric', 'category' => 'reparatii'],
-        ['image' => 'images/content/img8.webp', 'title' => 'Remediere defect de circuit', 'category' => 'reparatii'],
-        ['image' => 'images/content/img2.webp', 'title' => 'Înlocuire corpuri de iluminat', 'category' => 'reparatii'],
+        ['image' => 'images/content/img7.webp', 'title' => 'Trasee de cabluri în hală', 'category' => 'industriale'],
+        ['image' => 'images/content/img9.webp', 'title' => 'Instalație în spațiu comercial', 'category' => 'industriale'],
     ],
 
     'gallery_categories' => [
         'toate' => 'Toate',
-        'rezidentiale' => 'Rezidențiale',
+        'apartamente' => 'Apartamente',
+        'case' => 'Case',
         'industriale' => 'Industriale',
-        'reparatii' => 'Reparații',
     ],
 
     /*
-     | Cifrele de pe site-ul vechi sunt NEVERIFICATE si se contrazic intre pagini
-     | (8 vs 10+ ani). Nu se afiseaza pana la confirmarea clientului.
-     | Vezi .claude/context/BUSINESS.md, intrebarea deschisa 2.
+     | Cifrele de pe site-ul vechi (500/350/50) raman NEVERIFICATE si ascunse.
+     | Singura confirmata de client: vechimea — vezi `experience`.
      */
     'stats_enabled' => false,
     'stats' => [],
@@ -199,23 +246,23 @@ return [
         'pages' => [
             'home' => [
                 'title' => 'Energix — instalații electrice în Chișinău și toată Moldova',
-                'description' => 'Instalații electrice, reparații și mentenanță pentru case, apartamente și spații comerciale. Garanție pentru lucrări, intervenții urgente 24/7, preț fix în ofertă.',
+                'description' => 'Instalații electrice complete pentru apartamente, case și spații industriale — de la proiect la punere sub tensiune. Garanție și preț fix în ofertă. Chișinău și toată Moldova.',
             ],
             'services' => [
-                'title' => 'Servicii — instalații, reparații și mentenanță electrică | Energix',
-                'description' => 'Instalații electrice rezidențiale și industriale, reparații și mentenanță. Electrician în Chișinău și în toată Republica Moldova.',
+                'title' => 'Servicii — instalații electrice complete | Energix',
+                'description' => 'Instalația electrică de la zero: proiectare, cablare, tablou, montaj final și verificări. Apartamente, case și spații industriale.',
             ],
             'gallery' => [
                 'title' => 'Tipuri de lucrări | Energix',
-                'description' => 'Tipurile de lucrări electrice pe care le executăm: instalații rezidențiale, industriale, reparații și mentenanță.',
+                'description' => 'Tipurile de lucrări pe care le executăm: instalații electrice complete pentru apartamente, case și spații industriale.',
             ],
             'about' => [
                 'title' => 'Despre noi | Energix',
-                'description' => 'Cine suntem, cum lucrăm și după ce principii. Servicii electrice în Chișinău și toată Moldova.',
+                'description' => 'Cine suntem și cum lucrăm. Instalații electrice complete, de 10 ani, în Chișinău și toată Moldova.',
             ],
             'contact' => [
                 'title' => 'Contact — cere o ofertă | Energix',
-                'description' => 'Sună la +373 68 582 016 sau completează formularul. Evaluare gratuită, preț fix în ofertă, intervenții urgente 24/7.',
+                'description' => 'Sună la +373 68 582 016 sau completează formularul. Evaluare gratuită și preț fix în ofertă.',
             ],
             'legal.terms' => [
                 'title' => 'Termeni și condiții | Energix',

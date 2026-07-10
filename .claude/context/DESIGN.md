@@ -118,29 +118,39 @@ CLS e controlat.
    WCAG AA de 4.5:1. **Corectat:** `--color-paper-dim #94a3b8` dă **7.4:1**.
 8. **CTA telefon sticky pe mobil** — vezi `BUSINESS.md`, telefonul e conversia principală.
 
-## Elementul-semnătură: schema monofilară cu nodul Y
+## Elementul-semnătură: TABLOUL DE DISTRIBUȚIE INTERACTIV
 
-Hero-ul nu are o poză cu un om și o bormașină, ci **schema monofilară a unui tablou
-electric real**: sursă 230 V → siguranță generală → diferențial 30 mA → patru circuite.
+Înlocuiește schema monofilară statică (client, 2026-07-10: „inutil de simplistă").
+Hero-ul are un **tablou electric funcțional** (`<x-signature.panel>`), nu o ilustrație:
 
-Nodul „Y" (conexiunea în stea din becul logo-ului) e **sursa**. La încărcare se aprinde
-auriu, apoi curentul curge prin traseu, apoi diferențialul semnalează că instalația e sub
-tensiune. În ordinea asta, fiindcă așa se întâmplă în realitate.
+- **Separator general** — comutator real (`role="switch"`); pune tabloul sub tensiune.
+- **Voltmetru** — numără 0 → 230 V la energizare (constantă fizică, nu cifră de marketing).
+- **Diferențial 30 mA** — LED cyan + buton **TEST** care chiar declanșează totul și
+  reanclanșează după ~1s, exact ca pe un tablou real.
+- **6 disjunctoare** cu amperaje corecte per circuit (Iluminat 10 A, Prize 16 A,
+  Bucătărie 20 A, Boiler 16 A, Climă 16 A, Forță 25 A) — fiecare comutabil; firul și
+  consumatorul lui se aprind auriu, cu un puls de curent care coboară pe fir.
+- **Prima energizare**: o dată, când tabloul intră în cadru (IntersectionObserver).
+  După aceea nimic nu se mișcă fără acțiunea utilizatorului.
 
-Asta e răspunsul la golul lăsat de eliminarea lui „electrician autorizat":
-**competența se demonstrează, nu se revendică.**
+Starea „sub tensiune" curge în CSS după topologia reală: sursă → separator → busbar →
+disjunctor → consumator. Implementat în HTML/CSS (nu SVG lat): responsive nativ,
+3 circuite pe rând pe mobil, 6 pe desktop. Accesibil: `role="switch"`, anunțuri
+`role="status"` la fiecare comutare.
 
-⚠️ **Capcană SVG, deja plătită o dată:** `transform: scale()` din CSS **suprascrie**
-atributul `transform="translate(...)"` din SVG. Animația trebuie pusă pe un `<g>` interior,
-cu `translate` pe cel exterior. Altfel elementul aterizează în colțul stânga-sus.
+Al doilea element interactiv: **etapele pe cablu** (`<x-signature.stages>`) — cele 5
+etape ale instalației ca tab-uri (tablist real, săgeți stânga/dreapta), cu un cablu care
+se umple auriu până la etapa selectată.
 
-Două layout-uri, nu unul lat cu scroll orizontal: riser vertical sub `md`, bus orizontal
-peste. Verificat: zero scroll orizontal la 360px pe toate paginile.
+⚠️ Capcane plătite deja:
+- `transform` din CSS suprascrie atributul `transform` din SVG (de-asta panoul e HTML).
+- `requestAnimationFrame` îngheață în tab-uri de fundal — voltmetrul are un `setTimeout`
+  de gardă care garantează valoarea finală.
 
 ## Componente Blade (implementate)
 
 `layouts/app` · `partials/{navbar,footer,sticky-call,cookie-banner}` ·
-`seo/{head,json-ld}` · `signature/{wye,schematic}` · `section-header` · `service-card` ·
+`seo/{head,json-ld}` · `signature/{wye,panel,stages}` · `section-header` · `service-card` ·
 `answer-cote` · `promise-item` · `process-step` · `value-item` · `gallery-grid` ·
 `cta-band` · `contact-form`
 

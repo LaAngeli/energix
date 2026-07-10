@@ -27,10 +27,10 @@ Nu există coordonate GPS și nici hartă încorporată.
 - Luni–Vineri: 08:00 – 20:00
 - Sâmbătă: 09:00 – 17:00
 - Duminică: închis (implicit — nu era menționat)
-- Urgențe: 24/7
+- ~~Urgențe: 24/7~~ — era pe site-ul vechi; **eliminat pe site-ul nou** (2026-07-10,
+  business-ul nu face intervenții — vezi `BUSINESS.md`).
 
-Formularul promite răspuns în max. 24h; homepage-ul promite „Răspuns în 1 Oră".
-(Inconsistență preluată din site-ul vechi — de aliniat.)
+Promisiunea de răspuns pe site-ul nou (unică): „Te sunăm înapoi în aceeași zi lucrătoare."
 
 ## Rețele sociale și mesagerie
 

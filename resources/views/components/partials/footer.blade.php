@@ -13,8 +13,8 @@
                     <span class="font-display text-lg tracking-tight text-paper">Energix</span>
                 </div>
                 <p class="mt-4 max-w-sm text-paper-dim">
-                    Instalații electrice, reparații și mentenanță pentru case, apartamente și
-                    spații comerciale. {{ $contact['city'] }} și toată {{ $contact['country'] }}.
+                    Instalații electrice complete pentru apartamente, case și spații industriale.
+                    {{ $contact['city'] }} și toată {{ $contact['country'] }}.
                 </p>
 
                 <ul class="mt-6 flex flex-wrap gap-3">
@@ -60,7 +60,7 @@
                 </ul>
                 <p class="mt-4 inline-flex items-center gap-2 font-mono text-xs tracking-wider text-gold uppercase">
                     <x-signature.wye :size="12" :live="true" />
-                    {{ config('energix.emergency') }}
+                    {{ config('energix.experience.years') }} {{ config('energix.experience.label') }}
                 </p>
             </div>
         </div>

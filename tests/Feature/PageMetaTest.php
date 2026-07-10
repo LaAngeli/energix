@@ -15,7 +15,7 @@ it('serveste titlul propriu, nu pe cel al homepage-ului', function (string $path
         ->assertSee("<title>{$expected}</title>", escape: false);
 })->with([
     ['/', 'Energix — instalații electrice în Chișinău și toată Moldova'],
-    ['/servicii', 'Servicii — instalații, reparații și mentenanță electrică | Energix'],
+    ['/servicii', 'Servicii — instalații electrice complete | Energix'],
     ['/termeni-si-conditii', 'Termeni și condiții | Energix'],
     ['/politica-de-confidentialitate', 'Politica de confidențialitate | Energix'],
     ['/politica-cookie', 'Politica de cookie | Energix'],

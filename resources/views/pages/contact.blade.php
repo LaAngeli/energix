@@ -28,7 +28,7 @@
                         href="tel:{{ $contact['phone_href'] }}"
                         class="readout mt-3 block text-readout text-gold transition hover:brightness-110"
                     >{{ $contact['phone'] }}</a>
-                    <p class="mt-3 text-sm text-paper-dim">{{ config('energix.emergency') }}</p>
+                    <p class="mt-3 text-sm text-paper-dim">{{ config('energix.response_time') }}</p>
                 </div>
 
                 <div class="mt-5 space-y-5" data-reveal>
@@ -54,10 +54,6 @@
                                     <span class="readout text-sm text-paper">{{ $slot['time'] }}</span>
                                 </li>
                             @endforeach
-                            <li class="flex items-center justify-between gap-6 py-3">
-                                <span class="text-paper">Urgențe</span>
-                                <span class="readout text-sm text-gold">24/7</span>
-                            </li>
                         </ul>
                     </div>
 

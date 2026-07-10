@@ -4,51 +4,57 @@
 @section('content')
 
     {{-- ============================================================ 01 · HERO --}}
-    <section class="mx-auto max-w-6xl px-5 pt-12 pb-20 sm:px-8 sm:pt-20 sm:pb-28" aria-labelledby="hero-title">
-        <div class="grid items-center gap-14 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
-            <div>
-                <p class="eyebrow flex items-center gap-2.5">
-                    <x-signature.wye :size="13" :live="true" />
-                    Servicii electrice · {{ config('energix.contact.city') }}
-                </p>
+    <section class="relative overflow-hidden" aria-labelledby="hero-title">
+        {{-- caroiaj de plan tehnic — textura statica, nu miscare --}}
+        <div class="blueprint absolute inset-0 opacity-25 [mask-image:radial-gradient(75%_75%_at_60%_40%,black,transparent)]" aria-hidden="true"></div>
 
-                <h1 id="hero-title" class="mt-6 text-h1 text-paper">
-                    Curentul ajunge<br>unde trebuie.
-                </h1>
+        <div class="relative mx-auto max-w-6xl px-5 pt-12 pb-20 sm:px-8 sm:pt-20 sm:pb-24">
+            <div class="grid items-center gap-14 lg:grid-cols-[1fr_1.05fr] lg:gap-14">
+                <div>
+                    <p class="eyebrow flex items-center gap-2.5">
+                        <x-signature.wye :size="13" :live="true" />
+                        Instalații electrice · {{ config('energix.contact.city') }}
+                    </p>
 
-                <p class="mt-6 max-w-xl text-lead text-paper-dim">
-                    Instalații, reparații și mentenanță pentru case, apartamente și spații
-                    comerciale. În {{ config('energix.contact.city') }} și în toată {{ config('energix.contact.country') }}.
-                </p>
+                    <h1 id="hero-title" class="mt-6 text-h1 text-paper">
+                        Curentul ajunge<br>unde trebuie.
+                    </h1>
 
-                <div class="mt-9 flex flex-col gap-3 sm:flex-row">
-                    <a
-                        href="tel:{{ config('energix.contact.phone_href') }}"
-                        class="inline-flex items-center justify-center gap-3 rounded-sm bg-gold px-6 py-4 font-mono text-sm font-medium tracking-wider text-ink uppercase transition hover:brightness-110 hover:shadow-[0_0_28px_-6px_var(--color-gold)]"
-                    >
-                        Sună acum
-                        <span class="tabular-nums normal-case tracking-normal">{{ config('energix.contact.phone') }}</span>
-                    </a>
+                    <p class="mt-6 max-w-xl text-lead text-paper-dim">
+                        Instalația electrică completă, de la proiect până la punere sub tensiune.
+                        Apartamente, case și spații industriale, în {{ config('energix.contact.city') }}
+                        și toată {{ config('energix.contact.country') }}.
+                    </p>
 
-                    <a
-                        href="{{ route('contact') }}"
-                        class="inline-flex items-center justify-center rounded-sm border border-line px-6 py-4 font-mono text-sm tracking-wider text-paper uppercase transition hover:border-gold hover:text-gold"
-                    >
-                        Cere o ofertă
-                    </a>
+                    <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+                        <a
+                            href="tel:{{ config('energix.contact.phone_href') }}"
+                            class="inline-flex items-center justify-center gap-3 rounded-sm bg-gold px-6 py-4 font-mono text-sm font-medium tracking-wider text-ink uppercase transition hover:brightness-110 hover:shadow-[0_0_28px_-6px_var(--color-gold)]"
+                        >
+                            Sună acum
+                            <span class="tabular-nums normal-case tracking-normal">{{ config('energix.contact.phone') }}</span>
+                        </a>
+
+                        <a
+                            href="{{ route('contact') }}"
+                            class="inline-flex items-center justify-center rounded-sm border border-line px-6 py-4 font-mono text-sm tracking-wider text-paper uppercase transition hover:border-gold hover:text-gold"
+                        >
+                            Cere o ofertă
+                        </a>
+                    </div>
+
+                    <ul class="mt-10 grid gap-x-6 gap-y-2.5 font-mono text-xs tracking-wide text-paper-dim uppercase sm:grid-cols-2">
+                        @foreach (config('energix.promises') as $promise)
+                            <li class="flex items-center gap-2.5">
+                                <span class="h-1 w-1 shrink-0 rounded-full bg-gold" aria-hidden="true"></span>
+                                {{ $promise['label'] }}
+                            </li>
+                        @endforeach
+                    </ul>
                 </div>
 
-                <ul class="mt-10 grid gap-x-6 gap-y-2.5 font-mono text-xs tracking-wide text-paper-dim uppercase sm:grid-cols-2">
-                    @foreach (config('energix.promises') as $promise)
-                        <li class="flex items-center gap-2.5">
-                            <span class="h-1 w-1 shrink-0 rounded-full bg-gold" aria-hidden="true"></span>
-                            {{ $promise['label'] }}
-                        </li>
-                    @endforeach
-                </ul>
+                <x-signature.panel data-reveal />
             </div>
-
-            <x-signature.schematic class="text-paper" />
         </div>
     </section>
 
@@ -79,11 +85,10 @@
         <x-section-header
             :index="3"
             eyebrow="Ce facem"
-            title="Trei servicii. Duse până la capăt."
-            intro="Nu facem de toate. Facem bine ce facem, și îți lăsăm în urmă o instalație pe care o poate citi orice electrician care vine după noi."
+            title="Instalația completă, de la zero."
+            intro="Facem un singur lucru: instalații electrice pentru construcții. Toate etapele, pentru trei tipuri de spații."
         />
 
-        {{-- șina pe care se clipsează modulele --}}
         <div class="mt-14">
             <div class="hidden h-px w-full bg-line lg:block" aria-hidden="true"></div>
 
@@ -102,29 +107,22 @@
         </p>
     </section>
 
-    {{-- ========================================================= 04 · PROCES --}}
-    <section class="border-t border-line" aria-labelledby="process-title">
+    {{-- ================================================= 04 · ETAPE (interactiv) --}}
+    <section class="border-t border-line bg-ink-raised/40" aria-labelledby="stages-title">
         <div class="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
             <x-section-header
                 :index="4"
-                eyebrow="Cum lucrăm"
-                title="De la telefon la lumină aprinsă."
+                eyebrow="Cum se construiește o instalație"
+                title="Cinci etape. În ordinea asta."
+                intro="Fiecare ofertă acoperă toate cele cinci. Apasă pe o etapă ca să vezi ce se întâmplă în ea."
             />
 
-            <ol class="mt-14 max-w-2xl">
-                @foreach (config('energix.process') as $i => $step)
-                    <x-process-step
-                        :step="$step"
-                        :index="$i + 1"
-                        :last="$loop->last"
-                    />
-                @endforeach
-            </ol>
+            <x-signature.stages class="mt-14" data-reveal />
         </div>
     </section>
 
     {{-- ====================================================== 05 · ÎNCREDERE --}}
-    <section class="border-t border-line bg-ink-raised" aria-labelledby="trust-title">
+    <section class="border-t border-line" aria-labelledby="trust-title">
         <div class="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
             <div class="grid gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
                 <x-section-header
@@ -140,9 +138,9 @@
                     @endforeach
 
                     <p class="border-t border-line pt-6 text-paper-dim" data-reveal>
-                        În spatele fiecărei lucrări e
-                        <strong class="font-normal text-paper">{{ config('energix.founder.name') }}</strong>,
-                        {{ mb_strtolower(config('energix.founder.role')) }}.
+                        Facem asta de
+                        <strong class="font-normal text-paper">{{ config('energix.experience.years') }} ani</strong>
+                        — aceleași standarde la prima și la ultima lucrare.
                     </p>
                 </div>
             </div>
@@ -157,7 +155,7 @@
                     :index="6"
                     eyebrow="Unde lucrăm"
                     title="Chișinău și toată Moldova."
-                    intro="Pentru urgențe în oraș ajungem în aceeași zi. În restul țării, stabilim ziua la telefon."
+                    intro="Pentru evaluări în oraș ajungem în aceeași săptămână. În restul țării, stabilim ziua la telefon."
                 />
 
                 <div data-reveal>
@@ -169,11 +167,11 @@
                                 <span class="readout text-paper">{{ $slot['time'] }}</span>
                             </li>
                         @endforeach
-                        <li class="flex items-center justify-between gap-6 py-4">
-                            <span class="text-paper">Urgențe</span>
-                            <span class="readout text-gold">24/7</span>
-                        </li>
                     </ul>
+                    <p class="mt-4 flex items-center gap-2.5 font-mono text-xs tracking-wider text-gold uppercase">
+                        <x-signature.wye :size="12" :live="true" />
+                        {{ config('energix.experience.years') }} {{ config('energix.experience.label') }}
+                    </p>
                 </div>
             </div>
         </div>

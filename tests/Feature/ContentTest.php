@@ -9,10 +9,10 @@ declare(strict_types=1);
  * impotriva unei cai gresite de imagine sau a unui serviciu sters din greseala
  * este testul asta.
  */
-it('declara exact cele trei servicii ramase', function (): void {
+it('declara exact cele trei segmente de business', function (): void {
     $slugs = array_column(config('energix.services'), 'slug');
 
-    expect($slugs)->toBe(['rezidentiale', 'industriale', 'reparatii']);
+    expect($slugs)->toBe(['apartamente', 'case', 'industriale']);
 });
 
 it('nu referentiaza imagini inexistente', function (): void {
