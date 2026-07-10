@@ -1,7 +1,7 @@
 @php
     $fields = [
-        ['name' => 'name', 'label' => 'Nume', 'type' => 'text', 'autocomplete' => 'family-name'],
-        ['name' => 'prenume', 'label' => 'Prenume', 'type' => 'text', 'autocomplete' => 'given-name'],
+        ['name' => 'name', 'label' => __('site.form.name'), 'type' => 'text', 'autocomplete' => 'family-name'],
+        ['name' => 'prenume', 'label' => __('site.form.surname'), 'type' => 'text', 'autocomplete' => 'given-name'],
     ];
 @endphp
 
@@ -19,7 +19,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('contact.store') }}" class="space-y-5" data-circuit-form>
+    <form method="POST" action="{{ URL::localized('contact.store') }}" class="space-y-5" data-circuit-form>
         @csrf
 
         {{--
@@ -42,7 +42,7 @@
 
         {{-- Capcana. Ascunsa vizual SI pentru cititoarele de ecran. --}}
         <div class="absolute left-[-9999px]" aria-hidden="true">
-            <label for="website">Nu completa acest câmp</label>
+            <label for="website">{{ __('site.form.honeypot') }}</label>
             <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
         </div>
 
@@ -71,7 +71,7 @@
         </div>
 
         <div class="field">
-            <label for="phone" class="eyebrow block">Telefon *</label>
+            <label for="phone" class="eyebrow block">{{ __('site.form.phone') }} *</label>
             <input
                 type="tel"
                 id="phone"
@@ -93,7 +93,7 @@
         </div>
 
         <div class="field">
-            <label for="email" class="eyebrow block">Email *</label>
+            <label for="email" class="eyebrow block">{{ __('site.form.email') }} *</label>
             <input
                 type="email"
                 id="email"
@@ -112,7 +112,7 @@
         </div>
 
         <div class="field">
-            <label for="message" class="eyebrow block">Ce ai nevoie *</label>
+            <label for="message" class="eyebrow block">{{ __('site.form.message') }} *</label>
             <textarea
                 id="message"
                 name="message"
@@ -120,7 +120,7 @@
                 required
                 minlength="10"
                 maxlength="2000"
-                placeholder="Descrie pe scurt proiectul: tipul spațiului, suprafața, stadiul șantierului."
+                placeholder="{{ __('site.form.placeholder') }}"
                 data-circuit-field
                 @error('message') aria-invalid="true" aria-describedby="message-error" @enderror
                 class="mt-2 w-full resize-y rounded-sm border border-line bg-ink-raised px-4 py-3 text-paper transition placeholder:text-paper-dim/60 focus:border-gold focus:outline-none"
@@ -135,9 +135,9 @@
             data-submit
             class="energize-sweep w-full rounded-sm bg-gold px-6 py-4 font-mono text-sm font-medium tracking-wider text-ink uppercase sm:w-auto"
         >
-            Închide circuitul — trimite
+            {{ __('site.form.submit') }}
         </button>
 
-        <p class="text-sm text-paper-dim">{{ config('energix.response_time') }}</p>
+        <p class="text-sm text-paper-dim">{{ __('site.common.response_time') }}</p>
     </form>
 </div>

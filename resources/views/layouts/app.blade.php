@@ -3,7 +3,7 @@
     $page ??= 'home';
 @endphp
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -20,7 +20,7 @@
     {{ Vite::fonts() }}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <x-seo.json-ld />
+    <x-seo.json-ld :page="$page" />
 </head>
 <body class="bg-ink text-paper antialiased">
     {{-- Sonda: lumina care urmareste cursorul pe suprafetele navy. --}}
@@ -33,7 +33,7 @@
     </div>
 
     <a href="#continut" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[60] focus:rounded-sm focus:bg-gold focus:px-4 focus:py-2 focus:font-mono focus:text-sm focus:text-ink">
-        Sari la conținut
+        {{ __('site.nav.skip') }}
     </a>
 
     <x-partials.navbar />

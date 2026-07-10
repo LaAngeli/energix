@@ -15,10 +15,10 @@
         </a>
 
         <a
-            href="{{ route('contact') }}"
+            href="{{ URL::localized('contact') }}"
             class="flex items-center justify-center rounded-sm border border-line px-4 py-3.5 font-mono text-xs tracking-wider text-paper uppercase active:translate-y-px"
         >
-            Ofertă
+            {{ __('site.common.get_offer') }}
         </a>
     </div>
 </div>

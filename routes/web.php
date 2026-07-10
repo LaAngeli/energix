@@ -4,43 +4,72 @@ declare(strict_types=1);
 
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Paginile publice
-|--------------------------------------------------------------------------
-*/
-
-Route::view('/', 'pages.home')->name('home');
-Route::view('/servicii', 'pages.services')->name('services');
-Route::view('/galerie', 'pages.gallery')->name('gallery');
-Route::view('/despre', 'pages.about')->name('about');
-Route::view('/contacte', 'pages.contact')->name('contact');
-
-Route::view('/termeni-si-conditii', 'pages.legal.terms')->name('legal.terms');
-Route::view('/politica-de-confidentialitate', 'pages.legal.privacy')->name('legal.privacy');
-Route::view('/politica-cookie', 'pages.legal.cookies')->name('legal.cookies');
-
-/*
-|--------------------------------------------------------------------------
-| Formularul de contact
+| Site bilingv: RO la radacina, RU sub /ru cu slug-uri traduse
 |--------------------------------------------------------------------------
 |
-| `throttle:5,1` — cinci trimiteri pe minut, per IP. Site-ul vechi nu avea
-| nicio limita si putea fi folosit ca relay de spam.
+| Slug-urile ruse sunt traduse (`/ru/uslugi`, nu `/ru/servicii`) — cuvantul-cheie
+| in URL e un semnal slab, dar gratuit, iar pentru un vizitator rusofon un URL
+| romanesc arata a traducere neterminata.
+|
+| Numele rutelor: `services` pentru RO, `ru.services` pentru RU. Vederile nu stiu
+| asta — folosesc `URL::localized('services')` (macro in AppServiceProvider).
+|
+| Nu redirectam dupa `Accept-Language`: Googlebot crawleaza cu un singur set de
+| headere si ar vedea mereu aceeasi limba.
 |
 */
 
-Route::post('/contacte', [ContactController::class, 'store'])
-    ->middleware('throttle:5,1')
-    ->name('contact.store');
+/** @var array<string, array<string, string>> URI-ul fiecarei pagini, per limba. */
+$pages = [
+    'home' => ['ro' => '/', 'ru' => '/ru'],
+    'services' => ['ro' => '/servicii', 'ru' => '/ru/uslugi'],
+    'gallery' => ['ro' => '/galerie', 'ru' => '/ru/raboty'],
+    'about' => ['ro' => '/despre', 'ru' => '/ru/o-nas'],
+    'contact' => ['ro' => '/contacte', 'ru' => '/ru/kontakty'],
+    'legal.terms' => ['ro' => '/termeni-si-conditii', 'ru' => '/ru/usloviya'],
+    'legal.privacy' => ['ro' => '/politica-de-confidentialitate', 'ru' => '/ru/konfidencialnost'],
+    'legal.cookies' => ['ro' => '/politica-cookie', 'ru' => '/ru/cookie'],
+];
 
-/*
-|--------------------------------------------------------------------------
-| SEO
-|--------------------------------------------------------------------------
-*/
+/**
+ * Numele rutei => [vedere, date]. Cele trei pagini legale impart o singura
+ * vedere; continutul lor vine din `lang/{locale}/site.php`.
+ *
+ * @var array<string, array{0: string, 1: array<string, string>}>
+ */
+$views = [
+    'home' => ['pages.home', []],
+    'services' => ['pages.services', []],
+    'gallery' => ['pages.gallery', []],
+    'about' => ['pages.about', []],
+    'contact' => ['pages.contact', []],
+    'legal.terms' => ['pages.legal.page', ['doc' => 'terms']],
+    'legal.privacy' => ['pages.legal.page', ['doc' => 'privacy']],
+    'legal.cookies' => ['pages.legal.page', ['doc' => 'cookies']],
+];
+
+foreach (config('energix.locales') as $locale) {
+    $prefix = $locale === 'ro' ? '' : $locale.'.';
+
+    Route::middleware(SetLocale::class.':'.$locale)->group(function () use ($pages, $views, $locale, $prefix): void {
+        foreach ($views as $name => [$view, $data]) {
+            Route::view($pages[$name][$locale], $view, $data)->name($prefix.$name);
+        }
+
+        /*
+         | `throttle:5,1` — cinci trimiteri pe minut, per IP. Site-ul vechi nu avea
+         | nicio limita si putea fi folosit ca relay de spam.
+         */
+        Route::post($pages['contact'][$locale], [ContactController::class, 'store'])
+            ->middleware('throttle:5,1')
+            ->name($prefix.'contact.store');
+    });
+}
 
 // Controller invocabil, nu closure: closure-urile rup `php artisan route:cache`.
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');

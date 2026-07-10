@@ -1,8 +1,11 @@
-@props(['items', 'categories'])
+@php
+    $items = config('energix.gallery');
+    $categories = __('site.gallery.categories');
+@endphp
 
 <div data-gallery {{ $attributes }}>
-    <div class="flex flex-wrap items-center gap-2" role="group" aria-label="Filtrează după tipul lucrării">
-        @foreach ($categories as $slug => $label)
+    <div class="flex flex-wrap items-center gap-2" role="group" aria-label="{{ __('site.gallery.filter_label') }}">
+        @foreach (config('energix.gallery_categories') as $slug)
             {{-- filtrele sunt disjunctoare: LED aprins = circuit selectat --}}
             <button
                 type="button"
@@ -11,26 +14,27 @@
                 class="group inline-flex min-h-11 items-center gap-2.5 rounded-sm border border-line px-4 font-mono text-xs tracking-wider uppercase transition aria-pressed:border-gold aria-pressed:bg-gold/10 aria-pressed:text-gold text-paper-dim hover:border-gold hover:text-gold"
             >
                 <span class="led" aria-hidden="true"></span>
-                {{ $label }}
+                {{ $categories[$slug] }}
             </button>
         @endforeach
 
         <p class="ml-auto font-mono text-xs tracking-wider text-paper-dim uppercase">
-            <span class="readout text-gold" data-gallery-count>{{ count($items) }}</span> lucrări pe circuit
+            <span class="readout text-gold" data-gallery-count>{{ count($items) }}</span> {{ __('site.gallery.count_suffix') }}
         </p>
     </div>
 
     <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        @foreach ($items as $item)
+        @foreach ($items as $i => $item)
+            @php($title = __("site.gallery.items.{$item['key']}"))
             <figure
                 data-category="{{ $item['category'] }}"
                 class="group overflow-hidden rounded-sm border border-line bg-ink-raised"
                 data-reveal
-                style="--reveal-delay: {{ ($loop->index % 3) * 80 }}ms"
+                style="--reveal-delay: {{ ($i % 3) * 80 }}ms"
             >
                 <img
                     src="{{ asset($item['image']) }}"
-                    alt="{{ $item['title'] }}"
+                    alt="{{ $title }} — Energix, {{ __('site.common.city') }}"
                     width="640"
                     height="480"
                     loading="lazy"
@@ -38,7 +42,7 @@
                     class="h-52 w-full object-cover opacity-75 transition duration-500 group-hover:scale-[1.03] group-hover:opacity-100"
                 >
                 <figcaption class="flex items-center justify-between gap-3 border-t border-line px-4 py-3">
-                    <span class="text-sm text-paper">{{ $item['title'] }}</span>
+                    <span class="text-sm text-paper">{{ $title }}</span>
                     <span class="font-mono text-[0.65rem] tracking-wider text-paper-dim uppercase">
                         {{ $categories[$item['category']] }}
                     </span>

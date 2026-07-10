@@ -14,22 +14,19 @@
                 </div>
                 <p class="flex items-center gap-2.5 font-mono text-[0.65rem] tracking-[0.16em] text-gold uppercase">
                     <x-signature.wye :size="12" :live="true" />
-                    {{ config('energix.experience.years') }} {{ config('energix.experience.label') }}
+                    {{ config('energix.experience_years') }} {{ __('site.common.experience_label') }}
                 </p>
             </div>
 
             <div class="grid gap-x-10 gap-y-8 pt-7 md:grid-cols-3">
                 <div>
-                    <h2 class="eyebrow">Obiect</h2>
-                    <p class="mt-3 text-sm text-paper-dim">
-                        Instalații electrice complete pentru apartamente, case și spații
-                        industriale. {{ $contact['city'] }} și toată {{ $contact['country'] }}.
-                    </p>
+                    <h2 class="eyebrow">{{ __('site.common.object') }}</h2>
+                    <p class="mt-3 text-sm text-paper-dim">{{ __('site.about_page.lead') }}</p>
                     <x-social-links class="mt-5" />
                 </div>
 
                 <div>
-                    <h2 class="eyebrow">Contact</h2>
+                    <h2 class="eyebrow">{{ __('site.nav.contact') }}</h2>
                     <ul class="mt-3 space-y-2.5">
                         <li>
                             <a href="tel:{{ $contact['phone_href'] }}" class="readout text-lg text-gold transition hover:brightness-110">
@@ -41,32 +38,32 @@
                                 {{ $contact['email'] }}
                             </a>
                         </li>
-                        <li class="text-sm text-paper-dim">{{ $contact['city'] }}, {{ $contact['country'] }}</li>
+                        <li class="text-sm text-paper-dim">{{ __('site.common.area_served') }}</li>
                     </ul>
                 </div>
 
                 <div>
-                    <h2 class="eyebrow">Program</h2>
+                    <h2 class="eyebrow">{{ __('site.common.schedule') }}</h2>
                     <ul class="mt-3 space-y-1.5 text-sm">
-                        @foreach (config('energix.hours') as $slot)
+                        @foreach (__('site.hours') as $slot)
                             <li class="flex justify-between gap-4">
                                 <span class="text-paper-dim">{{ $slot['days'] }}</span>
                                 <span class="readout text-paper">{{ $slot['time'] }}</span>
                             </li>
                         @endforeach
                     </ul>
-                    <p class="mt-3 text-xs text-paper-dim">{{ config('energix.response_time') }}</p>
+                    <p class="mt-3 text-xs text-paper-dim">{{ __('site.common.response_time') }}</p>
                 </div>
             </div>
         </div>
 
         <div class="mt-6 flex flex-col gap-3 text-xs text-paper-dim sm:flex-row sm:items-center sm:justify-between">
-            <p>&copy; {{ date('Y') }} Energix. Toate drepturile rezervate.</p>
-            <nav aria-label="Pagini legale">
+            <p>&copy; {{ date('Y') }} Energix. {{ __('site.common.rights') }}</p>
+            <nav aria-label="{{ __('site.common.legal') }}">
                 <ul class="flex flex-wrap gap-x-5 gap-y-2">
-                    <li><a href="{{ route('legal.terms') }}" class="transition hover:text-paper">Termeni și condiții</a></li>
-                    <li><a href="{{ route('legal.privacy') }}" class="transition hover:text-paper">Confidențialitate</a></li>
-                    <li><a href="{{ route('legal.cookies') }}" class="transition hover:text-paper">Cookie</a></li>
+                    <li><a href="{{ URL::localized('legal.terms') }}" class="transition hover:text-paper">{{ __('site.common.legal_terms') }}</a></li>
+                    <li><a href="{{ URL::localized('legal.privacy') }}" class="transition hover:text-paper">{{ __('site.common.legal_privacy') }}</a></li>
+                    <li><a href="{{ URL::localized('legal.cookies') }}" class="transition hover:text-paper">{{ __('site.common.legal_cookies') }}</a></li>
                 </ul>
             </nav>
         </div>

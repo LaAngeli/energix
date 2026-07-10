@@ -1,7 +1,8 @@
-@props(['title' => 'Punem proiectul tău sub tensiune?', 'body' => null])
+@props(['title' => null, 'body' => null])
 
 @php
-    $body ??= config('energix.response_time');
+    $title ??= __('site.cta.title');
+    $body ??= __('site.common.response_time');
 @endphp
 
 {{--
@@ -21,7 +22,7 @@
             >
                 <span class="big-switch-track" aria-hidden="true"><span class="big-switch-knob"></span></span>
                 <span class="font-mono text-[0.6rem] tracking-[0.18em] text-paper-dim uppercase group-aria-checked:text-gold">
-                    Punere sub tensiune
+                    {{ __('site.cta.switch') }}
                 </span>
             </button>
 
@@ -35,15 +36,15 @@
                     href="tel:{{ config('energix.contact.phone_href') }}"
                     class="armed-target energize-sweep inline-flex w-full items-center justify-center gap-3 rounded-sm bg-gold px-7 py-4 font-mono text-sm font-medium tracking-wider text-ink uppercase sm:w-auto"
                 >
-                    Sună acum
+                    {{ __('site.common.call_now') }}
                     <span class="tabular-nums normal-case tracking-normal">{{ config('energix.contact.phone') }}</span>
                 </a>
 
                 <a
-                    href="{{ route('contact') }}"
+                    href="{{ URL::localized('contact') }}"
                     class="inline-flex w-full items-center justify-center rounded-sm border border-line px-7 py-4 font-mono text-sm tracking-wider text-paper uppercase transition hover:border-gold hover:text-gold sm:w-auto"
                 >
-                    Cere o ofertă
+                    {{ __('site.common.get_offer') }}
                 </a>
             </div>
         </div>

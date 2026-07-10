@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 /**
- * Integritatea continutului din config/energix.php.
+ * Integritatea continutului.
  *
- * Continutul nu are baza de date si nici admin, deci singura plasa de siguranta
- * impotriva unei cai gresite de imagine sau a unui serviciu sters din greseala
- * este testul asta.
+ * Structura sta in config/energix.php, textul in lang/{ro,ru}/site.php.
+ * Nu exista baza de date si nici admin, deci singura plasa de siguranta
+ * impotriva unei cai gresite de imagine sau a unei traduceri lipsa e testul asta.
  */
 it('declara exact cele trei segmente de business', function (): void {
     $slugs = array_column(config('energix.services'), 'slug');
@@ -30,16 +30,20 @@ it('nu referentiaza imagini inexistente', function (): void {
 });
 
 it('foloseste doar categorii de galerie declarate', function (): void {
-    $declared = array_keys(config('energix.gallery_categories'));
+    $declared = config('energix.gallery_categories');
     $used = array_unique(array_column(config('energix.gallery'), 'category'));
 
     expect(array_diff($used, $declared))->toBe([]);
 });
 
 it('nu afiseaza cifre neverificate', function (): void {
-    // Site-ul vechi se contrazicea: homepage „8 ani”, pagina Despre „peste 10 ani”.
-    // Raman ascunse pana la confirmarea clientului.
     expect(config('energix.stats_enabled'))->toBeFalse();
+});
+
+it('pastreaza datele de contact intacte', function (): void {
+    expect(config('energix.contact.phone'))->toBe('+373 68 582 016')
+        ->and(config('energix.contact.phone_href'))->toBe('+37368582016')
+        ->and(config('energix.contact.email'))->toBe('contact@energix.md');
 });
 
 it('are o glifa pentru fiecare retea sociala', function (): void {
@@ -60,17 +64,58 @@ it('randeaza toate iconitele sociale, cu nume accesibil', function (): void {
         expect($html)->toContain('aria-label="'.$network['name'].'"');
     }
 
-    /*
-     | Glife desenate, nu pastile de text. Pagina de contact le arata de doua ori:
-     | o data in coloana de date, o data in footer. (Y-ul din <x-signature.wye> e
-     | stroke, nu fill, deci nu intra la numaratoare.)
-     */
+    // De doua ori: coloana de contact + footer. Y-ul din wye e stroke, nu fill.
     expect(substr_count($html, 'fill="currentColor"'))->toBe(count($networks) * 2);
 });
 
-it('pastreaza datele de contact intacte', function (): void {
-    expect(config('energix.contact.phone'))->toBe('+373 68 582 016')
-        ->and(config('energix.contact.phone_href'))->toBe('+37368582016')
-        ->and(config('energix.contact.email'))->toBe('contact@energix.md')
-        ->and(config('energix.contact.city'))->toBe('Chișinău');
+/*
+|--------------------------------------------------------------------------
+| Paritate intre limbi
+|--------------------------------------------------------------------------
+|
+| Un site bilingv se strica tacut: cineva adauga un serviciu sau o intrebare
+| in romana si uita rusa. Blade nu crapa — afiseaza cheia bruta, `site.faq.6.q`.
+| Testele de mai jos prind exact asta.
+|
+*/
+
+it('are aceleasi chei de continut in ambele limbi', function (): void {
+    $flatten = function (array $array, string $prefix = '') use (&$flatten): array {
+        $keys = [];
+
+        foreach ($array as $key => $value) {
+            $path = $prefix === '' ? (string) $key : "{$prefix}.{$key}";
+            $keys = array_merge($keys, is_array($value) ? $flatten($value, $path) : [$path]);
+        }
+
+        return $keys;
+    };
+
+    $ro = $flatten(require lang_path('ro/site.php'));
+    $ru = $flatten(require lang_path('ru/site.php'));
+
+    expect(array_diff($ro, $ru))->toBe([], 'Chei prezente doar in RO')
+        ->and(array_diff($ru, $ro))->toBe([], 'Chei prezente doar in RU');
 });
+
+it('traduce fiecare serviciu, etapa si intrebare in ambele limbi', function (string $locale): void {
+    app()->setLocale($locale);
+
+    foreach (config('energix.services') as $service) {
+        expect(trans("site.services.{$service['slug']}.title"))->not->toStartWith('site.')
+            ->and(trans("site.services.{$service['slug']}.features"))->toHaveCount(5);
+    }
+
+    expect(trans('site.stages'))->toHaveCount(5)
+        ->and(trans('site.faq'))->toHaveCount(6)
+        ->and(trans('site.promises'))->toHaveCount(4)
+        ->and(trans('site.values'))->toHaveCount(4);
+
+    foreach (config('energix.gallery') as $item) {
+        expect(trans("site.gallery.items.{$item['key']}"))->not->toStartWith('site.');
+    }
+
+    foreach (config('energix.panel_circuits') as $circuit) {
+        expect(trans("site.panel.circuits.{$circuit['key']}"))->not->toStartWith('site.');
+    }
+})->with(['ro', 'ru']);

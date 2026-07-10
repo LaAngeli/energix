@@ -45,23 +45,40 @@ nimic nu justifică costul lor pe un site de prezentare.
 
 Servit de Herd la `https://energix.test` (vezi `APP_URL`). Nu porni `php artisan serve`.
 
-## Structură țintă a paginilor
+## Site bilingv: RO la rădăcină, RU sub `/ru`
 
-Mapare 1:1 după site-ul vechi, minus ce s-a exclus (vezi `BUSINESS.md`):
-
-| Rută | Pagină veche | Note |
+| Rută RO | Rută RU | Pagină veche |
 |---|---|---|
-| `/` | `index.html` | hero, servicii, de ce noi, proces, preview galerie, CTA |
-| `/servicii` | `services.html` | 3 secțiuni (erau 5) |
-| `/galerie` | `galery.html` | filtre: rezidențial, industrial (era + smart) |
-| `/despre` | `about.html` | echipă, valori, cifre |
-| `/contacte` | `contacts.html` | date contact + formular |
-| `/termeni-si-conditii` | `terms_conditions.html` | |
-| `/politica-de-confidentialitate` | `privacy_policy.html` | |
-| `/politica-cookie` | `cookie_policy.html` | |
+| `/` | `/ru` | `index.html` |
+| `/servicii` | `/ru/uslugi` | `services.html` |
+| `/galerie` | `/ru/raboty` | `galery.html` |
+| `/despre` | `/ru/o-nas` | `about.html` |
+| `/contacte` | `/ru/kontakty` | `contacts.html` |
+| `/termeni-si-conditii` | `/ru/usloviya` | `terms_conditions.html` |
+| `/politica-de-confidentialitate` | `/ru/konfidencialnost` | `privacy_policy.html` |
+| `/politica-cookie` | `/ru/cookie` | `cookie_policy.html` |
 
-Notă: vechiul URL era `galery.html` (typo). La rescriere folosim `/galerie` și punem
-redirect 301 din `/galery.html` ca să nu pierdem ce indexare există.
+Notă: vechiul URL era `galery.html` (typo). Redirect 301 din `/galery.html`.
+
+### Cum funcționează localizarea
+
+- **Structura** (slug-uri, imagini, amperaje, program numeric) → `config/energix.php`.
+- **Tot textul** → `lang/ro/site.php` și `lang/ru/site.php`. Vederile folosesc `__('site.…')`.
+- **Rutele** sunt înregistrate de două ori: `services` (RO) și `ru.services` (RU).
+  Vederile nu știu asta — folosesc `URL::localized('services')`, un macro definit în
+  `AppServiceProvider`. Pentru cealaltă limbă: `URL::inLocale('ru', 'services')`.
+- **Limba NU se ghicește din `Accept-Language`.** Fiecare limbă are URL-ul ei, iar o
+  redirectare automată ar sparge indexarea: Googlebot crawlează cu un singur set de headere.
+- `canonical`, `hreflang` și `sitemap.xml` se generează toate din tabela de rute, deci
+  dintr-o singură sursă (`APP_URL`). Un canonical care nu se potrivește cu hreflang îi
+  spune lui Google să ignore ambele.
+
+⚠️ **Un site bilingv se strică tăcut.** Dacă adaugi o cheie doar în `ro`, Blade afișează
+`site.faq.6.q` în pagină, fără să crape. `ContentTest` compară cheile celor două fișiere,
+iar `PagesTest` caută chei brute în HTML-ul randat.
+
+⚠️ **Excluderile de business se aplică și în rusă.** `ремонт` e cuvântul normal pentru
+renovare — de aceea `ContentExclusionsTest` vânează rădăcini în ambele limbi.
 
 ## Git — istorie deliberat separată de a site-ului vechi
 

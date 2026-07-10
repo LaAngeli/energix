@@ -174,6 +174,7 @@ proiect; nu deduce contextul din cod.
 - @.claude/context/DESIGN.md — tokens de culoare, tipografie, reguli responsive
 - @.claude/context/DEPLOY-HOSTINGER.md — constrângeri shared hosting, redirect-uri SEO
 - @.claude/context/SECURITY-NOTES.md — probleme moștenite din site-ul vechi
+- @.claude/context/SEO.md — strategia SEO/AEO/GEO, harta de cuvinte-cheie, RO+RU
 
 ## Flux de lucru: commit + push automat, deploy doar la comandă
 
@@ -222,6 +223,8 @@ nici după un task reușit. Doar la cerere explicită.
    vinde DOAR instalații complete de la zero. Detalii și grep-uri în `BUSINESS.md`;
    garda automată e `tests/Feature/ContentExclusionsTest.php`.
 4. Datele de contact se citesc din config (`config/energix.php`), nu se hardcodează în Blade.
+   **Tot textul** stă în `lang/ro/site.php` și `lang/ru/site.php` — site-ul e bilingv.
+   Orice text nou se adaugă în AMBELE, altfel `ContentTest` pică.
 5. Mobile-first. Clientul a cerut explicit accent pe design și responsivitate.
 6. Site-ul vechi (`C:\xampp\htdocs\energix`) e **doar referință de conținut**. Codul lui
    nu se copiază — are probleme de securitate documentate.

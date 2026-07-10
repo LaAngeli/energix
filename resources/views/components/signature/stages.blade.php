@@ -4,7 +4,7 @@
 | Cablul se „umple” cu auriu pana la etapa selectata — curentul ajunge acolo
 | unde esti in proiect. Tab-uri reale (role=tablist), navigabile cu sagetile.
 --}}
-@php($stages = config('energix.stages'))
+@php($stages = __('site.stages'))
 
 <div {{ $attributes }} data-stages>
     <div class="relative">
@@ -12,7 +12,7 @@
         <div class="absolute top-[22px] right-0 left-0 h-px bg-line" aria-hidden="true"></div>
         <div class="stage-fill absolute top-[22px] left-0 h-px" data-stage-fill aria-hidden="true"></div>
 
-        <div role="tablist" aria-label="Etapele instalației" class="relative grid grid-cols-5 gap-1 sm:gap-2">
+        <div role="tablist" aria-label="{{ __('site.home.stages_title') }}" class="relative grid grid-cols-5 gap-1 sm:gap-2">
             @foreach ($stages as $i => $stage)
                 <button
                     type="button"

@@ -2,36 +2,28 @@
 | Semnatura site-ului: un tablou de distributie INTERACTIV.
 |
 | Nu e o ilustratie — e obiectul pe care firma il monteaza, functional:
-|   - separatorul general pune tabloul sub tensiune (si tu il poti comuta);
-|   - diferentialul de 30 mA are buton TEST care chiar declanseaza si
-|     reanclanseaza, exact ca pe un tablou real;
-|   - fiecare disjunctor se comuta si isi aprinde / stinge consumatorul;
-|   - voltmetrul numara pana la 230 V (constanta fizica, nu cifra de marketing).
+| separatorul general pune tabloul sub tensiune, diferentialul de 30 mA are
+| buton TEST care chiar declanseaza si reanclanseaza, fiecare disjunctor se
+| comuta si isi aprinde consumatorul, iar voltmetrul numara pana la 230 V.
 |
-| La prima intrare in cadru tabloul se energizeaza singur, o data. Dupa aceea
-| nu se mai misca nimic fara actiunea utilizatorului.
-|
-| Accesibilitate: comutatoarele sunt <button role="switch">, starea se anunta
-| printr-un status sr-only, iar prefers-reduced-motion primeste starea finala
-| instant — comutarea ramane functionala, doar fara animatii.
+| Accesibilitate: `role="switch"`, anunturi `role="status"`, iar
+| prefers-reduced-motion primeste starea finala instant.
 --}}
 <div
     {{ $attributes->class('panel nameplate relative rounded-sm border border-line bg-ink-raised/70 p-5 backdrop-blur-[2px] sm:p-6') }}
     data-panel
     data-live="false"
 >
-    {{-- eticheta de tablou, ca pe usa unui tablou real --}}
     <p class="flex items-center justify-between gap-3 border-b border-line pb-3 font-mono text-[0.6rem] tracking-[0.18em] text-paper-dim uppercase">
-        <span>Tablou distribuție · TD-01</span>
+        <span>{{ __('site.panel.title') }}</span>
         <span>230 V ~ 50 Hz</span>
     </p>
 
-    {{-- ------------------------------------------------ randul de alimentare --}}
     <div class="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
         <div class="flex items-center gap-3">
             <x-signature.wye :size="20" data-panel-source class="shrink-0" />
             <div>
-                <p class="font-mono text-[0.6rem] tracking-[0.18em] text-paper-dim uppercase">Rețea</p>
+                <p class="font-mono text-[0.6rem] tracking-[0.18em] text-paper-dim uppercase">{{ __('site.panel.grid') }}</p>
                 <p class="readout text-xl leading-none text-paper">
                     <span data-voltmeter>0</span><span class="ml-1 text-sm text-paper-dim">V</span>
                 </p>
@@ -46,8 +38,8 @@
             class="group flex items-center gap-3 rounded-sm border border-line bg-ink px-3.5 py-2.5 transition-colors hover:border-gold/60"
         >
             <span class="text-left">
-                <span class="block font-mono text-[0.6rem] tracking-[0.18em] text-paper-dim uppercase">Separator</span>
-                <span class="block font-mono text-[0.6rem] tracking-[0.18em] text-gold uppercase" data-master-state>Oprit</span>
+                <span class="block font-mono text-[0.6rem] tracking-[0.18em] text-paper-dim uppercase">{{ __('site.panel.breaker') }}</span>
+                <span class="block font-mono text-[0.6rem] tracking-[0.18em] text-gold uppercase" data-master-state>{{ __('site.panel.off') }}</span>
             </span>
             <span class="lever-track" aria-hidden="true"><span class="lever-knob"></span></span>
         </button>
@@ -55,22 +47,21 @@
         <div class="flex items-center gap-3">
             <span class="rcd-led" data-rcd-led aria-hidden="true"></span>
             <div>
-                <p class="font-mono text-[0.6rem] tracking-[0.18em] text-cyan uppercase">Diferențial 30 mA</p>
+                <p class="font-mono text-[0.6rem] tracking-[0.18em] text-cyan uppercase">{{ __('site.panel.rcd') }}</p>
                 <button
                     type="button"
                     data-rcd-test
                     class="mt-1 rounded-[2px] border border-line px-2 py-0.5 font-mono text-[0.6rem] tracking-[0.18em] text-paper-dim uppercase transition-colors hover:border-cyan hover:text-cyan"
-                >Test</button>
+                >{{ __('site.panel.test') }}</button>
             </div>
         </div>
     </div>
 
-    {{-- ------------------------------------------------------------- busbar --}}
     <div class="panel-bus mt-5" aria-hidden="true"></div>
 
-    {{-- ---------------------------------------------------------- circuitele --}}
-    <ol class="grid grid-cols-3 gap-x-2 lg:grid-cols-6" role="group" aria-label="Circuitele tabloului — comută disjunctoarele">
+    <ol class="grid grid-cols-3 gap-x-2 lg:grid-cols-6" role="group" aria-label="{{ __('site.panel.group') }}">
         @foreach (config('energix.panel_circuits') as $circuit)
+            @php($name = __("site.panel.circuits.{$circuit['key']}"))
             <li class="circuit flex flex-col items-center" data-circuit>
                 <span class="circuit-drop" aria-hidden="true"></span>
 
@@ -79,7 +70,7 @@
                     data-breaker
                     role="switch"
                     aria-checked="true"
-                    aria-label="Circuit {{ $circuit['name'] }}, {{ $circuit['amps'] }}"
+                    aria-label="{{ $name }}, {{ $circuit['amps'] }}"
                     class="breaker group"
                 >
                     <span class="breaker-window" aria-hidden="true"><span class="breaker-lever"></span></span>
@@ -117,14 +108,14 @@
                                 <path d="M17 12h3.5M11 9.5v5M8.8 10.5l4.4 3M8.8 13.5l4.4-3" />
                         @endswitch
                     </svg>
-                    <span class="font-mono text-[0.58rem] tracking-[0.12em] uppercase">{{ $circuit['name'] }}</span>
+                    <span class="font-mono text-[0.58rem] tracking-[0.12em] uppercase">{{ $name }}</span>
                 </span>
             </li>
         @endforeach
     </ol>
 
     <p class="mt-4 border-t border-line pt-3 text-center font-mono text-[0.6rem] tracking-[0.14em] text-paper-dim uppercase">
-        Comută disjunctoarele — tabloul e funcțional
+        {{ __('site.panel.hint') }}
     </p>
 
     <p class="sr-only" role="status" data-panel-status></p>

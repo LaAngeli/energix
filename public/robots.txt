@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
 
+# Site bilingv: RO la rădăcină, RU sub /ru. Ambele sunt în sitemap,
+# cu alternative hreflang declarate pentru fiecare URL.
 Sitemap: https://energix.md/sitemap.xml

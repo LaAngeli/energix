@@ -674,11 +674,15 @@ function initLevel() {
     const label = root.querySelector('[data-level-label]');
     const degOut = root.querySelector('[data-level-deg]');
 
+    // Etichetele vin din Blade, deci instrumentul vorbeste limba paginii.
+    const textOk = root.dataset.labelOk;
+    const textCenter = root.dataset.labelCenter;
+
     const setLevel = (isLevel, deg) => {
         root.classList.toggle('is-level', isLevel);
         led.classList.toggle('is-on', isLevel);
         degOut.textContent = deg.toFixed(1);
-        label.textContent = isLevel ? 'Drept — la cotă' : 'Adu bula la centru';
+        label.textContent = isLevel ? textOk : textCenter;
     };
 
     // Tactil sau miscare redusa: nivela sta perfect dreapta, ca pe santier.
@@ -735,13 +739,15 @@ function initLineStatus() {
     }
 
     const schedule = JSON.parse(root.dataset.schedule || '[]');
+    const t = JSON.parse(root.dataset.i18n || '{}');
     const headline = root.querySelector('[data-line-headline]');
     const detail = root.querySelector('[data-line-detail]');
     const leds = root.querySelector('[data-line-leds]');
     const test = root.querySelector('[data-line-test]');
 
-    const days = ['duminică', 'luni', 'marți', 'miercuri', 'joi', 'vineri', 'sâmbătă'];
-    const pad = (n) => String(n).padStart(2, '0');
+    const pad = (n) => `${String(n).padStart(2, '0')}:00`;
+    const fill = (template, values) =>
+        Object.entries(values).reduce((text, [key, value]) => text.replaceAll(`:${key}`, value), template);
 
     function compute(now = new Date()) {
         const today = schedule[now.getDay()];
@@ -750,8 +756,8 @@ function initLineStatus() {
         if (today && hour >= today[0] && hour < today[1]) {
             return {
                 open: true,
-                headline: 'Linie liberă — sună acum',
-                detail: `Suntem deschiși până la ${pad(today[1])}:00.`,
+                headline: t.open,
+                detail: fill(t.openDetail, { hour: pad(today[1]) }),
             };
         }
 
@@ -764,16 +770,16 @@ function initLineStatus() {
                 continue;
             }
 
-            const when = offset === 0 ? 'azi' : (offset === 1 ? 'mâine' : days[day]);
+            const when = offset === 0 ? t.today : (offset === 1 ? t.tomorrow : t.days[day]);
 
             return {
                 open: false,
-                headline: 'Momentan închis',
-                detail: `Revenim ${when} la ${pad(slot[0])}:00. Scrie-ne — te sunăm noi.`,
+                headline: t.closed,
+                detail: fill(t.closedDetail, { when, hour: pad(slot[0]) }),
             };
         }
 
-        return { open: false, headline: 'Momentan închis', detail: 'Scrie-ne — te sunăm noi.' };
+        return { open: false, headline: t.closed, detail: t.closedPlain };
     }
 
     function render(state) {
@@ -810,7 +816,7 @@ function initLineStatus() {
         }
 
         leds.classList.add('line-chase');
-        headline.textContent = 'Verific linia…';
+        headline.textContent = t.testing;
         detail.textContent = ' ';
 
         setTimeout(() => {

@@ -1,12 +1,12 @@
 {{--
 | Contorul de lucrari (hero /galerie).
 |
-| Un contor electromecanic: alegi circuitul (segmentul), cifrele se rostogolesc
-| la numarul de lucrari, iar galeria de sub hero se filtreaza pe loc — instrumentul
-| chiar comanda pagina, nu e decor.
+| Un contor electromecanic: alegi circuitul, cifrele se rostogolesc la numarul
+| de lucrari, iar galeria de sub hero se filtreaza pe loc — instrumentul chiar
+| comanda pagina, nu e decor.
 --}}
 @php
-    $categories = config('energix.gallery_categories');
+    $labels = __('site.gallery.categories');
     $counts = ['toate' => count(config('energix.gallery'))];
 
     foreach (config('energix.gallery') as $item) {
@@ -16,7 +16,7 @@
 
 <div class="instrument w-full max-w-sm" data-works-counter data-counts='@json($counts)'>
     <p class="instrument-head">
-        <span>Contor de lucrări</span>
+        <span>{{ __('site.counter.title') }}</span>
         <span class="led is-on" aria-hidden="true"></span>
     </p>
 
@@ -34,14 +34,14 @@
                 @endforeach
             </div>
             <p class="max-w-28 font-mono text-[0.62rem] tracking-[0.14em] text-paper-dim uppercase">
-                lucrări pe circuitul ales
+                {{ __('site.counter.label') }}
             </p>
         </div>
 
         <p class="sr-only" role="status" data-works-status></p>
 
-        <div class="mt-4 grid gap-1.5" role="group" aria-label="Alege circuitul de lucrări">
-            @foreach ($categories as $slug => $label)
+        <div class="mt-4 grid gap-1.5" role="group" aria-label="{{ __('site.counter.group') }}">
+            @foreach (config('energix.gallery_categories') as $slug)
                 <button
                     type="button"
                     data-works-pick="{{ $slug }}"
@@ -50,15 +50,13 @@
                 >
                     <span class="flex items-center gap-2.5">
                         <span class="led" aria-hidden="true"></span>
-                        <span class="text-sm text-paper">{{ $label }}</span>
+                        <span class="text-sm text-paper">{{ $labels[$slug] }}</span>
                     </span>
                     <span class="readout text-xs text-paper-dim tabular-nums">{{ str_pad((string) ($counts[$slug] ?? 0), 2, '0', STR_PAD_LEFT) }}</span>
                 </button>
             @endforeach
         </div>
 
-        <p class="mt-3 text-[0.72rem] leading-snug text-paper-dim">
-            Alegerea de aici filtrează galeria de mai jos.
-        </p>
+        <p class="mt-3 text-[0.72rem] leading-snug text-paper-dim">{{ __('site.counter.note') }}</p>
     </div>
 </div>
