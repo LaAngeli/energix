@@ -106,11 +106,18 @@
                 :title="__('site.services_page.process_title')"
             />
 
-            <ol class="mt-12 max-w-2xl">
-                @foreach (__('site.process') as $i => $step)
-                    <x-process-step :step="$step" :index="$i + 1" :last="$loop->last" />
-                @endforeach
-            </ol>
+            <div class="mt-12 grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
+                <ol>
+                    @foreach (__('site.process') as $i => $step)
+                        <x-process-step :step="$step" :index="$i + 1" :last="$loop->last" />
+                    @endforeach
+                </ol>
+
+                {{-- Ilustrația trăiește doar unde există golul: coloana din dreapta pe lg+. --}}
+                <div class="hidden lg:block" data-reveal>
+                    <x-process-flow />
+                </div>
+            </div>
         </div>
     </section>
 

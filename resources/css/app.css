@@ -937,6 +937,97 @@
         }
     }
 
+    /* ===================== traseul curentului (sectiunea „Cum lucram”) ===================== */
+
+    /*
+    | Patru statii legate de un traseu care se umple cu auriu. `--pf-fill` (0..1),
+    | condus din JS, misca simultan umplerea firului si aprinderea nodurilor.
+    | Totul in SVG cu viewBox — o singura sursa de coordonate, responsive nativ.
+    */
+    .process-flow svg {
+        width: 100%;
+        height: auto;
+        overflow: visible;
+    }
+
+    .pf-wire {
+        stroke: var(--color-line);
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    /* Umplerea aurie: `pathLength=100`, deci offset-ul e direct procentul ramas. */
+    .pf-flow {
+        stroke: var(--color-gold);
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-dasharray: 100;
+        stroke-dashoffset: calc(100 - var(--pf-fill, 0) * 100);
+        filter: drop-shadow(0 0 4px color-mix(in srgb, var(--color-gold) 70%, transparent));
+    }
+
+    .pf-tile {
+        fill: var(--color-ink-raised);
+        stroke: var(--color-line);
+        stroke-width: 1.5;
+        transition:
+            stroke 0.35s ease-out,
+            fill 0.35s ease-out;
+    }
+
+    .pf-glyph {
+        fill: none;
+        stroke: var(--color-paper-dim);
+        stroke-width: 1.7;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        transition: stroke 0.35s ease-out;
+    }
+
+    .pf-led {
+        fill: var(--color-line);
+        transition:
+            fill 0.35s ease-out,
+            filter 0.35s ease-out;
+    }
+
+    /* Statie sub tensiune: rama, glyph-ul si LED-ul trec pe auriu. */
+    .pf-node.is-lit .pf-tile {
+        stroke: var(--color-gold);
+        fill: color-mix(in srgb, var(--color-gold) 8%, var(--color-ink-raised));
+    }
+
+    .pf-node.is-lit .pf-glyph {
+        stroke: var(--color-gold);
+    }
+
+    .pf-node.is-lit .pf-led {
+        fill: var(--color-gold);
+        filter: drop-shadow(0 0 4px var(--color-gold));
+    }
+
+    /* Aura becului (ultima statie), doar cand traseul e complet sub tensiune. */
+    .pf-aura {
+        fill: var(--color-gold);
+        opacity: 0;
+        filter: blur(14px);
+        transition: opacity 0.5s ease-out;
+    }
+
+    [data-process-flow].is-energized .pf-aura {
+        opacity: 0.16;
+    }
+
+    /* Bila de curent din varful umplerii; pozitionata din JS, ascunsa in repaus. */
+    .pf-head {
+        fill: #fff;
+        opacity: 0;
+        filter: drop-shadow(0 0 5px var(--color-gold)) drop-shadow(0 0 9px color-mix(in srgb, var(--color-gold) 60%, transparent));
+        transition: opacity 0.2s ease-out;
+    }
+
     /* ============================ intrari one-shot ============================ */
 
     /* Bara de apel de pe mobil urca o singura data, la incarcare. */

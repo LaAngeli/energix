@@ -523,6 +523,106 @@ function initLegacySegmentHash() {
     jump();
 }
 
+/* ------------------------------------- traseul curentului (sectiunea „Cum lucram”) */
+
+/**
+ * „De la apel la curent”: patru statii pe care le aprinde un curent auriu, in
+ * ordinea celor patru pasi. Se energizeaza o data cand intra in cadru; pe pointer
+ * fin, hover-ul pe o statie deruleaza curentul pana la ea.
+ *
+ * `--pf-fill` (0..1) conduce simultan umplerea firului (in CSS) si aprinderea
+ * nodurilor + bila de curent (aici). Sub `prefers-reduced-motion` sau fara JS,
+ * diagrama ramane complet aprinsa.
+ */
+function initProcessFlow() {
+    const root = document.querySelector('[data-process-flow]');
+
+    if (! root) {
+        return;
+    }
+
+    const path = root.querySelector('[data-flow-path]');
+    const head = root.querySelector('[data-flow-head]');
+    const nodes = [...root.querySelectorAll('[data-flow-node]')];
+    const fractions = nodes.map((node) => parseFloat(node.dataset.at));
+    const total = path.getTotalLength();
+
+    const clamp = (value) => Math.max(0, Math.min(1, value));
+
+    const apply = (fill) => {
+        root.style.setProperty('--pf-fill', fill.toFixed(4));
+        root.classList.toggle('is-energized', fill > 0.99);
+
+        // Un mic epsilon: nodul sursa (fractie 0) e aprins de la primul cadru.
+        nodes.forEach((node, i) => node.classList.toggle('is-lit', fill >= fractions[i] - 0.001));
+
+        const point = path.getPointAtLength(clamp(fill) * total);
+        head.setAttribute('transform', `translate(${point.x.toFixed(1)} ${point.y.toFixed(1)})`);
+        head.style.opacity = fill > 0.02 && fill < 0.98 ? '1' : '0';
+    };
+
+    // Miscare redusa: starea finala, fara animatie si fara interactiune.
+    if (prefersReducedMotion) {
+        apply(1);
+
+        return;
+    }
+
+    apply(0);
+
+    let frame = null;
+    let guard = null;
+
+    const animateTo = (target, duration) => {
+        cancelAnimationFrame(frame);
+        clearTimeout(guard);
+
+        const from = parseFloat(getComputedStyle(root).getPropertyValue('--pf-fill')) || 0;
+        const start = performance.now();
+
+        const tick = (now) => {
+            const t = clamp((now - start) / duration);
+            const eased = 1 - (1 - t) ** 3;
+            apply(from + (target - from) * eased);
+
+            if (t < 1) {
+                frame = requestAnimationFrame(tick);
+            }
+        };
+
+        frame = requestAnimationFrame(tick);
+
+        // rAF ingheata in tab-urile de fundal — garda garanteaza valoarea finala.
+        guard = setTimeout(() => {
+            cancelAnimationFrame(frame);
+            apply(target);
+        }, duration + 200);
+    };
+
+    // Prima energizare: o data, cand traseul intra in cadru.
+    new IntersectionObserver(
+        (entries, observer) => {
+            entries.forEach((entry) => {
+                if (! entry.isIntersecting) {
+                    return;
+                }
+
+                animateTo(1, 1800);
+                observer.unobserve(entry.target);
+            });
+        },
+        { threshold: 0.4 },
+    ).observe(root);
+
+    // Hover pe o statie: curentul curge pana la ea; la iesire, se reumple tot.
+    if (finePointer) {
+        nodes.forEach((node, i) => {
+            node.addEventListener('pointerenter', () => animateTo(fractions[i], 500));
+            node.addEventListener('pointerleave', () => animateTo(1, 700));
+        });
+    }
+}
+
 /* --------------------------------------------- circuitul formularului */
 
 /**
@@ -1405,6 +1505,7 @@ function boot() {
     initSegmentRows();
     initFaq();
     initLegacySegmentHash();
+    initProcessFlow();
     initCircuitsCalc();
     initWorksCounter();
     initLogoBuild();
