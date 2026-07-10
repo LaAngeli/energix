@@ -23,13 +23,22 @@
     <x-seo.json-ld />
 </head>
 <body class="bg-ink text-paper antialiased">
+    {{-- Sonda: lumina care urmareste cursorul pe suprafetele navy. --}}
+    <div class="probe" data-probe aria-hidden="true"></div>
+
+    {{-- Conductorul: firul care se umple cu aur pe masura ce cobori. --}}
+    <div class="spine" data-spine aria-hidden="true">
+        <div class="spine-fill"></div>
+        <div class="spine-head"></div>
+    </div>
+
     <a href="#continut" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[60] focus:rounded-sm focus:bg-gold focus:px-4 focus:py-2 focus:font-mono focus:text-sm focus:text-ink">
         Sari la conținut
     </a>
 
     <x-partials.navbar />
 
-    <main id="continut">
+    <main id="continut" class="relative">
         @yield('content')
     </main>
 

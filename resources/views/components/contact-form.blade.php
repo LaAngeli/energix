@@ -19,8 +19,23 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('contact.store') }}" class="space-y-5">
+    <form method="POST" action="{{ route('contact.store') }}" class="space-y-5" data-circuit-form>
         @csrf
+
+        {{--
+        | Circuitul formularului: fiecare camp valid inchide un segment; cand toate
+        | cele 5 sunt inchise, nodul si butonul se aprind. Pur vizual — nu blocheaza
+        | trimiterea si nu inlocuieste validarea de pe server.
+        --}}
+        <div class="form-circuit" data-form-circuit aria-hidden="true">
+            <x-signature.wye :size="14" :live="true" />
+            <span class="seg"></span>
+            <span class="seg"></span>
+            <span class="seg"></span>
+            <span class="seg"></span>
+            <span class="seg"></span>
+            <span class="node"></span>
+        </div>
 
         {{-- Momentul randarii, criptat: un bot nu il poate fabrica. --}}
         <input type="hidden" name="rendered_at" value="{{ encrypt(time()) }}">
@@ -42,7 +57,9 @@
                         value="{{ old($field['name']) }}"
                         autocomplete="{{ $field['autocomplete'] }}"
                         required
+                        minlength="2"
                         maxlength="50"
+                        data-circuit-field
                         @error($field['name']) aria-invalid="true" aria-describedby="{{ $field['name'] }}-error" @enderror
                         class="mt-2 w-full rounded-sm border border-line bg-ink-raised px-4 py-3 text-paper transition placeholder:text-paper-dim/60 focus:border-gold focus:outline-none"
                     >
@@ -64,7 +81,9 @@
                 inputmode="tel"
                 placeholder="+373 XX XXX XXX"
                 required
+                minlength="6"
                 maxlength="20"
+                data-circuit-field
                 @error('phone') aria-invalid="true" aria-describedby="phone-error" @enderror
                 class="mt-2 w-full rounded-sm border border-line bg-ink-raised px-4 py-3 text-paper tabular-nums transition placeholder:text-paper-dim/60 focus:border-gold focus:outline-none"
             >
@@ -83,6 +102,7 @@
                 autocomplete="email"
                 required
                 maxlength="100"
+                data-circuit-field
                 @error('email') aria-invalid="true" aria-describedby="email-error" @enderror
                 class="mt-2 w-full rounded-sm border border-line bg-ink-raised px-4 py-3 text-paper transition placeholder:text-paper-dim/60 focus:border-gold focus:outline-none"
             >
@@ -98,8 +118,10 @@
                 name="message"
                 rows="6"
                 required
+                minlength="10"
                 maxlength="2000"
-                placeholder="Descrie pe scurt lucrarea sau problema."
+                placeholder="Descrie pe scurt proiectul: tipul spațiului, suprafața, stadiul șantierului."
+                data-circuit-field
                 @error('message') aria-invalid="true" aria-describedby="message-error" @enderror
                 class="mt-2 w-full resize-y rounded-sm border border-line bg-ink-raised px-4 py-3 text-paper transition placeholder:text-paper-dim/60 focus:border-gold focus:outline-none"
             >{{ old('message') }}</textarea>
@@ -110,9 +132,10 @@
 
         <button
             type="submit"
-            class="w-full rounded-sm bg-gold px-6 py-4 font-mono text-sm font-medium tracking-wider text-ink uppercase transition hover:brightness-110 hover:shadow-[0_0_28px_-6px_var(--color-gold)] sm:w-auto"
+            data-submit
+            class="w-full rounded-sm bg-gold px-6 py-4 font-mono text-sm font-medium tracking-wider text-ink uppercase transition hover:brightness-110 sm:w-auto"
         >
-            Trimite mesajul
+            Închide circuitul — trimite
         </button>
 
         <p class="text-sm text-paper-dim">{{ config('energix.response_time') }}</p>

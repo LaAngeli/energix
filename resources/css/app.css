@@ -4,29 +4,27 @@
 @source '../../storage/framework/views/*.php';
 
 /*
-| Energix — sistem de design
+| Energix — sistem de design „INSTALAȚIA VIE”
 |
-| Fonturile sunt self-hosted prin laravel-vite-plugin/fonts (Bunny). Variabilele
-| --font-archivo / --font-plex / --font-plex-mono sunt injectate de `Vite::fonts()`.
+| Teza: site-ul nu e o broșură cu secțiuni, e o instalație sub tensiune.
+|   - un CONDUCTOR fix (stânga, xl+) se umple cu aur pe măsură ce derulezi,
+|     cu un punct de sarcină care coboară odată cu tine;
+|   - cursorul e o SONDĂ: o lumină caldă urmărește pointerul pe suprafețele navy;
+|   - fiecare pagină se deschide cu o FIȘĂ DE LUCRARE (metadata mono);
+|   - controalele sunt aparataj: comutatoare, disjunctoare, LED-uri, plăcuțe.
 |
-| Paleta vine din LOGO, nu din site-ul vechi: becul auriu #F2D147 pe bleumarinul
-| #091A31. Cyan-ul nu exista in marca; e degradat la accent strict tehnic.
+| Paleta vine din LOGO: auriu #F2D147 pe bleumarin #091A31. Cyan = doar instrument.
+| Fonturile sunt self-hosted prin Bunny; variabilele --font-* vin din Vite::fonts().
 */
 
 @theme {
-    /* --- Tipografie: trei roluri --- */
     --font-display: var(--font-archivo);
     --font-sans: var(--font-plex);
     --font-mono: var(--font-plex-mono);
 
-    /* --- Suprafata de baza: bleumarinul de brand ---
-     | Contrast pe --color-ink (WCAG 2.1, calculat):
-     |   paper      15.4:1
-     |   paper-dim   7.0:1   (AA pentru text mic)
-     |   gold       11.6:1
-     |   cyan       10.8:1
-     */
+    /* Contrast pe --color-ink (măsurat): paper 15.4 · paper-dim 7.0 · gold 11.6 · cyan 10.8 */
     --color-ink: #091a31;
+    --color-ink-deep: #060f1f;
     --color-ink-raised: #0f2540;
     --color-line: #22395b;
     --color-gold: #f2d147;
@@ -34,26 +32,20 @@
     --color-paper: #eaf1fb;
     --color-paper-dim: #93a6c4;
 
-    /* --- Banda luminoasa, o singura aparitie pe site ---
-     | Contrast pe --color-sheet:
-     |   graphite      15.2:1
-     |   graphite-dim   6.6:1  (AA)
-     | Auriul pe foaie da 1.3:1 => NICIODATA text auriu aici, doar hairline.
-     | Cyan-ul nu apare deloc pe foaie.
-     */
+    /* Banda luminoasă (o apariție/pagină): graphite 15.2 · graphite-dim 6.6. Fără auriu ca text aici. */
     --color-sheet: #edf1f6;
     --color-graphite: #0e1b2e;
     --color-graphite-dim: #47566c;
 
-    /* --- Scara tipografica, fluida, mobile-first --- */
     --text-eyebrow: 0.75rem;
     --text-body: 1.0625rem;
     --text-body--line-height: 1.65;
     --text-lead: clamp(1.125rem, 1.02rem + 0.5vw, 1.375rem);
     --text-h3: clamp(1.25rem, 1.12rem + 0.6vw, 1.5rem);
     --text-h2: clamp(1.75rem, 1.35rem + 2vw, 2.75rem);
-    --text-h1: clamp(2.25rem, 1.5rem + 4vw, 4.25rem);
+    --text-h1: clamp(2.5rem, 1.4rem + 5.2vw, 5.5rem);
     --text-readout: clamp(1.75rem, 1.35rem + 2vw, 2.5rem);
+    --text-meter: clamp(4rem, 2.5rem + 8vw, 9rem);
 }
 
 @layer base {
@@ -77,11 +69,10 @@
         font-family: var(--font-display);
         font-weight: 700;
         letter-spacing: -0.02em;
-        line-height: 1.05;
+        line-height: 1.02;
         text-wrap: balance;
     }
 
-    /* Focus vizibil, obligatoriu. Nu se scoate. */
     :focus-visible {
         outline: 2px solid var(--color-gold);
         outline-offset: 3px;
@@ -105,7 +96,6 @@
     color: var(--color-paper-dim);
 }
 
-/* Cifre de instrument: latime fixa, ca sa nu „danseze”. */
 @utility readout {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
@@ -113,13 +103,12 @@
     letter-spacing: -0.02em;
 }
 
-/* Suprafata luminoasa. Regula: fara cyan, fara text auriu. */
 @utility sheet-surface {
     background-color: var(--color-sheet);
     color: var(--color-graphite);
 }
 
-/* Caroiajul unui plan tehnic. Static — textura, nu miscare. */
+/* Caroiajul unui plan tehnic. Static — textură, nu mișcare. */
 @utility blueprint {
     background-image:
         linear-gradient(color-mix(in srgb, var(--color-line) 45%, transparent) 1px, transparent 1px),
@@ -130,15 +119,14 @@
 /* ------------------------------------------------------------- componente */
 
 @layer components {
-    /* ============================== reveal la scroll ============================== */
+    /* =============================== reveal la scroll =============================== */
 
-    /* Starea initiala se aplica DOAR daca JS a marcat documentul. */
     .js [data-reveal] {
         opacity: 0;
-        transform: translateY(12px);
+        transform: translateY(14px);
         transition:
-            opacity 0.5s ease-out,
-            transform 0.5s ease-out;
+            opacity 0.55s ease-out,
+            transform 0.55s ease-out;
     }
 
     .js [data-reveal].is-visible {
@@ -146,7 +134,6 @@
         transform: none;
     }
 
-    /* Glyph-ul Y de la dividere: stins pana intra in cadru. */
     .wye-glyph {
         color: var(--color-line);
         transition: color 0.5s ease-out;
@@ -156,13 +143,314 @@
         color: var(--color-gold);
     }
 
-    /* ============================ tabloul interactiv ============================ */
+    /* ============================ CONDUCTORUL (spine) ============================ */
 
     /*
-    | Starea „sub tensiune” curge de sus in jos: sursa -> separator -> busbar ->
-    | disjunctoare -> consumatori. Fiecare treapta isi ia culoarea din starea
-    | parintelui, deci CSS-ul reflecta topologia reala a tabloului.
+    | Fir vertical fix în marginea stângă (doar xl+, unde există margine reală).
+    | Umplerea = scaleY(progres-scroll) — transform pur, rAF, zero paint pe traseu.
     */
+    .spine {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 1.5rem;
+        width: 2px;
+        background: color-mix(in srgb, var(--color-line) 55%, transparent);
+        z-index: 30;
+        display: none;
+    }
+
+    @media (min-width: 80rem) {
+        .spine {
+            display: block;
+        }
+    }
+
+    .spine-fill {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, var(--color-gold), color-mix(in srgb, var(--color-gold) 60%, transparent));
+        transform-origin: top;
+        transform: scaleY(0);
+        will-change: transform;
+    }
+
+    .spine-head {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        width: 9px;
+        height: 9px;
+        border-radius: 9999px;
+        background: var(--color-gold);
+        box-shadow: 0 0 12px 1px var(--color-gold);
+        transform: translate(-50%, -50%);
+        will-change: transform;
+    }
+
+    /* ============================== SONDA (cursor) ============================== */
+
+    /*
+    | O singură suprafață fixă cu un gradient radial legat de pointer.
+    | Secțiunile cu fundal propriu (sheet, raised) o acoperă natural.
+    */
+    .probe {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+        opacity: 0;
+        transition: opacity 0.6s ease-out;
+        background: radial-gradient(
+            34rem circle at var(--gx, 50%) var(--gy, 30%),
+            color-mix(in srgb, var(--color-gold) 6%, transparent),
+            transparent 65%
+        );
+    }
+
+    .probe.is-on {
+        opacity: 1;
+    }
+
+    /* ============================ FIȘA DE LUCRARE ============================ */
+
+    .job-sheet {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem 1.75rem;
+        padding: 0.8rem 0;
+        border-top: 1px solid var(--color-line);
+        border-bottom: 1px dashed color-mix(in srgb, var(--color-line) 80%, transparent);
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--color-paper-dim);
+    }
+
+    .job-sheet strong {
+        font-weight: 500;
+        color: var(--color-paper);
+    }
+
+    .job-sheet .is-live {
+        color: var(--color-gold);
+    }
+
+    /* ================================ LED-uri ================================ */
+
+    .led {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border-radius: 1px;
+        background: var(--color-line);
+        transition:
+            background-color 0.25s ease-out,
+            box-shadow 0.25s ease-out;
+    }
+
+    .led.is-on,
+    [aria-pressed='true'] .led,
+    [aria-checked='true'] .led {
+        background: var(--color-gold);
+        box-shadow: 0 0 8px 0 var(--color-gold);
+    }
+
+    /* ======================= rânduri-segment expandabile ======================= */
+
+    .segment-row {
+        border-top: 1px solid var(--color-line);
+        transition: background-color 0.3s ease-out;
+    }
+
+    .segment-row:last-child {
+        border-bottom: 1px solid var(--color-line);
+    }
+
+    .segment-row.is-open {
+        background: color-mix(in srgb, var(--color-ink-raised) 60%, transparent);
+    }
+
+    .segment-body {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 0.45s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    .segment-row.is-open .segment-body {
+        grid-template-rows: 1fr;
+    }
+
+    .segment-body > div {
+        overflow: hidden;
+    }
+
+    .segment-arrow {
+        transition: transform 0.35s ease-out;
+    }
+
+    .segment-row.is-open .segment-arrow {
+        transform: rotate(90deg);
+    }
+
+    /* =========================== plăcuța de identificare =========================== */
+
+    /* Nituri în colțuri, dintr-un singur strat de background. */
+    .nameplate {
+        position: relative;
+        border: 1px solid var(--color-line);
+        border-radius: 3px;
+        background-image:
+            radial-gradient(circle 2.5px at 11px 11px, var(--color-line) 100%, transparent),
+            radial-gradient(circle 2.5px at calc(100% - 11px) 11px, var(--color-line) 100%, transparent),
+            radial-gradient(circle 2.5px at 11px calc(100% - 11px), var(--color-line) 100%, transparent),
+            radial-gradient(circle 2.5px at calc(100% - 11px) calc(100% - 11px), var(--color-line) 100%, transparent);
+    }
+
+    /* ============================ contorul de vechime ============================ */
+
+    .meter-scale {
+        height: 0.9rem;
+        background-image: repeating-linear-gradient(
+            90deg,
+            var(--color-line) 0,
+            var(--color-line) 1px,
+            transparent 1px,
+            transparent 0.75rem
+        );
+    }
+
+    /* ===================== modulele de protecție (valori) ===================== */
+
+    .protection {
+        border: 1px solid var(--color-line);
+        border-radius: 3px;
+        background: var(--color-ink-raised);
+        transition:
+            border-color 0.3s ease-out,
+            transform 0.3s ease-out;
+    }
+
+    .protection:hover,
+    .protection:focus-within {
+        border-color: color-mix(in srgb, var(--color-gold) 55%, transparent);
+        transform: translateY(-3px);
+    }
+
+    /* ======================== circuitul formularului ======================== */
+
+    .form-circuit {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .form-circuit .seg {
+        height: 2px;
+        flex: 1;
+        background: var(--color-line);
+        transition: background-color 0.35s ease-out;
+    }
+
+    .form-circuit .seg.is-done {
+        background: var(--color-gold);
+    }
+
+    .form-circuit .node {
+        width: 9px;
+        height: 9px;
+        border-radius: 9999px;
+        border: 1.5px solid var(--color-line);
+        transition:
+            border-color 0.35s ease-out,
+            background-color 0.35s ease-out,
+            box-shadow 0.35s ease-out;
+    }
+
+    .form-circuit.is-complete .node {
+        border-color: var(--color-gold);
+        background: var(--color-gold);
+        box-shadow: 0 0 10px 0 var(--color-gold);
+    }
+
+    [data-submit].is-armed {
+        box-shadow: 0 0 30px -6px var(--color-gold);
+    }
+
+    /* ========================= comutatorul mare (CTA) ========================= */
+
+    .big-switch-track {
+        display: inline-flex;
+        width: 3.6rem;
+        height: 6rem;
+        padding: 4px;
+        border: 1px solid var(--color-line);
+        border-radius: 4px;
+        background: var(--color-ink);
+        align-items: flex-end;
+        transition: border-color 0.25s ease-out;
+    }
+
+    .big-switch-knob {
+        width: 100%;
+        height: 2.5rem;
+        border-radius: 3px;
+        background: var(--color-paper-dim);
+        transition:
+            transform 0.28s cubic-bezier(0.34, 1.35, 0.64, 1),
+            background-color 0.28s ease-out;
+    }
+
+    [data-arm][aria-checked='true'] .big-switch-knob {
+        transform: translateY(-2.55rem);
+        background: var(--color-gold);
+    }
+
+    [data-arm][aria-checked='true'] .big-switch-track {
+        border-color: var(--color-gold);
+    }
+
+    .armed-target {
+        transition: box-shadow 0.45s ease-out;
+    }
+
+    .is-armed .armed-target {
+        box-shadow: 0 0 42px -4px var(--color-gold);
+    }
+
+    /* ====================== comutatoarele de segment (servicii) ====================== */
+
+    .seg-switch {
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        width: 100%;
+        padding: 1rem 1.1rem;
+        border: 1px solid var(--color-line);
+        border-radius: 3px;
+        background: var(--color-ink-raised);
+        text-align: left;
+        transition:
+            border-color 0.25s ease-out,
+            background-color 0.25s ease-out;
+    }
+
+    .seg-switch:hover {
+        border-color: color-mix(in srgb, var(--color-gold) 55%, transparent);
+    }
+
+    .seg-switch[aria-selected='true'] {
+        border-color: var(--color-gold);
+        background: color-mix(in srgb, var(--color-gold) 8%, var(--color-ink-raised));
+    }
+
+    .seg-switch[aria-selected='true'] .led {
+        background: var(--color-gold);
+        box-shadow: 0 0 8px 0 var(--color-gold);
+    }
+
+    /* ============================ tabloul interactiv ============================ */
 
     .panel[data-live='true'] [data-panel-source] {
         color: var(--color-gold);
@@ -179,7 +467,6 @@
         box-shadow: 0 0 14px -2px var(--color-gold);
     }
 
-    /* maneta separatorului general */
     .lever-track {
         display: inline-flex;
         width: 2rem;
@@ -206,7 +493,6 @@
         background: var(--color-gold);
     }
 
-    /* LED-ul diferentialului */
     .rcd-led {
         width: 0.65rem;
         height: 0.65rem;
@@ -231,7 +517,6 @@
         }
     }
 
-    /* disjunctoarele */
     .breaker {
         display: flex;
         flex-direction: column;
@@ -273,13 +558,11 @@
             background-color 0.16s ease-out;
     }
 
-    /* maneta jos = circuit intrerupt */
     [data-breaker][aria-checked='false'] .breaker-lever {
         transform: translateY(0.72rem);
         background: var(--color-paper-dim);
     }
 
-    /* firul si consumatorul fiecarui circuit */
     .circuit-drop {
         width: 1px;
         height: 1.1rem;
@@ -321,14 +604,8 @@
         border-color: color-mix(in srgb, var(--color-gold) 55%, transparent);
     }
 
-    /* pulsul de curent care coboara pe fir cand un circuit revine sub tensiune */
     .circuit.just-on .circuit-wire {
-        background-image: linear-gradient(
-            to bottom,
-            transparent 0%,
-            var(--color-paper) 50%,
-            transparent 100%
-        );
+        background-image: linear-gradient(to bottom, transparent 0%, var(--color-paper) 50%, transparent 100%);
         animation: current-pulse 0.45s ease-out 1;
     }
 
@@ -378,8 +655,8 @@
 }
 
 /*
-| Cine a cerut miscare redusa primeste starea finala instant. Nu o versiune
-| „mai lenta” — starea finala. Gardat si in JS, nu doar aici.
+| Mișcare redusă = starea finală, instant. Interacțiunile rămân funcționale,
+| doar fără animații. Gardat și în JS (sonda și conductorul nu pornesc deloc).
 */
 @media (prefers-reduced-motion: reduce) {
     *,
@@ -399,5 +676,14 @@
 
     .wye-glyph {
         color: var(--color-gold);
+    }
+
+    .spine-fill {
+        transform: scaleY(1);
+    }
+
+    .spine-head,
+    .probe {
+        display: none;
     }
 }

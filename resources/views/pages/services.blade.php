@@ -3,49 +3,70 @@
 
 @section('content')
 
-    <header class="border-b border-line">
-        <div class="mx-auto max-w-6xl px-5 pt-12 pb-16 sm:px-8 sm:pt-20 sm:pb-20">
-            <p class="eyebrow flex items-center gap-2.5">
-                <x-signature.wye :size="13" :live="true" />
-                Servicii
-            </p>
-            <h1 class="mt-6 max-w-3xl text-h1 text-paper">Instalația completă, pentru spațiul tău.</h1>
+    <header class="relative overflow-hidden border-b border-line">
+        <div class="blueprint absolute inset-0 opacity-20 [mask-image:radial-gradient(70%_90%_at_40%_20%,black,transparent)]" aria-hidden="true"></div>
+
+        <div class="relative mx-auto max-w-6xl px-5 pt-8 pb-14 sm:px-8 sm:pb-18">
+            <x-job-sheet code="SRV-02" name="Servicii" index="02/05" />
+
+            <h1 class="mt-10 max-w-3xl text-h1 text-paper">Instalația completă, pentru spațiul tău.</h1>
             <p class="mt-6 max-w-2xl text-lead text-paper-dim">
-                Același ciclu complet — proiect, cablare, tablou, montaj, verificare — adaptat
-                la apartament, casă sau spațiu industrial. De la zero până la predare.
+                Același ciclu complet — proiect, cablare, tablou, montaj, verificare —
+                adaptat la tipul construcției. Alege circuitul.
             </p>
         </div>
     </header>
 
-    @foreach (config('energix.services') as $i => $service)
-        <section
-            id="{{ $service['slug'] }}"
-            @class(['border-b border-line', 'bg-ink-raised' => $i % 2 === 1])
-            aria-labelledby="service-{{ $service['slug'] }}"
-        >
-            <div class="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
-                <div @class([
-                    'grid items-center gap-12 lg:grid-cols-2 lg:gap-20',
-                    'lg:[&>*:first-child]:order-2' => $i % 2 === 1,
-                ])>
-                    <div data-reveal>
+    {{-- ================================ consola de segmente ================================ --}}
+    <section class="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-20" aria-label="Alege tipul de spațiu" data-seg-switcher>
+        <div role="tablist" aria-label="Tipul de spațiu" class="grid gap-3 sm:grid-cols-3">
+            @foreach (config('energix.services') as $i => $service)
+                <button
+                    type="button"
+                    role="tab"
+                    id="seg-tab-{{ $service['slug'] }}"
+                    aria-controls="seg-panel-{{ $service['slug'] }}"
+                    aria-selected="{{ $i === 0 ? 'true' : 'false' }}"
+                    tabindex="{{ $i === 0 ? '0' : '-1' }}"
+                    class="seg-switch"
+                >
+                    <span class="led" aria-hidden="true"></span>
+                    <span>
+                        <span class="block font-mono text-[0.6rem] tracking-[0.16em] text-paper-dim uppercase">
+                            Circuit {{ str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT) }}
+                        </span>
+                        <span class="mt-0.5 block font-display text-base text-paper">{{ ucfirst($service['slug']) }}</span>
+                    </span>
+                </button>
+            @endforeach
+        </div>
+
+        @foreach (config('energix.services') as $i => $service)
+            <div
+                role="tabpanel"
+                id="seg-panel-{{ $service['slug'] }}"
+                data-slug="{{ $service['slug'] }}"
+                aria-labelledby="seg-tab-{{ $service['slug'] }}"
+                @if ($i !== 0) hidden @endif
+                class="pt-10"
+            >
+                {{-- ancora veche (#apartamente etc.) ramane functionala --}}
+                <span id="{{ $service['slug'] }}" class="block" aria-hidden="true"></span>
+
+                <div class="grid items-start gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
+                    <div>
                         <p class="eyebrow flex items-center gap-2.5">
-                            <x-signature.wye :size="13" />
-                            <span>{{ str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT) }}</span>
-                            <span aria-hidden="true">·</span>
-                            <span>{{ $service['tagline'] }}</span>
+                            <x-signature.wye :size="13" :live="true" />
+                            {{ $service['tagline'] }}
                         </p>
 
-                        <h2 id="service-{{ $service['slug'] }}" class="mt-4 text-h2 text-paper">
-                            {{ $service['title'] }}
-                        </h2>
-
+                        <h2 class="mt-4 text-h2 text-paper">{{ $service['title'] }}</h2>
                         <p class="mt-5 text-lead text-paper-dim">{{ $service['intro'] }}</p>
 
                         <ul class="mt-8 divide-y divide-line border-y border-line">
-                            @foreach ($service['features'] as $feature)
-                                <li class="flex items-start gap-4 py-4">
-                                    <span class="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-gold" aria-hidden="true"></span>
+                            @foreach ($service['features'] as $j => $feature)
+                                <li class="flex items-center gap-4 py-3.5">
+                                    <span class="readout text-xs text-gold">{{ str_pad((string) ($j + 1), 2, '0', STR_PAD_LEFT) }}</span>
                                     <span class="text-paper">{{ $feature }}</span>
                                 </li>
                             @endforeach
@@ -71,28 +92,39 @@
                         <img
                             src="{{ asset($service['image']) }}"
                             alt=""
-                            width="960"
-                            height="640"
+                            width="800"
+                            height="533"
                             loading="lazy"
                             decoding="async"
                             aria-hidden="true"
-                            class="h-64 w-full object-cover opacity-70 sm:h-80"
+                            class="h-64 w-full object-cover opacity-70 sm:h-96"
                         >
                     </div>
                 </div>
             </div>
-        </section>
-    @endforeach
+        @endforeach
+    </section>
 
-    <section class="border-b border-line" aria-labelledby="process-title">
-        <div class="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
+    {{-- ==================================== etapele ==================================== --}}
+    <section class="border-t border-line bg-ink-raised/40" aria-labelledby="stages-title">
+        <div class="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
             <x-section-header
-                :index="4"
+                eyebrow="Execuția"
+                title="Cinci etape, indiferent de spațiu."
+            />
+            <x-signature.stages class="mt-12" data-reveal />
+        </div>
+    </section>
+
+    {{-- ============================== drumul clientului ============================== --}}
+    <section class="border-t border-line" aria-labelledby="process-title">
+        <div class="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
+            <x-section-header
                 eyebrow="Cum lucrăm"
                 title="Patru pași, fără surprize."
             />
 
-            <ol class="mt-14 max-w-2xl">
+            <ol class="mt-12 max-w-2xl">
                 @foreach (config('energix.process') as $i => $step)
                     <x-process-step :step="$step" :index="$i + 1" :last="$loop->last" />
                 @endforeach
@@ -100,6 +132,6 @@
         </div>
     </section>
 
-    <x-cta-band title="Spune-ne ce ai nevoie." />
+    <x-cta-band title="Spune-ne despre spațiul tău." />
 
 @endsection

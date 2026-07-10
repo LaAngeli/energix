@@ -118,6 +118,40 @@ CLS e controlat.
    WCAG AA de 4.5:1. **Corectat:** `--color-paper-dim #94a3b8` dă **7.4:1**.
 8. **CTA telefon sticky pe mobil** — vezi `BUSINESS.md`, telefonul e conversia principală.
 
+## 🔴 Conceptul (v3, 2026-07-10): „INSTALAȚIA VIE"
+
+Clientul a respins structura clasică de site de prezentare („designul și structura au
+rămas aceleași") și a cerut **un site viu, cu numeroase elemente interactive relevante
+domeniului**. Conceptul curent: site-ul întreg se comportă ca o instalație sub tensiune.
+
+Sistemele globale (pe toate paginile):
+
+| Sistem | Ce face | Implementare |
+|---|---|---|
+| **Conductorul** (`.spine`) | fir fix în marginea stângă (xl+) care se umple cu auriu la scroll; un punct de sarcină luminos coboară cu tine | `scaleY(progres)`, transform-only, throttle pe `setTimeout` (rAF îngheață în tab-uri de fundal) |
+| **Sonda** (`.probe`) | lumină aurie care urmărește cursorul pe suprafețele navy | gradient radial pe un singur element fix, vars CSS, doar `pointer: fine` + motion-safe |
+| **Fișa de lucrare** (`<x-job-sheet>`) | fiecare pagină se deschide ca un document tehnic: cod, obiect, index, LED „sub tensiune" | metadata mono reală, nu decor |
+| **Navbar-tablou** | paginile ca circuite numerotate cu LED; circuitul activ e aprins | LED prin `[aria-current]` / `.is-on` |
+| **Footer-plăcuță** (`.nameplate`) | datele firmei ca plăcuță de identificare nituită | nituri din `radial-gradient` în colțuri |
+
+Instrumentele per pagină:
+
+- **Home**: hero full-height cu TABLOUL ca piesă centrală; segmentele ca rânduri
+  expandabile (`<x-segment-row>`, grid-rows 0fr→1fr); etapele pe cablu; CTA final =
+  comutator mare „PUNERE SUB TENSIUNE" care armează bloom-ul telefonului
+  (pur ceremonial — telefonul e apelabil oricând, nu se gate-uiește conversia).
+- **Servicii**: consolă cu 3 comutatoare de segment (tablist) care schimbă conținutul;
+  ancorele vechi `#apartamente/#case/#industriale` selectează tab-ul (hashchange).
+- **Lucrări**: filtrele ca disjunctoare cu LED + contor „N lucrări pe circuit".
+- **Despre**: contor de vechime (cifra 10 pe scală gradată) + valorile ca „aparataj de
+  protecție" (module cu LED, hover le ridică).
+- **Contacte**: formularul e un circuit — fiecare câmp valid închide un segment; toate
+  valide → nodul + butonul se armează. Pur vizual, validarea reală rămâne pe server.
+
+⚠️ Lecție de mediu: rAF **și** evenimentele de scroll îngheață în tab-uri de fundal
+(cadrele vin doar la screenshot în automatizare). Orice stare care contează folosește
+`setTimeout` de gardă sau se aplică imediat, nu doar în rAF.
+
 ## Elementul-semnătură: TABLOUL DE DISTRIBUȚIE INTERACTIV
 
 Înlocuiește schema monofilară statică (client, 2026-07-10: „inutil de simplistă").

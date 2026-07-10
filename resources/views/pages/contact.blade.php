@@ -4,25 +4,25 @@
 
 @section('content')
 
-    <header class="border-b border-line">
-        <div class="mx-auto max-w-6xl px-5 pt-12 pb-16 sm:px-8 sm:pt-20 sm:pb-20">
-            <p class="eyebrow flex items-center gap-2.5">
-                <x-signature.wye :size="13" :live="true" />
-                Contact
-            </p>
-            <h1 class="mt-6 max-w-3xl text-h1 text-paper">Sună. E cel mai rapid.</h1>
+    <header class="relative overflow-hidden border-b border-line">
+        <div class="blueprint absolute inset-0 opacity-20 [mask-image:radial-gradient(70%_90%_at_40%_20%,black,transparent)]" aria-hidden="true"></div>
+
+        <div class="relative mx-auto max-w-6xl px-5 pt-8 pb-14 sm:px-8 sm:pb-18">
+            <x-job-sheet code="CNT-05" name="Contact" index="05/05" />
+
+            <h1 class="mt-10 max-w-3xl text-h1 text-paper">Sună. E cel mai rapid.</h1>
             <p class="mt-6 max-w-2xl text-lead text-paper-dim">
                 {{ config('energix.response_time') }}
             </p>
         </div>
     </header>
 
-    <section class="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
+    <section class="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-20">
         <div class="grid gap-14 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
 
-            {{-- Coloana cu date. Telefonul primeste greutatea vizuala. --}}
+            {{-- Coloana cu date: telefonul primeste greutatea vizuala. --}}
             <div>
-                <div class="rounded-sm border border-line bg-ink-raised p-6" data-reveal>
+                <div class="nameplate bg-ink-raised p-6" data-reveal>
                     <p class="eyebrow">Telefon</p>
                     <a
                         href="tel:{{ $contact['phone_href'] }}"
@@ -31,7 +31,7 @@
                     <p class="mt-3 text-sm text-paper-dim">{{ config('energix.response_time') }}</p>
                 </div>
 
-                <div class="mt-5 space-y-5" data-reveal>
+                <div class="mt-6 space-y-6" data-reveal>
                     <div>
                         <p class="eyebrow">Email</p>
                         <a href="mailto:{{ $contact['email'] }}" class="mt-2 block text-paper transition hover:text-gold">
@@ -75,10 +75,10 @@
             </div>
 
             <div data-reveal>
-                <h2 class="text-h2 text-paper">Sau scrie-ne.</h2>
+                <h2 class="text-h2 text-paper">Sau închide circuitul în scris.</h2>
                 <p class="mt-3 text-paper-dim">
-                    Completează formularul și te sunăm noi. Cu cât ne spui mai multe despre
-                    lucrare, cu atât oferta e mai exactă.
+                    Completează câmpurile — fiecare închide un segment. Cu cât ne spui mai
+                    multe despre proiect, cu atât oferta e mai exactă.
                 </p>
 
                 <x-contact-form class="mt-8" />

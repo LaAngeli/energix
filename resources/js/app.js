@@ -1,12 +1,13 @@
 /*
-| Energix — interacțiuni.
+| Energix — interacțiunile „instalației vii”.
 |
-| Fără librării. Tot ce se mișcă folosește doar opacity/transform/culoare (GPU)
-| și se declanșează prin IntersectionObserver sau prin acțiunea utilizatorului —
-| niciodată legat de poziția scroll-ului.
+| Fără librării. Tot ce se mișcă e transform/opacity/culoare (GPU), pornit de
+| IntersectionObserver, de acțiunea utilizatorului sau — pentru conductor și
+| sondă — de un rAF throttled. Nimic paint-bound legat de scroll.
 */
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const finePointer = window.matchMedia('(pointer: fine)').matches;
 
 /**
  * Marcam documentul ca „are JS”. Fara asta, elementele cu [data-reveal] ar
@@ -20,7 +21,6 @@ function observeReveals() {
     const targets = document.querySelectorAll('[data-reveal]');
     const glyphs = document.querySelectorAll('.wye-glyph');
 
-    // Miscare redusa: starea finala, instant. Nu o versiune mai lenta.
     if (prefersReducedMotion) {
         targets.forEach((el) => el.classList.add('is-visible'));
         glyphs.forEach((el) => el.classList.add('is-live'));
@@ -44,7 +44,6 @@ function observeReveals() {
 
     targets.forEach((el) => observer.observe(el));
 
-    // Glyph-ul Y se „energizeaza” cand sectiunea lui intra in cadru.
     const glyphObserver = new IntersectionObserver(
         (entries) => {
             entries.forEach((entry) => {
@@ -60,6 +59,88 @@ function observeReveals() {
     );
 
     glyphs.forEach((el) => glyphObserver.observe(el));
+}
+
+/* ---------------------------------------------------- CONDUCTORUL (spine) */
+
+/**
+ * Firul din marginea stanga se umple cu aur pe masura ce cobori in pagina,
+ * iar punctul de sarcina coboara cu tine. Doar transformari — zero paint.
+ */
+function initSpine() {
+    const spine = document.querySelector('[data-spine]');
+
+    if (! spine || prefersReducedMotion) {
+        return;
+    }
+
+    const fill = spine.querySelector('.spine-fill');
+    const head = spine.querySelector('.spine-head');
+    let ticking = false;
+
+    const update = () => {
+        ticking = false;
+
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = max > 0 ? Math.min(window.scrollY / max, 1) : 1;
+
+        fill.style.transform = `scaleY(${progress})`;
+        head.style.transform = `translate(-50%, ${progress * spine.clientHeight - 4.5}px)`;
+    };
+
+    /*
+     | Throttle pe setTimeout, nu pe rAF: rAF ingheata in tab-urile de fundal,
+     | iar update-ul e doar doua transformari — ieftin la 30fps.
+     */
+    const onScroll = () => {
+        if (! ticking) {
+            ticking = true;
+            setTimeout(update, 33);
+        }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    update();
+}
+
+/* --------------------------------------------------------- SONDA (cursor) */
+
+/**
+ * O lumina calda urmareste pointerul pe suprafetele navy — site-ul raspunde
+ * oriunde il atingi. Doar pe pointer fin, doar fara reduced-motion.
+ */
+function initProbe() {
+    const probe = document.querySelector('[data-probe]');
+
+    if (! probe || ! finePointer || prefersReducedMotion) {
+        return;
+    }
+
+    let ticking = false;
+    let x = 0;
+    let y = 0;
+
+    window.addEventListener(
+        'pointermove',
+        (event) => {
+            x = event.clientX;
+            y = event.clientY;
+
+            // Aprinderea e imediata; doar pozitionarea e throttle-uita.
+            probe.classList.add('is-on');
+
+            if (! ticking) {
+                ticking = true;
+                requestAnimationFrame(() => {
+                    ticking = false;
+                    probe.style.setProperty('--gx', `${x}px`);
+                    probe.style.setProperty('--gy', `${y}px`);
+                });
+            }
+        },
+        { passive: true },
+    );
 }
 
 /* ------------------------------------------------- tabloul interactiv */
@@ -119,17 +200,13 @@ function initPanel() {
 
         voltFrame = requestAnimationFrame(tick);
 
-        /*
-         | rAF e inghetat in tab-urile din fundal. Valoarea finala e starea
-         | corecta a instrumentului, deci o garantam indiferent de throttling.
-         */
+        // rAF ingheata in tab-urile de fundal; valoarea finala e garantata.
         voltFallback = setTimeout(() => {
             cancelAnimationFrame(voltFrame);
             voltmeter.textContent = String(target);
         }, duration + 150);
     }
 
-    /** Aplica starea „sub tensiune” pe fiecare circuit, dupa topologie. */
     function refresh({ pulse = false } = {}) {
         const live = isLive();
 
@@ -140,7 +217,7 @@ function initPanel() {
 
             if (pulse && on && ! wasOn && ! prefersReducedMotion) {
                 circuit.classList.remove('just-on');
-                void circuit.offsetWidth; // reporneste animatia
+                void circuit.offsetWidth;
                 circuit.classList.add('just-on');
             }
         });
@@ -174,11 +251,6 @@ function initPanel() {
         });
     });
 
-    /*
-     | Butonul TEST al diferentialului face exact ce face pe un tablou real:
-     | declanseaza (totul cade), apoi se reanclanseaza. Starile disjunctoarelor
-     | individuale se pastreaza.
-     */
     let tripping = false;
 
     rcdTest?.addEventListener('click', () => {
@@ -203,10 +275,6 @@ function initPanel() {
         }, prefersReducedMotion ? 350 : 950);
     });
 
-    /*
-     | Prima energizare: o singura data, cand tabloul intra in cadru.
-     | Sub prefers-reduced-motion: direct starea finala.
-     */
     if (prefersReducedMotion) {
         setMaster(true, { pulse: false });
 
@@ -220,7 +288,6 @@ function initPanel() {
             }
 
             starter.disconnect();
-
             setTimeout(() => setMaster(true), 350);
         },
         { threshold: 0.35 },
@@ -251,7 +318,6 @@ function initStages() {
         });
 
         if (fill) {
-            // Cablul se umple pana la nodul activ.
             fill.style.width = `${(index / Math.max(tabs.length - 1, 1)) * 100}%`;
         }
 
@@ -276,6 +342,143 @@ function initStages() {
     });
 
     select(0);
+}
+
+/* --------------------------------------- rânduri-segment expandabile (home) */
+
+function initSegmentRows() {
+    const rows = document.querySelectorAll('[data-segment-row]');
+
+    rows.forEach((row) => {
+        const trigger = row.querySelector('[data-segment-toggle]');
+
+        trigger?.addEventListener('click', () => {
+            const open = ! row.classList.contains('is-open');
+
+            rows.forEach((other) => {
+                other.classList.toggle('is-open', other === row && open);
+                other.querySelector('[data-segment-toggle]')?.setAttribute('aria-expanded', String(other === row && open));
+            });
+        });
+    });
+}
+
+/* ------------------------------------- consola de segmente (pagina servicii) */
+
+function initServicesSwitcher() {
+    const root = document.querySelector('[data-seg-switcher]');
+
+    if (! root) {
+        return;
+    }
+
+    const tabs = [...root.querySelectorAll('[role="tab"]')];
+    const panels = [...root.querySelectorAll('[role="tabpanel"]')];
+
+    function select(index, { focus = false } = {}) {
+        tabs.forEach((tab, i) => {
+            const active = i === index;
+            tab.setAttribute('aria-selected', String(active));
+            tab.tabIndex = active ? 0 : -1;
+            panels[i].hidden = ! active;
+        });
+
+        if (focus) {
+            tabs[index].focus();
+        }
+    }
+
+    tabs.forEach((tab, i) => {
+        tab.addEventListener('click', () => select(i));
+
+        tab.addEventListener('keydown', (event) => {
+            const delta = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 1, ArrowUp: -1 }[event.key];
+
+            if (! delta) {
+                return;
+            }
+
+            event.preventDefault();
+            select((i + delta + tabs.length) % tabs.length, { focus: true });
+        });
+    });
+
+    /** Ancorele vechi (#apartamente, #case, #industriale) selecteaza tab-ul. */
+    function selectFromHash() {
+        const slug = window.location.hash.replace('#', '');
+        const index = panels.findIndex((panel) => panel.dataset.slug === slug);
+
+        if (index >= 0) {
+            select(index);
+        }
+    }
+
+    window.addEventListener('hashchange', selectFromHash);
+    selectFromHash();
+
+    if (! tabs.some((tab) => tab.getAttribute('aria-selected') === 'true')) {
+        select(0);
+    }
+}
+
+/* --------------------------------------------- circuitul formularului */
+
+/**
+ * Formularul e un circuit: fiecare camp valid inchide un segment; cand toate
+ * sunt inchise, butonul se armeaza. Pur vizual — nu blocheaza nimic.
+ */
+function initFormCircuit() {
+    const form = document.querySelector('[data-circuit-form]');
+
+    if (! form) {
+        return;
+    }
+
+    const fields = [...form.querySelectorAll('[data-circuit-field]')];
+    const circuit = form.querySelector('[data-form-circuit]');
+    const segments = circuit ? [...circuit.querySelectorAll('.seg')] : [];
+    const submit = form.querySelector('[data-submit]');
+
+    const check = () => {
+        let done = 0;
+
+        fields.forEach((field, i) => {
+            const ok = field.value.trim() !== '' && field.checkValidity();
+            segments[i]?.classList.toggle('is-done', ok);
+
+            if (ok) {
+                done++;
+            }
+        });
+
+        const complete = done === fields.length;
+        circuit?.classList.toggle('is-complete', complete);
+        submit?.classList.toggle('is-armed', complete);
+    };
+
+    fields.forEach((field) => {
+        field.addEventListener('input', check);
+        field.addEventListener('blur', check);
+    });
+
+    check();
+}
+
+/* ------------------------------------------- comutatorul de armare (CTA) */
+
+function initArmSwitch() {
+    const zone = document.querySelector('[data-arm-zone]');
+    const arm = zone?.querySelector('[data-arm]');
+
+    if (! zone || ! arm) {
+        return;
+    }
+
+    arm.addEventListener('click', () => {
+        const on = arm.getAttribute('aria-checked') !== 'true';
+        arm.setAttribute('aria-checked', String(on));
+        zone.classList.toggle('is-armed', on);
+    });
 }
 
 /* ------------------------------------------------------------- meniu mobil */
@@ -343,6 +546,13 @@ function initGalleryFilters() {
 
     const buttons = root.querySelectorAll('[data-filter]');
     const items = root.querySelectorAll('[data-category]');
+    const count = root.querySelector('[data-gallery-count]');
+
+    const applyCount = () => {
+        if (count) {
+            count.textContent = String([...items].filter((item) => ! item.hidden).length);
+        }
+    };
 
     buttons.forEach((button) => {
         button.addEventListener('click', () => {
@@ -353,18 +563,18 @@ function initGalleryFilters() {
             items.forEach((item) => {
                 item.hidden = filter !== 'toate' && item.dataset.category !== filter;
             });
+
+            applyCount();
         });
     });
+
+    applyCount();
 }
 
 /* ------------------------------------------------ cookie: GTM dupa accept */
 
 const CONSENT_KEY = 'energix.cookie-consent';
 
-/**
- * Google Tag Manager se incarca DOAR dupa consimtamant explicit.
- * Site-ul vechi il pornea in <head>, inaintea banner-ului — neconformitate GDPR.
- */
 function loadTagManager(id) {
     if (! id || window.__energixGtmLoaded) {
         return;
@@ -401,11 +611,6 @@ function initCookieBanner() {
     }
 
     banner.hidden = false;
-
-    /*
-     | Are role="dialog", deci focusul trebuie sa ajunga in el. Nu e modal si
-     | nu prindem focusul: nu blocam pe nimeni in banner.
-     */
     banner.focus({ preventScroll: true });
 
     banner.querySelector('[data-cookie-accept]')?.addEventListener('click', () => {
@@ -414,7 +619,6 @@ function initCookieBanner() {
         loadTagManager(gtmId);
     });
 
-    // Refuzul e o alegere de prim rang, nu un link ascuns.
     banner.querySelector('[data-cookie-decline]')?.addEventListener('click', () => {
         localStorage.setItem(CONSENT_KEY, 'declined');
         banner.hidden = true;
@@ -425,8 +629,14 @@ function initCookieBanner() {
 
 function boot() {
     observeReveals();
+    initSpine();
+    initProbe();
     initPanel();
     initStages();
+    initSegmentRows();
+    initServicesSwitcher();
+    initFormCircuit();
+    initArmSwitch();
     initNav();
     initNavbarScroll();
     initGalleryFilters();

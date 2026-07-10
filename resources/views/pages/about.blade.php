@@ -3,13 +3,13 @@
 
 @section('content')
 
-    <header class="border-b border-line">
-        <div class="mx-auto max-w-6xl px-5 pt-12 pb-16 sm:px-8 sm:pt-20 sm:pb-20">
-            <p class="eyebrow flex items-center gap-2.5">
-                <x-signature.wye :size="13" :live="true" />
-                Despre
-            </p>
-            <h1 class="mt-6 max-w-3xl text-h1 text-paper">Un singur lucru, făcut bine, de zece ani.</h1>
+    <header class="relative overflow-hidden border-b border-line">
+        <div class="blueprint absolute inset-0 opacity-20 [mask-image:radial-gradient(70%_90%_at_40%_20%,black,transparent)]" aria-hidden="true"></div>
+
+        <div class="relative mx-auto max-w-6xl px-5 pt-8 pb-14 sm:px-8 sm:pb-18">
+            <x-job-sheet code="DSP-04" name="Despre" index="04/05" />
+
+            <h1 class="mt-10 max-w-3xl text-h1 text-paper">Un singur lucru, făcut bine, de zece ani.</h1>
             <p class="mt-6 max-w-2xl text-lead text-paper-dim">
                 Energix e o echipă de electricieni din {{ config('energix.contact.city') }}.
                 Montăm instalații electrice complete pentru construcții: apartamente, case,
@@ -18,18 +18,23 @@
         </div>
     </header>
 
-    {{-- Semnalul de incredere: vechimea. Fara nume, fara afirmatii de certificare. --}}
+    {{-- ============================ contorul de vechime ============================ --}}
     <section class="border-b border-line" aria-labelledby="experience-title">
-        <div class="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
-            <div class="grid gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
+        <div class="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
+            <div class="grid items-center gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
                 <div data-reveal>
-                    <p class="eyebrow">Cât timp facem asta</p>
-                    <h2 id="experience-title" class="mt-4 text-h2 text-paper">
-                        <span class="readout text-gold">{{ config('energix.experience.years') }}</span>
-                        {{ config('energix.experience.label') }}
-                    </h2>
-                    <p class="mt-3 font-mono text-sm tracking-wide text-paper-dim">
-                        Chișinău și toată Republica Moldova
+                    <p class="eyebrow">Contor de vechime</p>
+                    <p class="mt-4 flex items-baseline gap-4">
+                        <span id="experience-title" class="readout text-meter leading-none text-gold">
+                            {{ config('energix.experience.years') }}
+                        </span>
+                        <span class="max-w-40 font-mono text-xs tracking-[0.14em] text-paper-dim uppercase">
+                            {{ config('energix.experience.label') }}
+                        </span>
+                    </p>
+                    <div class="meter-scale mt-6" aria-hidden="true"></div>
+                    <p class="mt-3 font-mono text-xs tracking-wide text-paper-dim">
+                        {{ config('energix.contact.city') }} și toată {{ config('energix.contact.country') }}
                     </p>
                 </div>
 
@@ -53,15 +58,16 @@
         </div>
     </section>
 
-    <section class="border-b border-line bg-ink-raised" aria-labelledby="values-title">
-        <div class="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
+    {{-- ==================== valorile, ca aparataj de protecție ==================== --}}
+    <section class="border-b border-line bg-ink-raised/40" aria-labelledby="values-title">
+        <div class="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
             <x-section-header
-                :index="2"
-                eyebrow="Valorile noastre"
+                eyebrow="Aparatajul de protecție"
                 title="Ce ne ține în frâu."
+                intro="Patru dispozitive care nu se scot din schemă, indiferent de lucrare."
             />
 
-            <div class="mt-14 grid gap-5 sm:grid-cols-2">
+            <div class="mt-12 grid gap-5 sm:grid-cols-2" data-reveal>
                 @foreach (config('energix.values') as $i => $value)
                     <x-value-item :value="$value" :index="$i + 1" />
                 @endforeach
@@ -69,19 +75,25 @@
         </div>
     </section>
 
+    {{-- =============================== garanțiile =============================== --}}
     <section class="border-b border-line" aria-labelledby="trust-title">
-        <div class="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
-            <div class="grid gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
+        <div class="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
+            <div class="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
                 <x-section-header
-                    :index="3"
                     eyebrow="Ce îți garantăm"
                     title="Fapte, nu insigne."
                     intro="Patru lucruri pe care ni le asumăm în scris, la fiecare lucrare."
                 />
 
-                <div>
+                <div class="nameplate grid content-start gap-px overflow-hidden bg-line sm:grid-cols-2" data-reveal>
                     @foreach (config('energix.promises') as $promise)
-                        <x-promise-item :promise="$promise" />
+                        <div class="bg-ink-raised p-6">
+                            <h3 class="flex items-center gap-2.5 font-display text-base text-paper">
+                                <x-signature.wye :size="14" />
+                                {{ $promise['label'] }}
+                            </h3>
+                            <p class="mt-2 text-sm text-paper-dim">{{ $promise['body'] }}</p>
+                        </div>
                     @endforeach
                 </div>
             </div>

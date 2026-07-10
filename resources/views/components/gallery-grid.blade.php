@@ -1,15 +1,23 @@
 @props(['items', 'categories'])
 
 <div data-gallery {{ $attributes }}>
-    <div class="flex flex-wrap gap-2" role="group" aria-label="Filtrează după tipul lucrării">
+    <div class="flex flex-wrap items-center gap-2" role="group" aria-label="Filtrează după tipul lucrării">
         @foreach ($categories as $slug => $label)
+            {{-- filtrele sunt disjunctoare: LED aprins = circuit selectat --}}
             <button
                 type="button"
                 data-filter="{{ $slug }}"
                 aria-pressed="{{ $slug === 'toate' ? 'true' : 'false' }}"
-                class="inline-flex min-h-11 items-center rounded-sm border border-line px-4 font-mono text-xs tracking-wider uppercase transition aria-pressed:border-gold aria-pressed:bg-gold aria-pressed:text-ink text-paper-dim hover:border-gold hover:text-gold"
-            >{{ $label }}</button>
+                class="group inline-flex min-h-11 items-center gap-2.5 rounded-sm border border-line px-4 font-mono text-xs tracking-wider uppercase transition aria-pressed:border-gold aria-pressed:bg-gold/10 aria-pressed:text-gold text-paper-dim hover:border-gold hover:text-gold"
+            >
+                <span class="led" aria-hidden="true"></span>
+                {{ $label }}
+            </button>
         @endforeach
+
+        <p class="ml-auto font-mono text-xs tracking-wider text-paper-dim uppercase">
+            <span class="readout text-gold" data-gallery-count>{{ count($items) }}</span> lucrări pe circuit
+        </p>
     </div>
 
     <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
