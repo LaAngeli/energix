@@ -62,29 +62,28 @@
             </div>
         </div>
 
-        <div class="mt-6 flex flex-col gap-3 text-xs text-paper-dim sm:flex-row sm:items-center sm:justify-between">
-            <p>&copy; {{ date('Y') }} Energix. {{ __('site.common.rights') }}</p>
-
-            {{--
-            | Creditul agentiei. NU se traduce: e semnatura ei, la fel ca numele
-            | „AdVista” — deci nu trece prin `lang/`. Cerinta explicita a clientului.
-            --}}
-            <p>
-                Created by
-                <a
-                    href="https://advista.marketing"
-                    target="_blank"
-                    rel="noopener"
-                    class="text-paper transition-colors hover:text-gold"
-                >AdVista</a>
+        {{--
+        | Sub-bara: doua grupuri, nu trei blocuri risipite. Separatorul e middot-ul
+        | hairline (`text-line`), acelasi idiom ca firimiturile si fisa de lucrare.
+        | Centrat si simetric pe mobil; justificat pe laturi de la sm in sus.
+        --}}
+        <div class="mt-8 flex flex-col items-center gap-5 border-t border-line/50 pt-6 text-xs text-paper-dim sm:flex-row sm:justify-between sm:gap-6">
+            <p class="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 sm:justify-start">
+                <span>&copy; {{ date('Y') }} Energix. {{ __('site.common.rights') }}</span>
+                <span class="text-line" aria-hidden="true">&middot;</span>
+                {{--
+                | Creditul agentiei. NU se traduce: e semnatura ei, la fel ca numele
+                | „AdVista” — deci nu trece prin `lang/`. Cerinta explicita a clientului.
+                --}}
+                <span>Created by <a href="https://advista.marketing" target="_blank" rel="noopener" class="text-paper-dim transition-colors hover:text-gold">AdVista</a></span>
             </p>
 
-            <nav aria-label="{{ __('site.common.legal') }}">
-                <ul class="flex flex-wrap gap-x-5 gap-y-2">
-                    <li><a href="{{ URL::localized('legal.terms') }}" class="transition hover:text-paper">{{ __('site.common.legal_terms') }}</a></li>
-                    <li><a href="{{ URL::localized('legal.privacy') }}" class="transition hover:text-paper">{{ __('site.common.legal_privacy') }}</a></li>
-                    <li><a href="{{ URL::localized('legal.cookies') }}" class="transition hover:text-paper">{{ __('site.common.legal_cookies') }}</a></li>
-                </ul>
+            <nav class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1" aria-label="{{ __('site.common.legal') }}">
+                <a href="{{ URL::localized('legal.terms') }}" class="transition-colors hover:text-paper">{{ __('site.common.legal_terms') }}</a>
+                <span class="text-line" aria-hidden="true">&middot;</span>
+                <a href="{{ URL::localized('legal.privacy') }}" class="transition-colors hover:text-paper">{{ __('site.common.legal_privacy') }}</a>
+                <span class="text-line" aria-hidden="true">&middot;</span>
+                <a href="{{ URL::localized('legal.cookies') }}" class="transition-colors hover:text-paper">{{ __('site.common.legal_cookies') }}</a>
             </nav>
         </div>
     </div>
