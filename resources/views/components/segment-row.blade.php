@@ -23,41 +23,54 @@
 
     <div class="segment-body">
         <div>
-            <div class="grid gap-8 pb-8 lg:grid-cols-[1.2fr_1fr] lg:gap-14">
-                <div>
-                    <p class="text-paper-dim">{{ $t['intro'] }}</p>
-                    <ul class="mt-6 grid gap-2.5 sm:grid-cols-2">
-                        @foreach ($t['features'] as $i => $feature)
-                            <li class="flex gap-3 text-sm text-paper-dim" style="--i: {{ $i }}">
-                                <span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-gold" aria-hidden="true"></span>
-                                {{ $feature }}
-                            </li>
-                        @endforeach
-                    </ul>
-                    {{--
-                    | Textul ancorei descrie pagina-țintă, nu acțiunea. „Detalii complete”
-                    | era cel mai valoros link intern de pe site și nu spunea nimic despre
-                    | nimic — nici lui Google, nici unui cititor de ecran.
-                    --}}
-                    <a
-                        href="{{ URL::localized("services.{$service['slug']}") }}"
-                        class="mt-6 inline-flex items-center gap-2 font-mono text-sm tracking-wider text-gold uppercase transition hover:brightness-110"
-                    >
-                        {{ $t['anchor'] }}
-                        <span aria-hidden="true">&rarr;</span>
-                    </a>
-                </div>
+            {{--
+            | Coloana-gutter aliniaza corpul sub TITLU, nu sub numarul „01”. Fara ea,
+            | descrierea si listele porneau de sub „01” (cu 47px in stanga titlului),
+            | lasand o margine stanga zimtata. Spacer-ul invizibil „00” are exact
+            | latimea lui „01” (acelasi `readout`, cifre tabulare), deci alinierea se
+            | potriveste singura la orice ecran — nu depinde de o valoare hardcodata.
+            --}}
+            <div class="grid grid-cols-[auto_1fr] gap-x-4 pb-8 sm:gap-x-8">
+                <span class="readout invisible text-sm select-none" aria-hidden="true">00</span>
 
-                <div class="overflow-hidden rounded-sm border border-line">
-                    <img
-                        src="{{ asset($service['image']) }}"
-                        alt="{{ $t['title'] }} — Energix, {{ __('site.common.city') }}"
-                        width="800"
-                        height="533"
-                        loading="lazy"
-                        decoding="async"
-                        class="h-44 w-full object-cover opacity-70 lg:h-full"
-                    >
+                <div class="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:gap-14">
+                    <div>
+                        <p class="text-paper-dim">{{ $t['intro'] }}</p>
+
+                        <ul class="mt-6 grid gap-2.5 sm:grid-cols-2">
+                            @foreach ($t['features'] as $i => $feature)
+                                <li class="flex gap-3 text-sm text-paper-dim" style="--i: {{ $i }}">
+                                    <span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-gold" aria-hidden="true"></span>
+                                    {{ $feature }}
+                                </li>
+                            @endforeach
+                        </ul>
+
+                        {{--
+                        | Textul ancorei descrie pagina-țintă, nu acțiunea. „Detalii complete”
+                        | era cel mai valoros link intern de pe site și nu spunea nimic despre
+                        | nimic — nici lui Google, nici unui cititor de ecran.
+                        --}}
+                        <a
+                            href="{{ URL::localized("services.{$service['slug']}") }}"
+                            class="mt-6 inline-flex items-center gap-2 font-mono text-sm tracking-wider text-gold uppercase transition hover:brightness-110"
+                        >
+                            {{ $t['anchor'] }}
+                            <span aria-hidden="true">&rarr;</span>
+                        </a>
+                    </div>
+
+                    <div class="overflow-hidden rounded-sm border border-line">
+                        <img
+                            src="{{ asset($service['image']) }}"
+                            alt="{{ $t['title'] }} — Energix, {{ __('site.common.city') }}"
+                            width="800"
+                            height="533"
+                            loading="lazy"
+                            decoding="async"
+                            class="h-44 w-full object-cover opacity-70 lg:h-full"
+                        >
+                    </div>
                 </div>
             </div>
         </div>
