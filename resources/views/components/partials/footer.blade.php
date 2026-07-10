@@ -59,6 +59,18 @@
 
         <div class="mt-6 flex flex-col gap-3 text-xs text-paper-dim sm:flex-row sm:items-center sm:justify-between">
             <p>&copy; {{ date('Y') }} Energix. {{ __('site.common.rights') }}</p>
+
+            {{-- Creditul agentiei care a facut site-ul. URL-ul e in CONTACT.md. --}}
+            <p>
+                {{ __('site.common.credit') }}
+                <a
+                    href="https://advista.marketing"
+                    target="_blank"
+                    rel="noopener"
+                    class="text-paper transition-colors hover:text-gold"
+                >AdVista</a>
+            </p>
+
             <nav aria-label="{{ __('site.common.legal') }}">
                 <ul class="flex flex-wrap gap-x-5 gap-y-2">
                     <li><a href="{{ URL::localized('legal.terms') }}" class="transition hover:text-paper">{{ __('site.common.legal_terms') }}</a></li>

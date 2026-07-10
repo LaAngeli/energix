@@ -51,6 +51,7 @@ return [
         'find_us' => 'Ne găsești și pe',
         'legal' => 'Pagini legale',
         'rights' => 'Toate drepturile rezervate.',
+        'credit' => 'Creat de',
         'legal_terms' => 'Termeni și condiții',
         'legal_privacy' => 'Confidențialitate',
         'legal_cookies' => 'Cookie',
