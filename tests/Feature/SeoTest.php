@@ -17,12 +17,17 @@ beforeEach(function (): void {
 |--------------------------------------------------------------------------
 */
 
-it('declara ElectricalContractor, nu Electrician', function (): void {
+it('declara un tip de business valid schema.org', function (): void {
     $html = $this->get('/')->assertOk()->getContent();
 
-    // `Electrician` din schema.org implica o afirmatie de autorizare — exclusa.
-    expect($html)->toContain('"@type":"ElectricalContractor"')
-        ->and($html)->not->toContain('"@type":"Electrician"');
+    /*
+     | `Electrician` e subtipul valid de LocalBusiness. `ElectricalContractor`, folosit
+     | anterior, NU e definit de schema.org — validatorul il respinge, iar entitatea
+     | cade la `Thing`. E o categorie citita de motoare, nu un text vizibil: excluderea
+     | „electrician autorizat” viza continutul paginii, nu tipul din schema.
+     */
+    expect($html)->toContain('"@type":"Electrician"')
+        ->and($html)->not->toContain('ElectricalContractor');
 });
 
 it('emite JSON-LD valid, fara noduri neparsabile', function (string $path, int $status): void {

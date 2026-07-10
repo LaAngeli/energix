@@ -117,8 +117,15 @@ autonome**. De aceea:
   `experience_years`.
 
 **Geographic / local:**
-- `ElectricalContractor` (NU `Electrician` — ar implica autorizare, exclusă) cu
-  `areaServed` ca listă de `City`, `openingHoursSpecification`, NAP consistent.
+- `@type: Electrician` — subtipul valid de LocalBusiness pentru un business electric —
+  cu `areaServed` ca listă de `City`, `openingHoursSpecification`, NAP consistent.
+
+⚠️ **Corecție 2026-07-10 (validator.schema.org):** tipul era `ElectricalContractor`, ales
+ca „alternativă fără autorizare". Dar **acela nu e un tip definit de schema.org** —
+validatorul îl respinge (3 erori), iar entitatea cade la `Thing`: Google nu mai recunoaște
+firma ca business local, deci toată semantica NAP/program/oferte atârnă în gol. `Electrician`
+e o **categorie** citită de motoare, nu textul vizibil pe care îl viza excluderea; fără
+`hasCredential`, fără afirmație de licențiere. Verificat: schema.org validator → 0 erori.
 - Secțiunea „Unde lucrăm": sectoarele Chișinăului + localitățile, ca text real, nu doar
   în schema.
 - **Firimituri**, vizibile pe pagină **și** marcate `BreadcrumbList`, dintr-o singură

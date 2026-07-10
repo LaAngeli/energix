@@ -51,8 +51,15 @@ Nu apare nicăieri, sub nicio formă. Include, dar nu se limitează la:
 - subtitlul de pe `/servicii` („…executate de electricieni autorizați");
 - cardurile de echipă de pe `/despre` („Electricieni Autorizați",
   **„Electricieni certificați ANRE"**);
-- `"@type": "Electrician"` din JSON-LD → se folosește `LocalBusiness` /
-  `ElectricalContractor` fără afirmații de licențiere.
+- orice **text vizibil** care revendică autorizare.
+
+⚠️ **Excluderea privește textul vizibil, NU tipul din schema.org.** Nodul de business
+din JSON-LD folosește `@type: Electrician` — tipul valid de LocalBusiness pentru un
+business electric. E o categorie citită de motoarele de căutare, fără `hasCredential`
+și fără afirmație de licențiere; nu apare nicăieri în pagină. Corecție 2026-07-10:
+`ElectricalContractor`, folosit inițial ca „alternativă fără autorizare", **nu e un tip
+definit de schema.org** — validatorul îl respinge și entitatea cade la `Thing`. Vezi
+`SEO.md`.
 
 ⚠️ Consecință de care trebuie ținut cont: „electrician autorizat" era probabil cel mai
 valoros cuvânt-cheie al site-ului. Eliminarea lui lasă un gol de semnal de încredere care

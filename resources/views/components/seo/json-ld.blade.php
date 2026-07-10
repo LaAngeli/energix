@@ -9,15 +9,23 @@
     $base = rtrim(url('/'), '/');
 
     /*
-     | `ElectricalContractor` (subtip de LocalBusiness), NU `Electrician`.
-     | Tipul `Electrician` din schema.org implica o afirmatie de autorizare, iar
-     | clientul a exclus orice afirmatie de acest fel. Vezi BUSINESS.md.
+     | `Electrician` — subtipul valid de LocalBusiness pentru un business electric.
+     |
+     | ⚠️ NU `ElectricalContractor`: acela NU e un tip definit de schema.org, iar
+     | validatorul schema.org il respinge. Un tip nerecunoscut cade la `Thing`, deci
+     | toata semantica de firma locala (adresa, program, areaServed, oferte) atarna
+     | de o entitate pe care Google n-o poate categorisi. Verificat cu
+     | validator.schema.org (2026-07-10): 3 erori, toate din acest tip invalid.
+     |
+     | `Electrician` e o CATEGORIE citita de motoare, nu un text vizibil si nu o
+     | afirmatie de licentiere — excluderea clientului viza „electrician autorizat”
+     | din continut, nu categoria din schema. Fara `hasCredential`, fara autorizare.
      |
      | `sameAs` accepta doar URL-uri http(s) — `viber://` nu e valid acolo.
      */
     $business = [
         '@context' => 'https://schema.org',
-        '@type' => 'ElectricalContractor',
+        '@type' => 'Electrician',
         '@id' => $base.'/#business',
         'name' => $seo['site_name'],
         'url' => $base,
@@ -129,7 +137,8 @@
                 config('energix.areas.cities'),
             ),
             'provider' => ['@id' => $base.'/#business'],
-            'inLanguage' => $locale,
+            // Fara `inLanguage`: e proprietate de CreativeWork, iar `Service` nu e una.
+            // Limba paginii vine oricum din `<html lang>` si din hreflang.
         ];
 
         /*
