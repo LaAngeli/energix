@@ -118,6 +118,73 @@ it('redirectioneaza 301 vechile URL-uri .html', function (string $old, string $n
 
 /*
 |--------------------------------------------------------------------------
+| Cartonasul social (Open Graph)
+|--------------------------------------------------------------------------
+|
+| Regresie: `og:image` a fost un WebP transparent de 669x543. Facebook si LinkedIn
+| nu randeaza fiabil WebP, iar raportul cerut e 1.91:1. Testul apara si formatul,
+| si dimensiunile declarate.
+|
+*/
+
+it('serveste un cartonas social opac de 1200x630, pe fiecare limba', function (string $locale): void {
+    $path = public_path(config("energix.seo.og_images.{$locale}"));
+
+    expect($path)->toBeFile();
+
+    [$width, $height, $type] = getimagesize($path);
+
+    expect($width)->toBe(1200)
+        ->and($height)->toBe(630)
+        ->and(image_type_to_mime_type($type))->toBe('image/png');
+})->with(['ro', 'ru']);
+
+it('declara imaginea Open Graph cu dimensiuni, tip si alt', function (string $path, string $image, string $ogLocale, string $altLocale): void {
+    $html = $this->get($path)->assertOk()->getContent();
+
+    expect($html)->toContain('<meta property="og:image" content="'.url($image).'">')
+        ->and($html)->toContain('<meta property="og:image:width" content="1200">')
+        ->and($html)->toContain('<meta property="og:image:height" content="630">')
+        ->and($html)->toContain('<meta property="og:image:type" content="image/png">')
+        ->and($html)->toContain('<meta property="og:locale" content="'.$ogLocale.'">')
+        ->and($html)->toContain('<meta property="og:locale:alternate" content="'.$altLocale.'">')
+        // `alt` e obligatoriu si pe Twitter, altfel cardul e mut pentru cititoarele de ecran.
+        ->and($html)->toContain('twitter:image:alt')
+        ->and($html)->toContain('og:image:alt');
+})->with([
+    ['/', '/images/og/energix-ro.png', 'ro_MD', 'ru_MD'],
+    ['/ru', '/images/og/energix-ru.png', 'ru_MD', 'ro_MD'],
+]);
+
+/*
+|--------------------------------------------------------------------------
+| llms.txt
+|--------------------------------------------------------------------------
+*/
+
+it('publica /llms.txt ca text simplu, bilingv', function (): void {
+    $response = $this->get('/llms.txt')->assertOk();
+
+    expect($response->headers->get('Content-Type'))->toBe('text/plain; charset=utf-8');
+
+    $body = $response->getContent();
+
+    expect($body)->toStartWith('# Energix')
+        // Rezumatul GEO, in ambele limbi.
+        ->and($body)->toContain(trans('site.home.summary', [], 'ro'))
+        ->and($body)->toContain(trans('site.home.summary', [], 'ru'))
+        // Ambele arbori de URL-uri.
+        ->and($body)->toContain(url('/servicii'))
+        ->and($body)->toContain(url('/ru/uslugi'))
+        // Partea care califica lead-urile: ce NU face firma.
+        ->and($body)->toContain('Nu execută lucrări punctuale pe instalații existente.')
+        ->and($body)->toContain('Не выполняет точечные работы на существующей проводке.')
+        // Cele cinci etape, ca un motor de raspuns sa poata cita procesul complet.
+        ->and($body)->toContain('5. Verificare și predare');
+});
+
+/*
+|--------------------------------------------------------------------------
 | Conversia
 |--------------------------------------------------------------------------
 */

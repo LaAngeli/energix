@@ -426,6 +426,12 @@ return [
     ],
 
     /*
+     | Textul alternativ al cartonașului social. Stă în afara lui `seo`, fiindcă
+     | `PageMetaTest` iterează `trans('site.seo')` așteptând perechi title/description.
+     */
+    'og_alt' => 'Energix — instalații electrice complete în Chișinău și toată Moldova',
+
+    /*
      | Meta per pagină. Titluri ≤ 60 caractere, descrieri ≤ 158.
      */
     'seo' => [

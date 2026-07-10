@@ -96,6 +96,53 @@ folosite. CSS-ul cu `@font-face` e inline în `<head>`, deci descoperirea e oric
 și se descarcă doar subsetul necesar. Fallback-urile metrice (fontaine) rămân active, deci
 CLS e controlat.
 
+## Cartonașul social (Open Graph)
+
+`public/images/og/energix-{ro,ru}.png` — **1200×630 (1.91:1), PNG opac, 8-bit**, câte unul
+pe limbă. Declarate în `config('energix.seo.og_images')`, alese după `app()->getLocale()`.
+
+Trei reguli, fiecare plătită:
+
+1. **Nu WebP.** Facebook și LinkedIn nu îl randează fiabil. Vechiul `og:image` era
+   `logo_transparent.webp`, deci partajările nu aveau imagine.
+2. **Nu transparent.** Un PNG cu alfa ajunge pe fundalul alb al feed-ului, unde
+   bleumarinul brandului dispare și rămâne un bec galben suspendat în gol.
+3. **Dimensiunile se declară** în `og:image:width` / `og:image:height`. Fără ele
+   crawler-ul trebuie să descarce fișierul înainte de a randa cardul, și adesea renunță —
+   de unde „prima partajare iese fără imagine".
+
+Textul e localizat integral, inclusiv linia de eyebrow (`КИШИНЁВ`, nu `CHIȘINĂU`).
+`SeoTest` verifică formatul, dimensiunile și meta-urile.
+
+### Regenerare (ImageMagick 7, PowerShell)
+
+Fontul e Segoe UI Semibold — singurul de pe mașină cu diacritice românești **și**
+chirilică. Nu Archivo: nu e instalat local, doar servit prin Vite.
+
+```powershell
+$tmp = "$env:TEMP\og"; New-Item -ItemType Directory -Force $tmp | Out-Null
+$font = "C:/Windows/Fonts/seguisb.ttf"   # slash-uri: magick nu acceptă backslash aici
+
+magick -size 60x60 xc:none -stroke "#22395b" -strokewidth 1 `
+  -draw "line 0,0 60,0" -draw "line 0,0 0,60" "$tmp/tile.png"
+magick -size 1200x630 "tile:$tmp/tile.png" -alpha set -channel A -evaluate multiply 0.30 +channel "$tmp/grid.png"
+magick -size 1200x630 "xc:#091a31" "$tmp/grid.png" -composite "$tmp/bg.png"
+magick public/images/logo/mark-512.png -resize 140x140 "$tmp/mark.png"
+
+# apoi, per limbă (fără paranteze în comandă — le mănâncă parserul PowerShell):
+magick "$tmp/bg.png" "$tmp/mark.png" -geometry +80+58 -compose over -composite `
+  -font $font `
+  -fill "#eaf1fb" -pointsize 54 -annotate +248+152 "Energix" `
+  -fill "#93a6c4" -pointsize 24 -annotate +80+272 "<EYEBROW>" `
+  -fill "#eaf1fb" -pointsize 58 -annotate +80+356 "<LINIA 1>" `
+  -fill "#f2d147" -pointsize 58 -annotate +80+432 "<LINIA 2>" `
+  -fill "#f2d147" -draw "rectangle 80,474 200,478" `
+  -fill "#93a6c4" -pointsize 30 -annotate +80+558 "energix.md   ·   +373 68 582 016" `
+  -depth 8 -define png:compression-level=9 -strip public/images/og/energix-<loc>.png
+```
+
+⚠️ Fără `-depth 8` ImageMagick scrie PNG pe 16 biți — dublu ca mărime, zero câștig.
+
 ## Reguli tehnice pentru implementare
 
 1. **Tailwind v4** — tokens în `@theme` din `resources/css/app.css`, nu `tailwind.config.js`.

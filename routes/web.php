@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\LlmsTxtController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
@@ -71,8 +72,14 @@ foreach (config('energix.locales') as $locale) {
     });
 }
 
-// Controller invocabil, nu closure: closure-urile rup `php artisan route:cache`.
+// Controllere invocabile, nu closure: closure-urile rup `php artisan route:cache`.
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+
+/*
+| `/llms.txt` (llmstxt.org) — rezumat in Markdown pentru motoarele de raspuns.
+| Nu e in vreun grup de limba: e un singur fisier, bilingv, pentru tot site-ul.
+*/
+Route::get('/llms.txt', LlmsTxtController::class)->name('llms');
 
 /*
 |--------------------------------------------------------------------------

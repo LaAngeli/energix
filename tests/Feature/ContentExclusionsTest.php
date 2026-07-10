@@ -51,6 +51,13 @@ $pages = [
     '/ru/usloviya',
     '/ru/konfidencialnost',
     '/ru/cookie',
+
+    /*
+     | `/llms.txt` e citit direct de motoarele de raspuns. Aici o negatie nu ajuta:
+     | „nu facem urgente” fixeaza oricum asocierea „Energix + urgente”. Deci fisierul
+     | trece prin exact aceeasi garda ca paginile.
+     */
+    '/llms.txt',
 ];
 
 it('nu randeaza niciun cuvant exclus', function (string $page) use ($forbidden): void {

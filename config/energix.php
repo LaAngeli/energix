@@ -139,9 +139,25 @@ return [
      | Canonical, hreflang si sitemap se genereaza toate din tabela de rute, deci
      | din `APP_URL`. O singura sursa de adevar pentru domeniu.
      */
+    /*
+     | Cartonasele sociale: 1200x630 (1.91:1), PNG opac, cate unul pe limba.
+     |
+     | NU WebP si NU logo transparent. Facebook si LinkedIn nu randeaza fiabil WebP,
+     | iar un PNG transparent ajunge pe fundalul alb al feed-ului, unde bleumarinul
+     | brandului dispare. Latimea si inaltimea se declara in meta, ca sa nu astepte
+     | crawler-ul descarcarea imaginii inainte de a rezerva spatiul in card.
+     |
+     | Regenerare: vezi `.claude/context/DESIGN.md` § „Cartonasul social”.
+     */
     'seo' => [
         'site_name' => 'Energix',
-        'og_image' => 'images/logo/logo_transparent.webp',
+        'og_images' => [
+            'ro' => 'images/og/energix-ro.png',
+            'ru' => 'images/og/energix-ru.png',
+        ],
+        'og_image_width' => 1200,
+        'og_image_height' => 630,
+        'og_image_type' => 'image/png',
     ],
 
     /*

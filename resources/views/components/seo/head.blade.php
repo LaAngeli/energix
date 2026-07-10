@@ -21,9 +21,12 @@
      | e cel mai bun mod de a-i spune lui Google sa ignore ambele.
      */
     $canonical = $routeName ? URL::localized($routeName) : null;
-    $ogImage = asset($seo['og_image']);
+
+    // Cartonas social pe limba: cel rus e scris in chirilica, nu e o traducere de alt.
+    $ogImage = asset($seo['og_images'][$locale] ?? $seo['og_images']['ro']);
 
     $hreflangMap = ['ro' => 'ro-MD', 'ru' => 'ru-MD'];
+    $ogLocaleMap = ['ro' => 'ro_MD', 'ru' => 'ru_MD'];
 @endphp
 
 <title>{{ $meta['title'] }}</title>
@@ -49,15 +52,32 @@
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="{{ $seo['site_name'] }}">
-<meta property="og:locale" content="{{ $locale === 'ru' ? 'ru_MD' : 'ro_MD' }}">
+<meta property="og:locale" content="{{ $ogLocaleMap[$locale] }}">
+@foreach (array_diff(config('energix.locales'), [$locale]) as $alt)
+    <meta property="og:locale:alternate" content="{{ $ogLocaleMap[$alt] }}">
+@endforeach
 <meta property="og:title" content="{{ $meta['title'] }}">
 <meta property="og:description" content="{{ $meta['description'] }}">
 @if ($canonical)
     <meta property="og:url" content="{{ $canonical }}">
 @endif
+
+{{--
+| Latimea, inaltimea si tipul evita „prima partajare fara imagine”: fara ele,
+| crawler-ul trebuie sa descarce fisierul inainte de a randa cardul si adesea
+| renunta. `secure_url` doar pe HTTPS — pe HTTP ar fi o minciuna.
+--}}
 <meta property="og:image" content="{{ $ogImage }}">
+@if (str_starts_with($ogImage, 'https://'))
+    <meta property="og:image:secure_url" content="{{ $ogImage }}">
+@endif
+<meta property="og:image:type" content="{{ $seo['og_image_type'] }}">
+<meta property="og:image:width" content="{{ $seo['og_image_width'] }}">
+<meta property="og:image:height" content="{{ $seo['og_image_height'] }}">
+<meta property="og:image:alt" content="{{ __('site.og_alt') }}">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ $meta['title'] }}">
 <meta name="twitter:description" content="{{ $meta['description'] }}">
 <meta name="twitter:image" content="{{ $ogImage }}">
+<meta name="twitter:image:alt" content="{{ __('site.og_alt') }}">

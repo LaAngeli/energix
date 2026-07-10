@@ -51,6 +51,10 @@ Sunt cuvintele concurenței, dar contrazic modelul de business. Vezi `BUSINESS.m
   **aceeași** tabelă de rute. Sitemap cu `xhtml:link` per URL.
 - 404: fără canonical, cu `noindex, follow`.
 - Redirect-uri 301 de la vechile `.html`.
+- **Open Graph complet**: cartonaș social 1200×630 PNG **pe fiecare limbă**, cu
+  `og:image:{width,height,type,alt,secure_url}`, `og:locale:alternate` și
+  `twitter:image:alt`. Vezi `DESIGN.md` § „Cartonașul social". Vechiul `og:image` era
+  un WebP transparent de 669×543 — adică partajări fără imagine pe Facebook/LinkedIn.
 
 ## AEO — optimizare pentru motoarele de răspuns
 
@@ -64,6 +68,14 @@ autonome**. De aceea:
   care trimit la paragraful anterior.
 - Ultima întrebare declară explicit ce **nu** face firma. Un motor de răspuns care
   citează asta ne trimite lead-uri calificate, nu apeluri de depanare.
+- **`/llms.txt`** (convenția llmstxt.org), generat de `LlmsTxtController` din `lang/` și
+  din tabela de rute — nu un fișier static, care ar fi rămas în urmă tăcut. Conține
+  rezumatul în ambele limbi, cele 5 etape, cele 3 servicii, toate FAQ-urile, NAP-ul și
+  secțiunea „Ce NU face". Anunțat în `robots.txt`.
+
+⚠️ Textul din `llms.txt` respectă **aceleași excluderi** ca paginile — `ContentExclusionsTest`
+îl scanează. O negație nu ajută: „nu facem urgențe" fixează oricum asocierea
+„Energix + urgențe" în modelul care o citește.
 
 ## GEO — ambele sensuri, fiindcă amândouă contează aici
 
