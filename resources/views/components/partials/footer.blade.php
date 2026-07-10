@@ -1,7 +1,4 @@
-@php
-    $contact = config('energix.contact');
-    $social = config('energix.social');
-@endphp
+@php($contact = config('energix.contact'))
 
 {{--
 | Footer = placuta de identificare a instalatiei: datele firmei ca specificatii
@@ -28,18 +25,7 @@
                         Instalații electrice complete pentru apartamente, case și spații
                         industriale. {{ $contact['city'] }} și toată {{ $contact['country'] }}.
                     </p>
-                    <ul class="mt-5 flex flex-wrap gap-2">
-                        @foreach ($social as $item)
-                            {{-- `viber://` nu se deschide pe desktop fara clientul instalat. --}}
-                            <li @class(['hidden sm:list-item' => str_starts_with($item['url'], 'viber:')])>
-                                <a
-                                    href="{{ $item['url'] }}"
-                                    @if (str_starts_with($item['url'], 'https://')) target="_blank" rel="noopener noreferrer" @endif
-                                    class="inline-flex items-center rounded-sm border border-line px-2.5 py-1.5 font-mono text-[0.6rem] tracking-[0.14em] text-paper-dim uppercase transition hover:border-gold hover:text-gold"
-                                >{{ $item['name'] }}</a>
-                            </li>
-                        @endforeach
-                    </ul>
+                    <x-social-links class="mt-5" />
                 </div>
 
                 <div>

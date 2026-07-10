@@ -42,6 +42,32 @@ it('nu afiseaza cifre neverificate', function (): void {
     expect(config('energix.stats_enabled'))->toBeFalse();
 });
 
+it('are o glifa pentru fiecare retea sociala', function (): void {
+    // <x-social-icon> randeaza un <svg> gol daca `icon` nu are un case in @switch.
+    $component = file_get_contents(resource_path('views/components/social-icon.blade.php'));
+
+    foreach (config('energix.social') as $network) {
+        expect($network)->toHaveKey('icon')
+            ->and($component)->toContain("@case('{$network['icon']}')");
+    }
+});
+
+it('randeaza toate iconitele sociale, cu nume accesibil', function (): void {
+    $html = $this->withoutVite()->get('/contacte')->assertOk()->getContent();
+    $networks = config('energix.social');
+
+    foreach ($networks as $network) {
+        expect($html)->toContain('aria-label="'.$network['name'].'"');
+    }
+
+    /*
+     | Glife desenate, nu pastile de text. Pagina de contact le arata de doua ori:
+     | o data in coloana de date, o data in footer. (Y-ul din <x-signature.wye> e
+     | stroke, nu fill, deci nu intra la numaratoare.)
+     */
+    expect(substr_count($html, 'fill="currentColor"'))->toBe(count($networks) * 2);
+});
+
 it('pastreaza datele de contact intacte', function (): void {
     expect(config('energix.contact.phone'))->toBe('+373 68 582 016')
         ->and(config('energix.contact.phone_href'))->toBe('+37368582016')

@@ -73,12 +73,16 @@ return [
         ['q' => 'Când puteți începe?', 'a' => 'De regulă în aceeași săptămână. Data exactă o stabilim la telefon.'],
     ],
 
+    /*
+     | `icon` alege glifa din <x-social-icon>. Numele ramane pentru eticheta
+     | accesibila — link-urile sunt doar iconite, deci au nevoie de nume.
+     */
     'social' => [
-        ['name' => 'Facebook', 'url' => 'https://facebook.com/profile.php?id=61567185351755'],
-        ['name' => 'Instagram', 'url' => 'https://instagram.com/energix_electrician_moldova_/'],
-        ['name' => 'Telegram', 'url' => 'https://t.me/energix_md'],
-        ['name' => 'WhatsApp', 'url' => 'https://wa.me/37368582016'],
-        ['name' => 'Viber', 'url' => 'viber://chat?number=37368582016'],
+        ['name' => 'Facebook', 'icon' => 'facebook', 'url' => 'https://facebook.com/profile.php?id=61567185351755'],
+        ['name' => 'Instagram', 'icon' => 'instagram', 'url' => 'https://instagram.com/energix_electrician_moldova_/'],
+        ['name' => 'Telegram', 'icon' => 'telegram', 'url' => 'https://t.me/energix_md'],
+        ['name' => 'WhatsApp', 'icon' => 'whatsapp', 'url' => 'https://wa.me/37368582016'],
+        ['name' => 'Viber', 'icon' => 'viber', 'url' => 'viber://chat?number=37368582016'],
     ],
 
     /*

@@ -59,17 +59,7 @@
 
                     <div>
                         <p class="eyebrow">Ne găsești și pe</p>
-                        <ul class="mt-3 flex flex-wrap gap-2">
-                            @foreach (config('energix.social') as $item)
-                                <li @class(['hidden sm:list-item' => str_starts_with($item['url'], 'viber:')])>
-                                    <a
-                                        href="{{ $item['url'] }}"
-                                        @if (str_starts_with($item['url'], 'https://')) target="_blank" rel="noopener noreferrer" @endif
-                                        class="inline-flex rounded-sm border border-line px-3 py-2 font-mono text-xs tracking-wider text-paper-dim uppercase transition hover:border-gold hover:text-gold"
-                                    >{{ $item['name'] }}</a>
-                                </li>
-                            @endforeach
-                        </ul>
+                        <x-social-links class="mt-3" :size="21" />
                     </div>
                 </div>
             </div>
