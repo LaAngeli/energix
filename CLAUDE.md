@@ -185,10 +185,17 @@ Cerință directă a userului (2026-07-10).
 Commit + push, fără să mai întrebi:
 
 ```bash
-git add -A
+git add <cale1> <cale2> …   # DOAR fișierele atinse de task; NICIODATĂ `git add -A`
 git commit -m "<mesaj descriptiv, in romana>"
-git push            # merge pe origin/laravel-rewrite, upstream deja setat
+git push                    # merge pe origin/laravel-rewrite, upstream deja setat
 ```
+
+🔴 **Căi explicite, nu `git add -A`.** Cerință directă a userului (2026-07-10). Se pot
+rula două sesiuni în paralel pe același repo; un `git add -A` din oricare le-ar înghiți
+munca work-in-progress a celeilalte și ar băga într-un commit fișiere fără legătură cu
+task-ul. Adaugă doar căile pe care le-ai atins tu. Verifică `git status` înainte de
+commit: dacă apar modificări pe care nu le-ai făcut, **nu le include** — sunt ale altei
+sesiuni.
 
 „Verificat" înseamnă **dovadă**, nu impresie: testele trec, pagina se randează, comanda
 returnează ce trebuie. Dacă un task a eșuat parțial sau e work-in-progress, **nu comite** —
