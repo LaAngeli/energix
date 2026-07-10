@@ -916,53 +916,401 @@
         min-width: 1.4rem;
     }
 
-    /* --- nivela cu bula (Despre) --- */
-
-    .vial {
+    /*
+    | --- sigla care se incarca (hero /despre) ---
+    |
+    | Portul animatiei livrate de client. Geometria ramane in spatiul machetei
+    | 940x800: `--u` e un pixel de macheta exprimat in latimea containerului.
+    | Asa coordonatele din CSS se citesc identic cu cele din sursa, iar piesa
+    | scaleaza fara o linie de JavaScript.
+    |
+    | Nimic nu se misca in repaus. Ciclul porneste doar cand `.is-charging` e pus
+    | de IntersectionObserver (o data) sau de cursor. Starea de repaus e exact
+    | cadrul 100% al fiecarui keyframe, deci oprirea nu sare.
+    */
+    .logo-charge {
+        --nrg-cycle: 5s;
+        --u: calc(100cqw / 940);
         position: relative;
-        height: 2.2rem;
-        border: 1px solid var(--color-line);
-        border-radius: 9999px;
-        background: linear-gradient(to bottom, var(--color-ink), var(--color-ink-raised));
+        width: 100%;
+        aspect-ratio: 940 / 800;
+        container-type: inline-size;
         overflow: hidden;
     }
 
-    /* reperele de centru */
-    .vial::before,
-    .vial::after {
-        content: '';
+    .logo-charge > * {
         position: absolute;
-        top: 3px;
-        bottom: 3px;
-        width: 1px;
-        background: var(--color-paper-dim);
-        opacity: 0.7;
     }
 
-    .vial::before {
-        left: calc(50% - 14px);
+    .logo-charge-img,
+    .logo-charge-surge,
+    .logo-charge-sweep {
+        left: calc(120 * var(--u));
+        top: calc(116 * var(--u));
+        width: calc(700 * var(--u));
+        height: calc(568 * var(--u));
     }
 
-    .vial::after {
-        left: calc(50% + 14px);
+    .logo-charge-img {
+        filter: brightness(1.05) saturate(1.05) drop-shadow(0 0 calc(6 * var(--u)) rgb(255 232 170 / 0.45))
+            drop-shadow(0 0 calc(16 * var(--u)) rgb(242 209 71 / 0.3));
     }
 
-    .bubble {
-        position: absolute;
-        top: 4px;
-        bottom: 4px;
-        left: 50%;
-        width: 22px;
-        margin-left: -11px;
-        border-radius: 9999px;
-        background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--color-gold) 85%, white), var(--color-gold) 60%);
-        box-shadow: 0 0 10px -2px var(--color-gold);
-        transition: transform 0.18s ease-out;
-        will-change: transform;
+    /* becul: 67% de sus din sigla */
+    .logo-charge-surge {
+        clip-path: inset(0 0 33% 0);
+        filter: brightness(1.9) saturate(1.15) drop-shadow(0 0 calc(10 * var(--u)) rgb(255 236 180 / 0.7));
+        opacity: 0;
     }
 
-    [data-level].is-level .bubble {
-        box-shadow: 0 0 16px 0 var(--color-gold);
+    /* wordmark-ul: 34% de jos, cu o fereastra de lumina care il traverseaza */
+    .logo-charge-sweep {
+        clip-path: inset(66% 0 0 0);
+        filter: brightness(1.95) saturate(1.15) drop-shadow(0 0 calc(9 * var(--u)) rgb(224 240 255 / 0.95));
+        mask-image: linear-gradient(90deg, transparent 0%, black 40%, black 60%, transparent 100%);
+        mask-size: 42% 100%;
+        mask-repeat: no-repeat;
+        mask-position: -55% 50%;
+        opacity: 0;
+    }
+
+    .logo-charge-bar {
+        left: calc(135 * var(--u));
+        top: calc(498 * var(--u));
+        width: calc(62 * var(--u));
+        height: calc(196 * var(--u));
+        background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgb(255 255 255 / 0.92) 46%,
+            rgb(170 210 255 / 0.55) 66%,
+            transparent 100%
+        );
+        filter: blur(calc(6 * var(--u)));
+        opacity: 0;
+    }
+
+    .logo-charge-aura {
+        left: calc(470 * var(--u));
+        top: calc(308 * var(--u));
+        width: calc(520 * var(--u));
+        height: calc(520 * var(--u));
+        margin: calc(-260 * var(--u)) 0 0 calc(-260 * var(--u));
+        border-radius: 50%;
+        background: radial-gradient(circle, rgb(255 224 150 / 0.5) 0%, rgb(242 209 71 / 0.22) 40%, rgb(242 209 71 / 0) 68%);
+        opacity: 0.42;
+    }
+
+    .logo-charge-ring {
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    .logo-charge-track {
+        stroke: rgb(255 255 255 / 0.08);
+        stroke-width: 3;
+    }
+
+    .logo-charge-arc {
+        stroke: var(--color-gold);
+        stroke-width: 4;
+        stroke-linecap: round;
+        stroke-dasharray: 100;
+        stroke-dashoffset: 100;
+        opacity: 0;
+        filter: drop-shadow(0 0 5px var(--color-gold)) drop-shadow(0 0 12px rgb(242 209 71 / 0.55));
+    }
+
+    /* `transform-box: view-box` muta originea rotatiei in coordonatele viewBox-ului */
+    .logo-charge-head {
+        transform-box: view-box;
+        transform-origin: 470px 308px;
+        opacity: 0;
+    }
+
+    .logo-charge-head circle {
+        fill: #fff;
+        filter: drop-shadow(0 0 4px #fff) drop-shadow(0 0 9px var(--color-gold));
+    }
+
+    .logo-charge-flash,
+    .logo-charge-ripple {
+        left: calc(470 * var(--u));
+        top: calc(498 * var(--u));
+        border-radius: 50%;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .logo-charge-flash {
+        width: calc(120 * var(--u));
+        height: calc(120 * var(--u));
+        margin: calc(-60 * var(--u));
+        background: radial-gradient(circle, rgb(255 255 255 / 0.95) 0%, rgb(255 235 180 / 0.5) 32%, rgb(255 235 180 / 0) 62%);
+    }
+
+    .logo-charge-ripple {
+        width: calc(90 * var(--u));
+        height: calc(90 * var(--u));
+        margin: calc(-45 * var(--u));
+        border: calc(3 * var(--u)) solid var(--color-gold);
+    }
+
+    .logo-charge-spark {
+        left: calc(470 * var(--u));
+        top: calc(308 * var(--u));
+        width: var(--size);
+        height: var(--size);
+        margin: calc(var(--size) / -2);
+        border-radius: 50%;
+        background: var(--color-gold);
+        box-shadow: 0 0 calc(7 * var(--u)) var(--color-gold);
+        opacity: 0;
+    }
+
+    /* ---- ciclul: pornit doar de `.is-charging`, rulat o singura data ---- */
+
+    .logo-charge.is-charging .logo-charge-aura {
+        animation: nrg-glow var(--nrg-cycle) ease-in-out both;
+    }
+
+    .logo-charge.is-charging .logo-charge-arc {
+        animation:
+            nrg-fill var(--nrg-cycle) cubic-bezier(0.4, 0, 0.2, 1) both,
+            nrg-ringop var(--nrg-cycle) linear both;
+    }
+
+    .logo-charge.is-charging .logo-charge-head {
+        animation:
+            nrg-head var(--nrg-cycle) cubic-bezier(0.4, 0, 0.2, 1) both,
+            nrg-headop var(--nrg-cycle) linear both;
+    }
+
+    .logo-charge.is-charging .logo-charge-surge {
+        animation: nrg-surge var(--nrg-cycle) ease-in-out both;
+    }
+
+    .logo-charge.is-charging .logo-charge-sweep {
+        animation: nrg-wordsweep var(--nrg-cycle) ease-in-out both;
+    }
+
+    .logo-charge.is-charging .logo-charge-bar {
+        animation: nrg-sweepbar var(--nrg-cycle) ease-in-out both;
+    }
+
+    .logo-charge.is-charging .logo-charge-flash {
+        animation: nrg-flash var(--nrg-cycle) ease-out both;
+    }
+
+    .logo-charge.is-charging .logo-charge-ripple {
+        animation: nrg-ripple var(--nrg-cycle) ease-out both;
+    }
+
+    /*
+    | Particulele: doua ture de 52% din ciclu, cu pornire decalata. Legate de
+    | `--nrg-cycle`, deci schimbarea duratei nu le desincronizeaza de inel.
+    */
+    .logo-charge.is-charging .logo-charge-spark {
+        animation: nrg-inflow calc(var(--nrg-cycle) * 0.52) linear var(--lead) 2 both;
+    }
+
+    /* Inelul se umple de jos si se inchide tot jos, la 76% din ciclu. */
+    @keyframes nrg-fill {
+        0% {
+            stroke-dashoffset: 100;
+        }
+
+        76%,
+        100% {
+            stroke-dashoffset: 0;
+        }
+    }
+
+    @keyframes nrg-ringop {
+        0% {
+            opacity: 0;
+        }
+
+        7%,
+        78% {
+            opacity: 1;
+        }
+
+        90%,
+        100% {
+            opacity: 0;
+        }
+    }
+
+    @keyframes nrg-head {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        76%,
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    @keyframes nrg-headop {
+        0% {
+            opacity: 0;
+        }
+
+        7%,
+        74% {
+            opacity: 1;
+        }
+
+        82%,
+        100% {
+            opacity: 0;
+        }
+    }
+
+    /* Aura respira usor, apoi da un val cand inelul se inchide. */
+    @keyframes nrg-glow {
+        0%,
+        71% {
+            opacity: 0.42;
+            transform: scale(1);
+        }
+
+        40% {
+            opacity: 0.52;
+            transform: scale(1.03);
+        }
+
+        80% {
+            opacity: 0.95;
+            transform: scale(1.13);
+        }
+
+        90% {
+            opacity: 0.52;
+            transform: scale(1.03);
+        }
+
+        100% {
+            opacity: 0.42;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes nrg-surge {
+        0%,
+        71%,
+        92%,
+        100% {
+            opacity: 0;
+        }
+
+        80% {
+            opacity: 0.5;
+        }
+    }
+
+    /* Fereastra de lumina traverseaza wordmark-ul de la stanga la dreapta. */
+    @keyframes nrg-wordsweep {
+        0%,
+        74% {
+            mask-position: -55% 50%;
+            opacity: 0;
+        }
+
+        79% {
+            mask-position: -12% 50%;
+            opacity: 1;
+        }
+
+        94% {
+            mask-position: 140% 50%;
+            opacity: 1;
+        }
+
+        100% {
+            mask-position: 158% 50%;
+            opacity: 0;
+        }
+    }
+
+    @keyframes nrg-sweepbar {
+        0%,
+        75% {
+            opacity: 0;
+            transform: translateX(0);
+        }
+
+        79% {
+            opacity: 0.95;
+        }
+
+        90% {
+            opacity: 0.6;
+        }
+
+        96%,
+        100% {
+            opacity: 0;
+            transform: translateX(calc(640 * var(--u)));
+        }
+    }
+
+    @keyframes nrg-flash {
+        0%,
+        70% {
+            opacity: 0;
+            transform: scale(0.35);
+        }
+
+        79% {
+            opacity: 0.95;
+            transform: scale(1);
+        }
+
+        90%,
+        100% {
+            opacity: 0;
+            transform: scale(1.5);
+        }
+    }
+
+    @keyframes nrg-ripple {
+        0%,
+        71% {
+            opacity: 0;
+            transform: scale(0.2);
+        }
+
+        78% {
+            opacity: 0.8;
+        }
+
+        95%,
+        100% {
+            opacity: 0;
+            transform: scale(3.2);
+        }
+    }
+
+    @keyframes nrg-inflow {
+        0% {
+            opacity: 0;
+            transform: translate(var(--sx), var(--sy)) scale(0.5);
+        }
+
+        14%,
+        82% {
+            opacity: 1;
+        }
+
+        100% {
+            opacity: 0;
+            transform: translate(0, 0) scale(1);
+        }
     }
 
     /* --- verificarea liniei (Contacte) --- */

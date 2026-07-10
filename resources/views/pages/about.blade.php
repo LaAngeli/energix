@@ -9,14 +9,16 @@
         <div class="relative mx-auto max-w-6xl px-5 pt-8 pb-14 sm:px-8 sm:pb-18">
             <x-job-sheet code="DSP-04" :name="__('site.nav.about')" index="04/05" />
 
-            <div class="mt-10 grid gap-10 lg:grid-cols-[1.1fr_auto] lg:items-center">
+            <div class="mt-10 grid gap-10 lg:grid-cols-[1fr_26rem] lg:items-center lg:gap-8">
                 <div>
-                    <h1 class="max-w-3xl text-h1 text-paper">{{ __('site.about_page.h1') }}</h1>
-                    <p class="mt-6 max-w-2xl text-lead text-paper-dim">{{ __('site.about_page.lead') }}</p>
+                    <h1 class="max-w-2xl text-h1 text-paper">{{ __('site.about_page.h1') }}</h1>
+                    <p class="mt-6 max-w-xl text-lead text-paper-dim">{{ __('site.about_page.lead') }}</p>
                 </div>
 
+                {{-- Sigla se energizează o dată, la intrarea în cadru. Doar pe desktop:
+                     pe mobil coloana nu există, iar `loading="lazy"` ține imaginea nedescărcată. --}}
                 <div class="hidden lg:block" data-reveal>
-                    <x-hero-instrument.level />
+                    <x-signature.logo-charge />
                 </div>
             </div>
         </div>

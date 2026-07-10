@@ -661,73 +661,52 @@ function initWorksCounter() {
     roll(counts.toate ?? 0);
 }
 
-/** /despre — nivela: bula fuge dupa cursor; la centru, instrumentul confirma. */
-function initLevel() {
-    const root = document.querySelector('[data-level]');
+/**
+ * /despre — sigla se energizeaza o data cand intra in cadru; cursorul o reia.
+ *
+ * Fara bucla: in repaus, sigla ramane pur si simplu aprinsa. Durata se citeste
+ * din `--nrg-cycle`, deci CSS-ul ramane singura sursa a timpilor.
+ *
+ * `setTimeout`, nu `animationend`: pe elementul cu doua animatii, evenimentul
+ * vine de doua ori, iar in tab-urile de fundal cadrele nu curg deloc.
+ */
+function initLogoCharge() {
+    const root = document.querySelector('[data-logo-charge]');
 
-    if (! root) {
+    if (! root || prefersReducedMotion) {
         return;
     }
 
-    const bubble = root.querySelector('[data-bubble]');
-    const led = root.querySelector('[data-level-led]');
-    const label = root.querySelector('[data-level-label]');
-    const degOut = root.querySelector('[data-level-deg]');
+    const seconds = parseFloat(getComputedStyle(root).getPropertyValue('--nrg-cycle')) || 5;
+    const cycleMs = seconds * 1000 + 120;
 
-    // Etichetele vin din Blade, deci instrumentul vorbeste limba paginii.
-    const textOk = root.dataset.labelOk;
-    const textCenter = root.dataset.labelCenter;
+    const charge = () => {
+        // Un ciclu in curs nu se intrerupe: repornirea la mijloc ar sari cadre.
+        if (root.classList.contains('is-charging')) {
+            return;
+        }
 
-    const setLevel = (isLevel, deg) => {
-        root.classList.toggle('is-level', isLevel);
-        led.classList.toggle('is-on', isLevel);
-        degOut.textContent = deg.toFixed(1);
-        label.textContent = isLevel ? textOk : textCenter;
+        root.classList.add('is-charging');
+        window.setTimeout(() => root.classList.remove('is-charging'), cycleMs);
     };
 
-    // Tactil sau miscare redusa: nivela sta perfect dreapta, ca pe santier.
-    if (! finePointer || prefersReducedMotion) {
-        setLevel(true, 0);
-
-        return;
-    }
-
-    const maxShift = 70; // px de alunecare a bulei
-    let ticking = false;
-
-    window.addEventListener(
-        'pointermove',
-        (event) => {
-            if (ticking) {
-                return;
-            }
-
-            ticking = true;
-            requestAnimationFrame(() => {
-                ticking = false;
-
-                const box = root.getBoundingClientRect();
-
-                // In afara vecinatatii instrumentului, bula se aseaza singura.
-                if (event.clientY < box.top - 240 || event.clientY > box.bottom + 240) {
-                    bubble.style.transform = 'translateX(0px)';
-                    setLevel(true, 0);
-
+    new IntersectionObserver(
+        (entries, observer) => {
+            entries.forEach((entry) => {
+                if (! entry.isIntersecting) {
                     return;
                 }
 
-                const center = box.left + box.width / 2;
-                const ratio = Math.max(-1, Math.min(1, (event.clientX - center) / (box.width / 2)));
-                const shift = ratio * maxShift;
-
-                bubble.style.transform = `translateX(${shift.toFixed(1)}px)`;
-                setLevel(Math.abs(shift) < 6, Math.abs(ratio * 2));
+                charge();
+                observer.unobserve(entry.target);
             });
         },
-        { passive: true },
-    );
+        { threshold: 0.35 },
+    ).observe(root);
 
-    setLevel(true, 0);
+    if (finePointer) {
+        root.addEventListener('pointerenter', charge);
+    }
 }
 
 /** /contacte — starea liniei: deschis ACUM sau cand revenim, plus testul ceremonial. */
@@ -983,7 +962,7 @@ function boot() {
     initServicesSwitcher();
     initCircuitsCalc();
     initWorksCounter();
-    initLevel();
+    initLogoCharge();
     initLineStatus();
     initFormCircuit();
     initArmSwitch();

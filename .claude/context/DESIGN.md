@@ -196,8 +196,7 @@ Instrumentele per pagină:
   Hero: **contorul electromecanic** — cifre care se rostogolesc (odometru); alegerea
   segmentului **comandă filtrul real** al galeriei de sub el.
 - **Despre**: contor de vechime (cifra 10 pe scală gradată) + valorile ca „aparataj de
-  protecție". Hero: **nivela cu bulă** — bula urmărește cursorul; adusă la centru,
-  confirmă „Drept — la cotă". Pe tactil/reduced-motion stă fixă la zero.
+  protecție". Hero: **sigla care se încarcă** (`<x-signature.logo-charge>`) — vezi mai jos.
 - **Contacte**: formularul e un circuit — fiecare câmp valid închide un segment; toate
   valide → nodul + butonul se armează. Pur vizual, validarea reală rămâne pe server.
   Hero: **starea liniei** — deschis/închis calculat live din program, cu „revenim {zi}
@@ -241,12 +240,44 @@ se umple auriu până la etapa selectată.
 - `requestAnimationFrame` îngheață în tab-uri de fundal — voltmetrul are un `setTimeout`
   de gardă care garantează valoarea finală.
 
+## Al doilea element-semnătură: SIGLA CARE SE ÎNCARCĂ (hero /despre)
+
+`<x-signature.logo-charge>` — portul animației livrate de client (2026-07-10, folderul
+`Animație logo electricitate`, varianta „Energix Loop"). Un inel auriu se umple în jurul
+becului, un punct-cap orbitează cu umplerea, particule converg spre bec; la închiderea
+inelului becul dă un val de lumină, iar o fereastră de lumină traversează wordmark-ul.
+
+Trei abateri deliberate de la sursă:
+
+1. **Nu rulează în buclă.** Se energizează o dată, la intrarea în cadru
+   (`IntersectionObserver`), apoi rămâne aprinsă. Cursorul o reia (`pointerenter`,
+   doar `pointer: fine`). Regula „zero mișcare ambientală" de mai jos nu are excepții:
+   o buclă perpetuă lângă un `<h1>` obligă ochiul să lupte cu ea.
+2. **Culorile vin din tokenii de brand** (`--color-gold`), nu din auriul `#f5c23e` al
+   machetei. Cyan-ul nu apare deloc.
+3. **Decorativă**: `aria-hidden`, `alt=""`. „Energix" e deja în navbar și în `<h1>`.
+
+Detalii de implementare care contează:
+
+- Coordonatele rămân **în spațiul machetei 940×800**. `--u: calc(100cqw / 940)` traduce
+  un pixel de machetă în lățimea containerului (`container-type: inline-size`), deci CSS-ul
+  se citește identic cu sursa și scalează fără nicio linie de JavaScript.
+- Inelul e SVG cu `pathLength="100"`, deci `stroke-dashoffset` **este** procentul de
+  încărcare. Rotația punctului-cap se pune din CSS (`transform-box: view-box`), niciodată
+  din atributul `transform` — vezi capcana de mai sus.
+- Starea de repaus **este** cadrul 100% al fiecărui keyframe, deci oprirea nu sare.
+- Sub `prefers-reduced-motion`, JS nu adaugă niciodată `.is-charging`: sigla stă aprinsă.
+- Cele trei `<img>` (sigla, becul decupat, wordmark-ul decupat) sunt **o singură cerere**;
+  `loading="lazy"` într-un părinte `hidden lg:block` înseamnă **zero octeți pe mobil**
+  (verificat: Chrome nu descarcă imagini lazy fără cutie de layout).
+
 ## Componente Blade (implementate)
 
 `layouts/app` · `partials/{navbar,footer,sticky-call,cookie-banner}` ·
-`seo/{head,json-ld}` · `signature/{wye,panel,stages}` · `section-header` · `service-card` ·
-`answer-cote` · `promise-item` · `process-step` · `value-item` · `gallery-grid` ·
-`cta-band` · `contact-form`
+`seo/{head,json-ld}` · `signature/{wye,panel,stages,logo-charge}` ·
+`hero-instrument/{circuits-calc,works-counter,line-status}` · `section-header` ·
+`service-card` · `answer-cote` · `promise-item` · `process-step` · `value-item` ·
+`gallery-grid` · `cta-band` · `contact-form`
 
 ## Motion
 

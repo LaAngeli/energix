@@ -246,13 +246,6 @@ return [
         'note' => 'Alegerea de aici filtrează galeria de mai jos.',
     ],
 
-    'level' => [
-        'title' => 'Nivelă de șantier',
-        'center' => 'Adu bula la centru',
-        'ok' => 'Drept — la cotă',
-        'note' => 'Așa montăm și noi: la cotă, verificat cu instrumentul, nu din ochi.',
-    ],
-
     'line' => [
         'title' => 'Starea liniei',
         'open' => 'Linie liberă — sună acum',
