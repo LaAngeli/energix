@@ -183,6 +183,8 @@ Direct, practic, fără jargon tehnic inutil. Se păstrează.
 
 ## Întrebări încă deschise
 
-1. **Există fotografii reale ale lucrărilor?** Cele 9 imagini rămân de umplutură,
-   declarate onest ca ilustrative pe `/galerie`. Prioritate: poze de pe șantierele proprii.
+1. **Există fotografii reale ale lucrărilor?** Galeria are acum 12 imagini stock
+   curate (2026-07-11: Unsplash/Pexels, licențe libere, sursele în comentariul din
+   `config/energix.php`), 4 pe segment, declarate onest ca ilustrative pe `/galerie`.
+   Rămâne prioritară înlocuirea cu poze de pe șantierele proprii.
 2. **Se confirmă restul cifrelor (500/350/50)?** Rămân ascunse până la confirmare.

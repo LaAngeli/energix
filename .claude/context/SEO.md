@@ -146,8 +146,10 @@ unde scriau altceva. `BreadcrumbsTest` compară acum cele două, pe fiecare pagi
    `public/.htaccess`, plus `URL::forceScheme('https')` în producție.
    Redirectarea exista, dar venea din `.htaccess`-ul site-ului vechi, care dispare la
    cutover. Detalii și matricea de verificare: `DEPLOY-HOSTINGER.md`.
-2. **Nume de fișiere de imagine**: `img1.webp`, `img5_flipped.webp`. `alt`-urile sunt
-   deja descriptive; numele nu. Se redenumesc odată cu fotografiile reale.
+2. ✅ **Nume de fișiere de imagine** — **făcut** (2026-07-11), odată cu setul stock
+   curat: `apartament-doze.webp`, `casa-tablou.webp`, `industrial-poduri-cabluri.webp`…
+   Numele descriu conținutul, în limba site-ului. Se păstrează convenția la
+   fotografiile reale.
 
 ### Blocate pe date de la client
 
