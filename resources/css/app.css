@@ -958,14 +958,34 @@
         animation: slide-up 0.45s ease-out 1;
     }
 
-    /* Linia de indicatie a cotei creste la hover (grafit pe foaie, permis). */
-    [data-cote]:hover .cote-tick {
-        transform: scaleY(1.35);
+    /* ============================ intrebari frecvente ============================ */
+
+    /*
+    | Acordeon: raspunsul se desface pe grid-rows (0fr -> 1fr), exact ca segmentele
+    | „Ce facem”. Raspunsul ramane in DOM cand e inchis (doar inaltime 0), deci e
+    | indexabil. Neutralizat automat de blocul global `prefers-reduced-motion`.
+    */
+    .faq-body {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 0.4s cubic-bezier(0.65, 0, 0.35, 1);
     }
 
-    .cote-tick {
-        transform-origin: top;
+    .faq-item.is-open .faq-body {
+        grid-template-rows: 1fr;
+    }
+
+    .faq-body > div {
+        overflow: hidden;
+    }
+
+    /* „+” devine „−” la deschidere: bara verticala se strange. */
+    .faq-mark-v {
         transition: transform 0.3s ease-out;
+    }
+
+    .faq-item.is-open .faq-mark-v {
+        transform: translateX(-50%) scaleY(0);
     }
 }
 

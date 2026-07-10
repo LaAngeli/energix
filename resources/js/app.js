@@ -465,6 +465,30 @@ function initSegmentRows() {
     });
 }
 
+/* ---------------------------------------------- intrebari frecvente (acordeon) */
+
+/**
+ * FAQ = acordeon. Fiecare intrebare se deschide INDEPENDENT (mai multe pot sta
+ * deschise deodata — spre deosebire de segmente, unde una o inchide pe cealalta).
+ * Raspunsurile raman in DOM chiar inchise, deci raman indexabile pentru AEO.
+ */
+function initFaq() {
+    document.querySelectorAll('[data-faq-toggle]').forEach((toggle) => {
+        const item = toggle.closest('[data-faq-item]');
+
+        if (! item) {
+            return;
+        }
+
+        toggle.addEventListener('click', () => {
+            const open = ! item.classList.contains('is-open');
+
+            item.classList.toggle('is-open', open);
+            toggle.setAttribute('aria-expanded', String(open));
+        });
+    });
+}
+
 /* ------------------------------------------ ancorele vechi de pe /servicii */
 
 /**
@@ -1379,6 +1403,7 @@ function boot() {
     initPanel();
     initStages();
     initSegmentRows();
+    initFaq();
     initLegacySegmentHash();
     initCircuitsCalc();
     initWorksCounter();
