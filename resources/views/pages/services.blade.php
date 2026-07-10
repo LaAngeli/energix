@@ -75,7 +75,7 @@
                         <div class="mt-8 flex flex-col gap-3 sm:flex-row">
                             <a
                                 href="tel:{{ config('energix.contact.phone_href') }}"
-                                class="inline-flex items-center justify-center gap-3 rounded-sm bg-gold px-6 py-3.5 font-mono text-sm font-medium tracking-wider text-ink uppercase transition hover:brightness-110"
+                                class="energize-sweep inline-flex items-center justify-center gap-3 rounded-sm bg-gold px-6 py-3.5 font-mono text-sm font-medium tracking-wider text-ink uppercase"
                             >
                                 Sună acum
                             </a>

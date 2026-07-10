@@ -26,7 +26,7 @@
                     <p class="text-paper-dim">{{ $service['intro'] }}</p>
                     <ul class="mt-6 grid gap-2.5 sm:grid-cols-2">
                         @foreach ($service['features'] as $feature)
-                            <li class="flex gap-3 text-sm text-paper-dim">
+                            <li class="flex gap-3 text-sm text-paper-dim" style="--i: {{ $loop->index }}">
                                 <span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-gold" aria-hidden="true"></span>
                                 {{ $feature }}
                             </li>

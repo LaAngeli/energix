@@ -50,7 +50,7 @@
 
         <a
             href="tel:{{ $phoneHref }}"
-            class="hidden items-center gap-2 rounded-sm bg-gold px-4 py-2.5 font-mono text-sm font-medium text-ink tabular-nums transition hover:brightness-110 lg:inline-flex"
+            class="energize-sweep hidden items-center gap-2 rounded-sm bg-gold px-4 py-2.5 font-mono text-sm font-medium text-ink tabular-nums lg:inline-flex"
         >
             {{ $phone }}
         </a>

@@ -30,7 +30,7 @@
                 <div class="mt-8 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row">
                     <a
                         href="tel:{{ config('energix.contact.phone_href') }}"
-                        class="inline-flex items-center justify-center gap-3 rounded-sm bg-gold px-6 py-4 font-mono text-sm font-medium tracking-wider text-ink uppercase transition hover:brightness-110 hover:shadow-[0_0_28px_-6px_var(--color-gold)]"
+                        class="energize-sweep inline-flex items-center justify-center gap-3 rounded-sm bg-gold px-6 py-4 font-mono text-sm font-medium tracking-wider text-ink uppercase"
                     >
                         Sună acum
                         <span class="tabular-nums normal-case tracking-normal">{{ config('energix.contact.phone') }}</span>
@@ -47,10 +47,14 @@
                 <x-signature.panel class="mt-12 w-full max-w-3xl text-left" data-reveal />
             </div>
 
-            {{-- specificatiile, ca un rand de placute pe sina --}}
-            <ul class="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-sm border border-line bg-line sm:grid-cols-4" data-reveal>
+            {{-- specificatiile, ca un rand de placute pe sina — se aprind esalonat --}}
+            <ul class="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-sm border border-line bg-line sm:grid-cols-4">
                 @foreach (config('energix.promises') as $promise)
-                    <li class="bg-ink px-4 py-3.5 text-center font-mono text-[0.62rem] tracking-[0.12em] text-paper-dim uppercase">
+                    <li
+                        class="bg-ink px-4 py-3.5 text-center font-mono text-[0.62rem] tracking-[0.12em] text-paper-dim uppercase transition-colors hover:text-paper"
+                        data-reveal
+                        style="--reveal-delay: {{ $loop->index * 80 }}ms"
+                    >
                         {{ $promise['label'] }}
                     </li>
                 @endforeach
@@ -105,7 +109,12 @@
 
             <div class="mt-12 grid gap-10 sm:grid-cols-3 sm:gap-8">
                 @foreach (config('energix.answers') as $i => $answer)
-                    <x-answer-cote :question="$answer['q']" :answer="$answer['a']" :index="$i + 1" />
+                    <x-answer-cote
+                        :question="$answer['q']"
+                        :answer="$answer['a']"
+                        :index="$i + 1"
+                        style="--reveal-delay: {{ $i * 100 }}ms"
+                    />
                 @endforeach
             </div>
         </div>

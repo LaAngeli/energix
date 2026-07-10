@@ -22,7 +22,12 @@
 
     <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         @foreach ($items as $item)
-            <figure data-category="{{ $item['category'] }}" class="group overflow-hidden rounded-sm border border-line bg-ink-raised" data-reveal>
+            <figure
+                data-category="{{ $item['category'] }}"
+                class="group overflow-hidden rounded-sm border border-line bg-ink-raised"
+                data-reveal
+                style="--reveal-delay: {{ ($loop->index % 3) * 80 }}ms"
+            >
                 <img
                     src="{{ asset($item['image']) }}"
                     alt="{{ $item['title'] }}"

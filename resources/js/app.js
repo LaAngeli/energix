@@ -456,9 +456,13 @@ function initFormCircuit() {
         submit?.classList.toggle('is-armed', complete);
     };
 
-    fields.forEach((field) => {
+    fields.forEach((field, i) => {
         field.addEventListener('input', check);
         field.addEventListener('blur', check);
+
+        // Segmentul campului focalizat se evidentiaza: „aici masori acum”.
+        field.addEventListener('focus', () => segments[i]?.classList.add('is-active'));
+        field.addEventListener('blur', () => segments[i]?.classList.remove('is-active'));
     });
 
     check();

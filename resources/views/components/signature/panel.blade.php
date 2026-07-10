@@ -16,7 +16,7 @@
 | instant — comutarea ramane functionala, doar fara animatii.
 --}}
 <div
-    {{ $attributes->class('panel relative rounded-sm border border-line bg-ink-raised/70 p-5 backdrop-blur-[2px] sm:p-6') }}
+    {{ $attributes->class('panel nameplate relative rounded-sm border border-line bg-ink-raised/70 p-5 backdrop-blur-[2px] sm:p-6') }}
     data-panel
     data-live="false"
 >

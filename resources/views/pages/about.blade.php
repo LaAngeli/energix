@@ -67,9 +67,14 @@
                 intro="Patru dispozitive care nu se scot din schemă, indiferent de lucrare."
             />
 
-            <div class="mt-12 grid gap-5 sm:grid-cols-2" data-reveal>
+            <div class="mt-12 grid gap-5 sm:grid-cols-2">
                 @foreach (config('energix.values') as $i => $value)
-                    <x-value-item :value="$value" :index="$i + 1" />
+                    <x-value-item
+                        :value="$value"
+                        :index="$i + 1"
+                        data-reveal
+                        style="--reveal-delay: {{ $i * 90 }}ms"
+                    />
                 @endforeach
             </div>
         </div>

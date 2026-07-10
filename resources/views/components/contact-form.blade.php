@@ -48,7 +48,7 @@
 
         <div class="grid gap-5 sm:grid-cols-2">
             @foreach ($fields as $field)
-                <div>
+                <div class="field">
                     <label for="{{ $field['name'] }}" class="eyebrow block">{{ $field['label'] }} *</label>
                     <input
                         type="{{ $field['type'] }}"
@@ -70,7 +70,7 @@
             @endforeach
         </div>
 
-        <div>
+        <div class="field">
             <label for="phone" class="eyebrow block">Telefon *</label>
             <input
                 type="tel"
@@ -92,7 +92,7 @@
             @enderror
         </div>
 
-        <div>
+        <div class="field">
             <label for="email" class="eyebrow block">Email *</label>
             <input
                 type="email"
@@ -111,7 +111,7 @@
             @enderror
         </div>
 
-        <div>
+        <div class="field">
             <label for="message" class="eyebrow block">Ce ai nevoie *</label>
             <textarea
                 id="message"
@@ -133,7 +133,7 @@
         <button
             type="submit"
             data-submit
-            class="w-full rounded-sm bg-gold px-6 py-4 font-mono text-sm font-medium tracking-wider text-ink uppercase transition hover:brightness-110 sm:w-auto"
+            class="energize-sweep w-full rounded-sm bg-gold px-6 py-4 font-mono text-sm font-medium tracking-wider text-ink uppercase sm:w-auto"
         >
             Închide circuitul — trimite
         </button>

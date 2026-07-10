@@ -33,7 +33,7 @@
             <div class="flex flex-col items-center gap-3 lg:items-end">
                 <a
                     href="tel:{{ config('energix.contact.phone_href') }}"
-                    class="armed-target inline-flex w-full items-center justify-center gap-3 rounded-sm bg-gold px-7 py-4 font-mono text-sm font-medium tracking-wider text-ink uppercase transition hover:brightness-110 sm:w-auto"
+                    class="armed-target energize-sweep inline-flex w-full items-center justify-center gap-3 rounded-sm bg-gold px-7 py-4 font-mono text-sm font-medium tracking-wider text-ink uppercase sm:w-auto"
                 >
                     Sună acum
                     <span class="tabular-nums normal-case tracking-normal">{{ config('energix.contact.phone') }}</span>

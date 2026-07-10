@@ -2,7 +2,7 @@
 
 {{--
 | Eyebrow-ul e o eticheta-callout de pe un desen tehnic: index + nume.
-| Indexul e informativ (ordinea sectiunilor), nu decorativ.
+| Sub titlu, linia de cota se deseneaza cand sectiunea intra in cadru.
 --}}
 <div {{ $attributes->class('max-w-2xl') }} data-reveal>
     <p @class(['eyebrow flex items-center gap-2.5', 'text-graphite-dim!' => $onSheet])>
@@ -15,6 +15,7 @@
     </p>
 
     <h2 @class(['mt-4 text-h2', $onSheet ? 'text-graphite' : 'text-paper'])>{{ $title }}</h2>
+    <span @class(['title-rule', 'on-sheet' => $onSheet]) aria-hidden="true"></span>
 
     @if ($intro)
         <p @class(['mt-4 text-lead', $onSheet ? 'text-graphite-dim' : 'text-paper-dim'])>{{ $intro }}</p>
