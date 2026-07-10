@@ -6,6 +6,8 @@
 @section('content')
 
     <section class="mx-auto max-w-3xl px-5 py-16 sm:px-8 sm:py-24" aria-labelledby="legal-title">
+        <x-breadcrumbs :page="$page" class="mb-10" />
+
         <p class="eyebrow flex items-center gap-2.5">
             <x-signature.wye :size="13" />
             {{ __('site.common.legal') }}

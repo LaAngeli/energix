@@ -298,7 +298,7 @@ ars în cadru ar fi apărut ca un dreptunghi pe bleumarinul hero-ului.
 `layouts/app` · `partials/{navbar,footer,sticky-call,cookie-banner}` ·
 `seo/{head,json-ld}` · `signature/{wye,panel,stages,logo-flux}` ·
 `hero-instrument/{circuits-calc,works-counter,line-status}` · `section-header` ·
-`job-sheet` · `faq` · `segment-row` · `segment-link` · `related-segments` ·
+`job-sheet` · `breadcrumbs` · `faq` · `segment-row` · `segment-link` · `related-segments` ·
 `answer-cote` · `process-step` · `value-item` · `gallery-grid` · `cta-band` ·
 `contact-form` · `social-icon` · `social-links`
 

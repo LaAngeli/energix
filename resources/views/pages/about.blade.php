@@ -9,17 +9,19 @@
         <div class="relative mx-auto max-w-6xl px-5 pt-8 pb-14 sm:px-8 sm:pb-18">
             <x-job-sheet code="DSP-04" :name="__('site.nav.about')" index="04/05" />
 
+            <x-breadcrumbs :page="$page" class="mt-6" />
+
             <div class="mt-10 grid gap-10 lg:grid-cols-[1fr_26rem] lg:items-center lg:gap-8">
                 <div>
                     <h1 class="max-w-2xl text-h1 text-paper">{{ __('site.about_page.h1') }}</h1>
                     <p class="mt-6 max-w-xl text-lead text-paper-dim">{{ __('site.about_page.lead') }}</p>
                 </div>
 
-                {{-- Sigla „Flux” rulează o dată, la intrarea în cadru, apoi îngheață.
-                     Doar pe desktop: pe mobil coloana nu există, deci nici SVG-ul, nici
-                     bucla rAF, nici fontul wordmark-ului nu costă nimic. --}}
+                {{-- Sigla „Construcție” se desenează o dată, la intrarea în cadru, apoi
+                     îngheață aprinsă. Doar pe desktop: pe mobil coloana nu există, deci
+                     nici SVG-ul, nici bucla rAF, nici fontul wordmark-ului nu costă nimic. --}}
                 <div class="hidden lg:block" data-reveal>
-                    <x-signature.logo-flux />
+                    <x-signature.logo-build />
                 </div>
             </div>
         </div>

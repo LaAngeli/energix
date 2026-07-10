@@ -10,6 +10,8 @@
         <div class="relative mx-auto max-w-6xl px-5 pt-8 pb-14 sm:px-8 sm:pb-18">
             <x-job-sheet code="CNT-05" :name="__('site.nav.contact')" index="05/05" />
 
+            <x-breadcrumbs :page="$page" class="mt-6" />
+
             <div class="mt-10 grid gap-10 lg:grid-cols-[1.1fr_auto] lg:items-center">
                 <div>
                     <h1 class="max-w-3xl text-h1 text-paper">{{ __('site.contact_page.h1') }}</h1>

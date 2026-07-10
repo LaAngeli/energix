@@ -638,40 +638,64 @@ function initWorksCounter() {
 }
 
 /**
- * /despre — sigla „Flux”: portarea vectoriala a animatiei livrate de client
- * („Energix Loop B — Flux”).
+ * /despre — sigla „Constructie”: portarea vectoriala a animatiei livrate de client
+ * („Energix Loop C — Constructie”).
  *
- * Formulele sunt copiate identic din sursa (`energix-logo.jsx`, scena InnerB):
- * bilele de curent curg pe conturul becului, o matura de lumina roteste razele,
- * doua surge-uri aprind filamentul si arunca scantei, soclul licareste, iar o unda
- * traverseaza literele.
+ * Formulele sunt copiate identic din sursa (`energix-logo.jsx`, scena InnerC):
+ * conturul becului se traseaza cu o bila de curent in varf, filamentul „Y” creste
+ * din soclu, barele soclului sar la loc, razele ies in evantai in sens orar, un
+ * flash aprinde totul, literele urca in cadru — iar la final o scanteie se naste
+ * in bec si zboara pe o curba pana devine punctul de pe „i”.
  *
- * Ruleaza O SINGURA DATA, 6 secunde, la intrarea in cadru — apoi ingheata.
- * Sursa e o bucla infinita; oprirea e ceruta explicit de client, iar `DESIGN.md`
- * interzice oricum miscarea ambientala langa un `<h1>`.
+ * UNDE SE OPRESTE. Sursa e o bucla de 7s: ultima secunda (t = 5.95…6.95)
+ * DEZASAMBLEAZA logo-ul, ca sa poata reporni din nimic. Clientul cere o singura
+ * rulare, cu inghet la final — deci rulam pana la `END`, dupa care inghetam pe
+ * sigla aprinsa. Nu e o aproximare: fiecare factor de demontare din sursa e de
+ * forma `1 - seg(t, a, b)` cu `a >= 5.95`, deci pe intervalul [0, END] valoreaza
+ * exact 1. Termenii aceia sunt omisi mai jos fiindca sunt constanti, nu ignorati.
  */
-function initLogoFlux() {
-    const root = document.querySelector('[data-logo-flux]');
+function initLogoBuild() {
+    const root = document.querySelector('[data-logo-build]');
 
     if (! root) {
         return;
     }
 
-    const D = 6; // durata unui ciclu complet, ca in sursa
+    /*
+     | Ciclul sursei e 7s, dar ultimele 1.5s sunt demontarea. Ne oprim la 5.5s:
+     | unda punctului s-a stins (5.3s), iar sigla e complet aprinsa.
+     */
+    const END = 5.5;
     const TAU = Math.PI * 2;
     const GOLD = '#f2d147'; // tokenul de brand, nu auriul #f1c232 al machetei
     const BRIGHT = '#ffde6e';
     const HOT = '#fff4c8';
 
     const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
-    const cyc = (t, d) => ((t % d) + d) % d;
-    const seg = (t, a, b) => clamp01((t - a) / (b - a));
 
-    /** Cocoasa 0→1→0 care incepe la `t0`, ciclica pe perioada `d`. */
-    const bumpAt = (t, t0, dur, d) => {
-        const x = cyc(t - t0, d);
+    // Easing-urile, copiate din sursa (`animations.jsx`), scrise fara mutatie de parametru.
+    const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1);
+    const easeOutCubic = (t) => (t - 1) ** 3 + 1;
+    const easeInOutQuad = (t) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
+    const easeOutBack = (t) => {
+        const c1 = 1.70158;
+        const c3 = c1 + 1;
 
-        return x > 0 && x < dur ? Math.sin(Math.PI * (x / dur)) : 0;
+        return 1 + c3 * (t - 1) ** 3 + c1 * (t - 1) ** 2;
+    };
+
+    /** Rampa 0→1 intre `a` si `b`, optional cu easing. */
+    const seg = (t, a, b, ease) => {
+        const p = clamp01((t - a) / (b - a));
+
+        return ease ? ease(p) : p;
+    };
+
+    /** Cocoasa 0→1→0 care incepe la `t0` si tine `dur`. */
+    const bumpAt = (t, t0, dur) => {
+        const d = t - t0;
+
+        return d > 0 && d < dur ? Math.sin(Math.PI * (d / dur)) : 0;
     };
 
     const lerpHex = (a, b, k) => {
@@ -685,7 +709,7 @@ function initLogoFlux() {
 
     const glow = (px, alpha) => `drop-shadow(0 0 ${px.toFixed(1)}px rgba(255,213,74,${alpha.toFixed(2)}))`;
 
-    // ---- geometria conturului becului, pentru pozitionarea bilelor ----
+    // ---- geometria conturului becului, pentru pozitionarea bilei de curent ----
     const CX = 322;
     const CY = 178;
     const R = 90;
@@ -720,14 +744,24 @@ function initLogoFlux() {
     const RIN = 120;
     const ROUT = 157;
 
-    const halo = root.querySelector('[data-flux-halo]');
-    const core = root.querySelector('[data-flux-core]');
-    const bulb = root.querySelector('[data-flux-bulb]');
-    const filament = root.querySelector('[data-flux-filament]');
-    const rays = [...root.querySelectorAll('[data-flux-ray]')];
-    const bars = [...root.querySelectorAll('[data-flux-bar]')];
-    const letters = [...root.querySelectorAll('[data-flux-letter]')];
-    const dot = root.querySelector('[data-flux-dot]');
+    // Scanteia se naste in bec si aterizeaza pe „i”, pe o curba Bezier patratica.
+    const FLY_FROM = { x: 322, y: 198 };
+    const FLY_CTRL = { x: 448, y: 168 };
+    const DOT_Y = 408;
+
+    const halo = root.querySelector('[data-build-halo]');
+    const core = root.querySelector('[data-build-core]');
+    const bulb = root.querySelector('[data-build-bulb]');
+    const filament = root.querySelector('[data-build-filament]');
+    const stem = root.querySelector('[data-build-stem]');
+    const arms = [...root.querySelectorAll('[data-build-arm]')];
+    const rays = [...root.querySelectorAll('[data-build-ray]')];
+    const barGroups = [...root.querySelectorAll('[data-build-bar]')];
+    const letters = [...root.querySelectorAll('[data-build-letter]')];
+    const flash = root.querySelector('[data-build-flash]');
+    const ring = root.querySelector('[data-build-ring]');
+    const dot = root.querySelector('[data-build-dot]');
+    const fly = root.querySelector('[data-build-fly]');
 
     const NS = 'http://www.w3.org/2000/svg';
     const makeCircle = (parent, fill, blur) => {
@@ -740,15 +774,27 @@ function initLogoFlux() {
         return c;
     };
 
-    // Cercurile se creeaza o data si se reutilizeaza: 12 bile, 6 scantei.
-    const beadsGroup = root.querySelector('[data-flux-beads]');
-    const sparksGroup = root.querySelector('[data-flux-sparks]');
-    const beadEls = Array.from({ length: 12 }, () => makeCircle(beadsGroup, '#fff3c4', 6));
-    const sparkEls = Array.from({ length: 6 }, () => makeCircle(sparksGroup, '#ffe9a0', 5));
+    // In scena C exista o singura bila (varful trasajului) si o singura scanteie.
+    const bead = makeCircle(root.querySelector('[data-build-beads]'), '#fff3c4', 6);
+    const spark = makeCircle(root.querySelector('[data-build-sparks]'), '#ffe9a0', 5);
+
+    /** Trasajul unui path cu `pathLength=100`: `draw` e fractiunea desenata. */
+    const drawPath = (el, draw) => {
+        if (draw <= 0.002) {
+            el.setAttribute('opacity', '0');
+
+            return;
+        }
+
+        el.setAttribute('opacity', '1');
+        el.setAttribute('stroke-dasharray', draw >= 1 ? 'none' : `${(draw * 100).toFixed(2)} 200`);
+    };
+
+    let dotCx = 500; // rescris de `layoutWord()`
 
     /**
      * Literele se aseaza dupa latimile lor REALE, masurate dupa ce fontul s-a
-     * incarcat. Punctul auriu sta deasupra lui „ı”, deci depinde de aceeasi masurare.
+     * incarcat. Punctul auriu — si tinta scanteii — depind de aceeasi masurare.
      */
     function layoutWord() {
         const widths = letters.map((el) => el.getComputedTextLength());
@@ -764,23 +810,47 @@ function initLogoFlux() {
         });
 
         if (letters[5]) {
-            dot.setAttribute('cx', letters[5].dataset.cx);
-            dot.setAttribute('cy', '408');
+            dotCx = +letters[5].dataset.cx;
         }
+
+        [dot, ring].forEach((el) => {
+            el.setAttribute('cx', dotCx.toFixed(1));
+            el.setAttribute('cy', String(DOT_Y));
+        });
     }
 
-    /** Un cadru la momentul `t`: exact formulele scenei B din sursa. */
+    /** Un cadru la momentul `t`: exact formulele scenei C din sursa. */
     function frame(t) {
-        // trei sinusoide — filamentul „respira” fara sa para un ceas
-        const n = (Math.sin((TAU * 5 * t) / D + 1) + Math.sin((TAU * 9 * t) / D + 2.4) + Math.sin((TAU * 13 * t) / D + 4.1)) / 3;
-        const surge = bumpAt(t, 1.2, 0.6, D) + bumpAt(t, 4.2, 0.6, D);
+        // 1. conturul becului se traseaza, cu o bila de curent in varf
+        const bulbDraw = seg(t, 0.2, 1.35, easeInOutCubic);
 
-        const filBright = 0.5 + 0.2 * n + 1.05 * surge;
-        const bloom = 0.2 + 0.07 * n + 0.55 * surge;
-        const bulbBright = 0.22 + 0.35 * surge;
+        drawPath(bulb, bulbDraw);
+
+        if (t > 0.24 && t < 1.33) {
+            const [bx, by] = bulbPoint(bulbDraw * 100);
+            bead.setAttribute('cx', bx.toFixed(1));
+            bead.setAttribute('cy', by.toFixed(1));
+            bead.setAttribute('r', '7');
+            bead.setAttribute('opacity', '0.95');
+        } else {
+            bead.setAttribute('opacity', '0');
+        }
+
+        // 2. filamentul creste: intai piciorul, apoi bratele
+        drawPath(stem, seg(t, 1.05, 1.35, easeOutCubic));
+        const armsDraw = seg(t, 1.28, 1.7, easeOutCubic);
+        arms.forEach((el) => drawPath(el, armsDraw));
+
+        // 3. aprinderea: flash la 2.92s, apoi lumina se aseaza si ramane
+        const envHold = seg(t, 2.92, 3.3, easeOutCubic);
+        const breathe = Math.sin((TAU * (t - 3)) / 1.75);
+        const filBright = envHold * (0.95 + 0.15 * breathe);
+        const bloom = envHold * (0.55 + 0.4 * bumpAt(t, 2.92, 0.9) + 0.07 * breathe);
+        const bulbBright = 0.5 * envHold;
 
         halo.setAttribute('opacity', (clamp01(bloom) * 0.5).toFixed(3));
         core.setAttribute('opacity', (clamp01(bloom) * 0.85).toFixed(3));
+        flash.setAttribute('opacity', clamp01(0.55 * bumpAt(t, 2.92, 0.55)).toFixed(3));
 
         bulb.setAttribute('stroke', lerpHex(GOLD, BRIGHT, bulbBright));
         bulb.style.filter = bulbBright > 0.03 ? glow(10 * bulbBright, 0.8 * bulbBright) : '';
@@ -790,103 +860,111 @@ function initLogoFlux() {
             ? glow(9 * Math.min(filBright, 1.7), Math.min(0.95, 0.7 * filBright))
             : '';
 
-        // matura de lumina peste raze: un tur complet la fiecare 3 secunde
-        const om = (TAU * t) / 3;
+        // 4. barele soclului sar la loc, cu un mic overshoot, de sus in jos
+        barGroups.forEach((g, i) => {
+            const sx = easeOutBack(seg(t, 1.6 + i * 0.18, 2.1 + i * 0.18));
+
+            if (sx <= 0.01) {
+                g.setAttribute('opacity', '0');
+
+                return;
+            }
+
+            const hw = +g.dataset.hw * Math.min(sx, 1.15);
+            const fl = bumpAt(t, 2.92, 0.6) * 0.5;
+
+            g.setAttribute('opacity', '1');
+
+            [...g.children].forEach((line) => {
+                line.setAttribute('x1', (CX - hw).toFixed(1));
+                line.setAttribute('x2', (CX + hw).toFixed(1));
+            });
+
+            const coreLine = g.lastElementChild;
+            coreLine.setAttribute('stroke', lerpHex('#ffffff', BRIGHT, fl));
+            coreLine.style.filter = fl > 0.03 ? glow(7 * fl, 0.8 * fl) : '';
+        });
+
+        // 5. razele ies in evantai, in sens orar, si se aprind la flash
+        const rayBr = 0.9 * bumpAt(t, 2.95, 0.7) + 0.18 * envHold;
 
         rays.forEach((line, i) => {
-            const a = (RAYS[i] * Math.PI) / 180;
-            let k = 0.5 + 0.5 * Math.cos(a - om);
-            k = k * k * k;
+            const ext = easeOutBack(seg(t, 2.15 + i * 0.1, 2.65 + i * 0.1));
 
-            const rEnd = RIN + (ROUT - RIN) * (1 + 0.15 * k);
-            const br = 0.9 * k;
+            if (ext <= 0.02) {
+                line.setAttribute('opacity', '0');
+
+                return;
+            }
+
+            const a = (RAYS[i] * Math.PI) / 180;
             const c = Math.cos(a);
             const s = Math.sin(a);
+            const rEnd = RIN + (ROUT - RIN) * ext;
 
+            line.setAttribute('opacity', '1');
             line.setAttribute('x1', (CX + c * RIN).toFixed(1));
             line.setAttribute('y1', (CY + s * RIN).toFixed(1));
             line.setAttribute('x2', (CX + c * rEnd).toFixed(1));
             line.setAttribute('y2', (CY + s * rEnd).toFixed(1));
-            line.setAttribute('stroke', lerpHex(GOLD, '#ffec9e', br));
-            line.style.filter = br > 0.03 ? glow(8 * br, 0.85 * br) : '';
+            line.setAttribute('stroke', lerpHex(GOLD, '#ffec9e', rayBr));
+            line.style.filter = rayBr > 0.03 ? glow(8 * rayBr, 0.85 * rayBr) : '';
         });
 
-        // soclul licareste, fiecare bara cu un mic decalaj
-        bars.forEach((line, i) => {
-            let fl = 0;
-            [0, 1.5, 3, 4.5].forEach((L) => {
-                fl += bumpAt(t, L + 0.04 + i * 0.13, 0.45, D);
-            });
-            fl = 0.5 * Math.min(1, fl);
-
-            line.setAttribute('stroke', lerpHex('#ffffff', BRIGHT, fl));
-            line.style.filter = fl > 0.03 ? glow(7 * fl, 0.8 * fl) : '';
-        });
-
-        // bilele de curent: doua trenuri, defazate la jumatate de tur
-        let b = 0;
-
-        [0, 0.5].forEach((ph) => {
-            const s0 = cyc(t / 3 + ph, 1) * 100;
-
-            for (let k = 0; k < 6; k++) {
-                const s = s0 - k * 2.3;
-                const el = beadEls[b++];
-
-                if (s < 0 || s > 100) {
-                    el.setAttribute('opacity', '0');
-
-                    continue;
-                }
-
-                const edge = Math.min(seg(s, 0, 7), 1 - seg(s, 93, 100));
-                const [x, y] = bulbPoint(s);
-
-                el.setAttribute('cx', x.toFixed(1));
-                el.setAttribute('cy', y.toFixed(1));
-                el.setAttribute('r', (6.5 - k * 0.75).toFixed(2));
-                el.setAttribute('opacity', clamp01((1 - k * 0.15) * edge * 0.95).toFixed(3));
-            }
-        });
-
-        // scanteile: doua salve, traiectorie balistica
-        let sp = 0;
-
-        [1.25, 4.25].forEach((ts) => {
-            const life = 0.7;
-            const d = cyc(t - ts, D);
-
-            [[-2.05, 150], [-1.57, 178], [-1.05, 150]].forEach(([an, speed]) => {
-                const el = sparkEls[sp++];
-
-                if (d <= 0 || d >= life) {
-                    el.setAttribute('opacity', '0');
-
-                    return;
-                }
-
-                el.setAttribute('cx', (JX + Math.cos(an) * speed * d).toFixed(1));
-                el.setAttribute('cy', (CY + Math.sin(an) * speed * d + 230 * d * d).toFixed(1));
-                el.setAttribute('r', Math.max(0.5, 4.5 - 3 * (d / life)).toFixed(2));
-                el.setAttribute('opacity', clamp01(1 - d / life).toFixed(3));
-            });
-        });
-
-        // unda de licarire care traverseaza literele
+        // 6. literele urca in cadru, una dupa alta
         letters.forEach((el, i) => {
-            const k = Math.pow(Math.max(0, Math.sin((TAU * t) / D - i * 0.45)), 6) * 0.55;
+            const oIn = seg(t, 3.25 + i * 0.11, 3.7 + i * 0.11, easeOutCubic);
 
-            el.setAttribute('transform', `translate(0 ${(-3 * k).toFixed(2)})`);
-            el.style.filter = k > 0.02 ? glow(16 * k, 0.85 * Math.min(1, k)) : '';
+            el.setAttribute('opacity', oIn.toFixed(3));
+            el.setAttribute('transform', `translate(0 ${(46 * (1 - oIn)).toFixed(2)})`);
         });
 
-        // punctul de pe „ı” pulseaza pe surge-uri
-        const dk = bumpAt(t, 1.55, 0.65, D) + bumpAt(t, 4.55, 0.65, D);
+        // 7. scanteia se aduna in bec...
+        if (t > 3.88 && t <= 4.05) {
+            spark.setAttribute('cx', String(FLY_FROM.x));
+            spark.setAttribute('cy', String(FLY_FROM.y));
+            spark.setAttribute('r', (13 * seg(t, 3.88, 4.05, easeOutCubic)).toFixed(2));
+            spark.setAttribute('opacity', '1');
+        } else {
+            spark.setAttribute('opacity', '0');
+        }
 
-        dot.setAttribute('opacity', '1');
-        dot.setAttribute('fill', lerpHex(GOLD, '#ffe99a', Math.min(1, dk)));
-        dot.setAttribute('r', (15 * (1 + 0.28 * dk)).toFixed(2));
-        dot.style.filter = dk > 0.02 ? glow(18 * dk, 0.9 * dk) : '';
+        // ...si zboara pe o Bezier patratica pana peste „i”
+        if (t > 4.05 && t < 4.6) {
+            const p = seg(t, 4.05, 4.6, easeInOutQuad);
+            const q = 1 - p;
+            const x = q * q * FLY_FROM.x + 2 * q * p * FLY_CTRL.x + p * p * dotCx;
+            const y = q * q * FLY_FROM.y + 2 * q * p * FLY_CTRL.y + p * p * DOT_Y;
+
+            fly.setAttribute('cx', x.toFixed(1));
+            fly.setAttribute('cy', y.toFixed(1));
+            fly.setAttribute('r', (15 * (1 + 0.2 * Math.sin(Math.PI * p))).toFixed(2));
+            fly.setAttribute('opacity', '1');
+            fly.style.filter = glow(16, 0.95);
+        } else {
+            fly.setAttribute('opacity', '0');
+        }
+
+        // 8. aterizarea: punctul se turteste, iar o unda se propaga din el
+        const landK = bumpAt(t, 4.6, 0.42);
+        const dotBr = Math.min(1, 0.8 * bumpAt(t, 4.6, 0.8) + 0.15 * envHold);
+
+        dot.setAttribute('opacity', t >= 4.58 ? '1' : '0');
+        dot.setAttribute('fill', lerpHex(GOLD, '#ffe99a', dotBr));
+        dot.setAttribute(
+            'transform',
+            `translate(${dotCx.toFixed(1)} ${DOT_Y}) scale(${(1 + 0.18 * landK).toFixed(3)} ${(1 - 0.3 * landK).toFixed(3)}) translate(${(-dotCx).toFixed(1)} ${-DOT_Y})`,
+        );
+        dot.style.filter = dotBr > 0.02 ? glow(18 * dotBr, 0.9 * dotBr) : '';
+
+        const ringP = seg(t, 4.64, 5.3);
+
+        if (ringP > 0 && ringP < 1) {
+            ring.setAttribute('r', (15 * (1 + 2.2 * ringP)).toFixed(2));
+            ring.setAttribute('opacity', ((1 - ringP) * 0.9).toFixed(3));
+        } else {
+            ring.setAttribute('opacity', '0');
+        }
     }
 
     let started = false;
@@ -898,9 +976,9 @@ function initLogoFlux() {
 
         started = true;
 
-        // Miscare redusa: starea de repaus, instant. Nicio bucla rAF.
+        // Miscare redusa: starea finala, instant. Nicio bucla rAF.
         if (prefersReducedMotion) {
-            frame(0);
+            frame(END);
 
             return;
         }
@@ -909,8 +987,8 @@ function initLogoFlux() {
         let raf = requestAnimationFrame(function tick(now) {
             const t = (now - t0) / 1000;
 
-            if (t >= D) {
-                frame(D); // ultimul cadru = primul; bucla se inchide curat, apoi ingheata
+            if (t >= END) {
+                frame(END); // sigla aprinsa, apoi inghetata pana la un nou acces al paginii
 
                 return;
             }
@@ -925,8 +1003,8 @@ function initLogoFlux() {
          */
         setTimeout(() => {
             cancelAnimationFrame(raf);
-            frame(D);
-        }, D * 1000 + 250);
+            frame(END);
+        }, END * 1000 + 250);
     }
 
     function boot() {
@@ -943,7 +1021,7 @@ function initLogoFlux() {
 
         wordmark.catch(() => {}).then(() => {
             layoutWord();
-            frame(0);
+            frame(0); // cadrul zero: pagina goala, nimic desenat inca
 
             const io = new IntersectionObserver(
                 ([entry]) => {
@@ -1235,7 +1313,7 @@ function boot() {
     initLegacySegmentHash();
     initCircuitsCalc();
     initWorksCounter();
-    initLogoFlux();
+    initLogoBuild();
     initLineStatus();
     initFormCircuit();
     initArmSwitch();

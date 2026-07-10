@@ -33,6 +33,8 @@ return [
         'contact' => 'Contacte',
         'menu' => 'Deschide meniul',
         'main' => 'Navigare principală',
+        // `aria-label` pentru firimituri. Etichetează navigarea, nu o descrie.
+        'breadcrumb' => 'Unde te afli',
         'active' => 'Activ',
         'skip' => 'Sari la conținut',
         'switch' => 'Schimbă limba',

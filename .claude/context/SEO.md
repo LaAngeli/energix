@@ -121,7 +121,15 @@ autonome**. De aceea:
   `areaServed` ca listă de `City`, `openingHoursSpecification`, NAP consistent.
 - Secțiunea „Unde lucrăm": sectoarele Chișinăului + localitățile, ca text real, nu doar
   în schema.
-- `BreadcrumbList` pe paginile interioare.
+- **Firimituri**, vizibile pe pagină **și** marcate `BreadcrumbList`, dintr-o singură
+  sursă: `App\Support\Breadcrumbs::trail()`. Ierarhia se deduce din numele rutei
+  (`services.apartamente` → Acasă / Servicii / Apartamente); nivelurile intermediare
+  fără pagină proprie (`legal`) se sar. Homepage-ul și 404 nu au firimituri.
+
+⚠️ Google **compară** marcajul cu ce vede pe pagină și îl ignoră când diferă. Înainte,
+`BreadcrumbList` folosea `<title>`-ul („Lucrări de instalații electrice | Energix" —
+inclusiv numele de brand), iar firimiturile vizibile existau doar pe paginile de segment,
+unde scriau altceva. `BreadcrumbsTest` compară acum cele două, pe fiecare pagină.
 
 ## Ce rămâne de făcut
 

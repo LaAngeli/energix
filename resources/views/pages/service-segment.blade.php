@@ -25,16 +25,7 @@
         <div class="relative mx-auto max-w-6xl px-5 pt-8 pb-14 sm:px-8 sm:pb-18">
             <x-job-sheet code="SRV-02.{{ str_pad((string) $index, 2, '0', STR_PAD_LEFT) }}" :name="$t['nav']" index="0{{ $index }}/03" />
 
-            {{-- Firimituri vizibile, nu doar în JSON-LD: Google le cere pe amândouă. --}}
-            <nav class="mt-8 font-mono text-xs tracking-wider text-paper-dim uppercase" aria-label="{{ __('site.nav.main') }}">
-                <ol class="flex flex-wrap items-center gap-2">
-                    <li><a href="{{ URL::localized('home') }}" class="transition hover:text-gold">{{ __('site.nav.home') }}</a></li>
-                    <li aria-hidden="true" class="text-line">/</li>
-                    <li><a href="{{ URL::localized('services') }}" class="transition hover:text-gold">{{ __('site.nav.services') }}</a></li>
-                    <li aria-hidden="true" class="text-line">/</li>
-                    <li class="text-paper" aria-current="page">{{ $t['nav'] }}</li>
-                </ol>
-            </nav>
+            <x-breadcrumbs :page="$page" class="mt-8" />
 
             <div class="mt-8 grid gap-10 lg:grid-cols-[1.15fr_1fr] lg:items-center lg:gap-16">
                 <div>

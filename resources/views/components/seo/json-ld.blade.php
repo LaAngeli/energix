@@ -144,26 +144,30 @@
         ];
     }
 
-    // Firimituri: doar pe paginile interioare — homepage-ul e radacina.
-    if ($page !== 'home' && $page !== '404') {
-        $crumbs = [
-            ['@type' => 'ListItem', 'position' => 1, 'name' => trans('site.nav.home'), 'item' => URL::localized('home')],
-        ];
+    /*
+     | Firimituri: aceeasi sursa ca `<x-breadcrumbs>`, deci marcajul si pagina spun
+     | acelasi lucru. Google compara cele doua si ignora marcajul daca difera.
+     | Homepage-ul e radacina, iar 404 nu e nicaieri in ierarhie — `trail()` intoarce
+     | un array gol pentru amandoua.
+     |
+     | Ultimul element nu primeste `item`: e pagina curenta, exact cum recomanda Google.
+     */
+    $trail = App\Support\Breadcrumbs::trail($page);
 
-        // Segmentele stau sub /servicii, deci firimitura are trei niveluri, nu doua.
-        if (str_starts_with($page, 'services.')) {
-            $slug = substr($page, strlen('services.'));
-
-            $crumbs[] = ['@type' => 'ListItem', 'position' => 2, 'name' => trans('site.nav.services'), 'item' => URL::localized('services')];
-            $crumbs[] = ['@type' => 'ListItem', 'position' => 3, 'name' => trans("site.services.{$slug}.title")];
-        } else {
-            $crumbs[] = ['@type' => 'ListItem', 'position' => 2, 'name' => trans('site.seo')[$page]['title']];
-        }
-
+    if ($trail !== []) {
         $graph[] = [
             '@context' => 'https://schema.org',
             '@type' => 'BreadcrumbList',
-            'itemListElement' => $crumbs,
+            'itemListElement' => array_map(
+                fn (array $crumb, int $i): array => array_filter([
+                    '@type' => 'ListItem',
+                    'position' => $i + 1,
+                    'name' => $crumb['name'],
+                    'item' => $crumb['url'],
+                ], fn (mixed $value): bool => $value !== null),
+                $trail,
+                array_keys($trail),
+            ),
         ];
     }
 @endphp

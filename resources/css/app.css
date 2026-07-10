@@ -886,31 +886,30 @@
     }
 
     /*
-    /*
-    | --- sigla „Flux” (hero /despre) ---
+    | --- sigla „Constructie” (hero /despre) ---
     |
     | Portarea vectoriala a animatiei livrate de client. Geometria si timpii traiesc
-    | in JS (`initLogoFlux`), unde sunt copiati identic din sursa; aici raman doar
+    | in JS (`initLogoBuild`), unde sunt copiati identic din sursa; aici raman doar
     | cadrul si regulile de randare.
     |
-    | `will-change` lipseste intentionat: animatia ruleaza o data, 6 secunde, apoi
+    | `will-change` lipseste intentionat: animatia ruleaza o data, 5.5 secunde, apoi
     | ingheata. Promovarea permanenta a unui strat de compozitie ar costa memorie
     | GPU pentru nimic.
     */
-    .logo-flux {
+    .logo-build {
         width: 100%;
         aspect-ratio: 1000 / 840;
     }
 
-    .logo-flux svg {
+    .logo-build svg {
         width: 100%;
         height: 100%;
-        /* bloom-ul si scanteile depasesc viewBox-ul */
+        /* bloom-ul, flash-ul si scanteile depasesc viewBox-ul */
         overflow: visible;
     }
 
     /* Literele wordmark-ului: fontul e incarcat doar aici, pe /despre desktop. */
-    .logo-flux [data-flux-letter] {
+    .logo-build [data-build-letter] {
         font-family: var(--font-quicksand), sans-serif;
     }
 
