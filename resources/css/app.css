@@ -911,7 +911,7 @@
         overflow: visible;
     }
 
-    /* Literele wordmark-ului: fontul e incarcat doar aici, pe /despre desktop. */
+    /* Literele wordmark-ului: fontul Quicksand se incarca doar unde apare sigla. */
     .logo-build [data-build-letter] {
         font-family: var(--font-quicksand), sans-serif;
     }
@@ -966,6 +966,110 @@
     .cote-tick {
         transform-origin: top;
         transition: transform 0.3s ease-out;
+    }
+}
+
+/*
+| ========================= meniul mobil (tabloul) =========================
+|
+| INTENTIONAT FARA `@layer`: regulile de mai jos trebuie sa invinga utilitarele
+| Tailwind (`.flex`, `.py-4`, `.text-3xl`) puse pe aceleasi elemente. In v4
+| ordinea layerelor e `components` apoi `utilities`, deci un layer nu poate bate
+| utilitarele prin specificitate — dar CSS-ul NElayerizat bate orice layer.
+| De-aceea compactarea pe ecrane scunde (ascunderea animatiei, micsorarea
+| randurilor) chiar are efect.
+*/
+
+/*
+| Vizibilitatea o comanda `.is-open`, NU `.flex` + atributul `hidden`: `[hidden]`
+| (UA) si `.flex` au aceeasi specificitate, deci `.flex` ar castiga si meniul ar
+| ramane vizibil cand ar trebui inchis. O singura sursa de adevar.
+*/
+[data-nav-menu] {
+    display: none;
+}
+
+[data-nav-menu].is-open {
+    display: flex;
+}
+
+/* Pe desktop nu exista: navigarea traieste in bara. */
+@media (min-width: 64rem) {
+    [data-nav-menu].is-open {
+        display: none;
+    }
+}
+
+/*
+| Circuitele se aprind in cascada la deschidere — tabloul se pune sub tensiune.
+| `--i` (indexul randului) esaloneaza pornirea. Neutralizat automat de blocul
+| global `prefers-reduced-motion` de mai jos.
+*/
+[data-nav-menu].is-open .nav-circuit {
+    animation: circuit-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation-delay: calc(var(--i) * 0.06s + 0.04s);
+}
+
+@keyframes circuit-in {
+    from {
+        opacity: 0;
+        transform: translateX(-14px);
+    }
+}
+
+/*
+| Animatia siglei umple spatiul ramas (`flex-1` in markup). `.logo-build` e setat
+| pe LATIME; aici il legam de INALTIMEA disponibila, pastrand raportul, ca sa
+| incapa fara scroll indiferent de ecran.
+*/
+[data-nav-menu] .logo-build {
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+    margin-inline: auto;
+}
+
+/*
+| Ecrane scunde (peisaj, dispozitive mici): animatia se retrage, randurile se
+| compacteaza si coloana se distribuie, ca CTA-ul de telefon sa ramana mereu
+| vizibil — fara scroll. Pragul prinde si peisajul telefoanelor inalte.
+*/
+@media (max-height: 600px) {
+    [data-nav-menu].is-open {
+        justify-content: space-between;
+    }
+
+    [data-nav-menu] [data-nav-anim] {
+        display: none;
+    }
+
+    [data-nav-menu] .nav-strip {
+        padding-block: 0.4rem;
+    }
+
+    [data-nav-menu] .nav-strip [data-nav-close] {
+        height: 2.25rem;
+        width: 2.25rem;
+    }
+
+    [data-nav-menu] .nav-circuit > a {
+        padding-block: 0.5rem;
+    }
+
+    [data-nav-menu] .nav-label {
+        font-size: 1.5rem;
+    }
+
+    [data-nav-menu] .nav-foot {
+        padding-top: 0.6rem;
+    }
+
+    [data-nav-menu] .nav-cta {
+        padding-block: 0.7rem;
+    }
+
+    [data-nav-menu] .nav-foot-lang {
+        margin-top: 0.6rem;
     }
 }
 

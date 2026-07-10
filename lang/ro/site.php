@@ -38,6 +38,8 @@ return [
         'active' => 'Activ',
         'skip' => 'Sari la conținut',
         'switch' => 'Schimbă limba',
+        'menu_title' => 'Meniu',
+        'close' => 'Închide meniul',
     ],
 
     'common' => [

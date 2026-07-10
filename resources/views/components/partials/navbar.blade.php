@@ -73,13 +73,13 @@
                 {{ $phone }}
             </a>
 
-            {{-- Mobil --}}
+            {{-- Mobil: deschide tabloul --}}
             <button
                 type="button"
                 data-nav-toggle
                 aria-expanded="false"
                 aria-controls="nav-menu"
-                class="inline-flex h-11 w-11 items-center justify-center rounded-sm border border-line text-paper lg:hidden"
+                class="inline-flex h-11 w-11 items-center justify-center rounded-sm border border-line text-paper active:translate-y-px lg:hidden"
             >
                 <span class="sr-only">{{ __('site.nav.menu') }}</span>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -88,33 +88,98 @@
             </button>
         </div>
     </nav>
+</header>
 
-    {{-- Mobil: panoul de circuite --}}
-    <div id="nav-menu" data-nav-menu hidden class="border-t border-line bg-ink lg:hidden">
-        <ul class="mx-auto max-w-6xl px-5 py-3 sm:px-8">
+{{--
+| Meniul mobil = TABLOUL care se pune sub tensiune. Overlay pe tot ecranul, in
+| afara header-ului: header-ul are `backdrop-filter`, care ancoreaza `fixed` la
+| el, nu la viewport — deci overlay-ul ar fi fost taiat la inaltimea barei.
+|
+| Fara scroll, la orice inaltime: coloana flex in care banda de sus, circuitele
+| si CTA-ul au inaltime fixa, iar animatia (`data-nav-anim`) absoarbe restul si
+| se retrage spre 0 pe ecrane scunde. Vizibilitatea o comanda clasa `.is-open`
+| (vezi app.css) — nu `.flex` + `hidden`, care s-ar anula reciproc.
+--}}
+<div
+    id="nav-menu"
+    data-nav-menu
+    hidden
+    class="fixed inset-x-0 top-0 z-[70] h-dvh flex-col overflow-hidden bg-ink lg:hidden"
+>
+    <div class="blueprint pointer-events-none absolute inset-0 opacity-20 [mask-image:radial-gradient(75%_55%_at_50%_28%,black,transparent)]" aria-hidden="true"></div>
+
+    {{-- 1. banda de sus: eticheta „sub tensiune” + inchidere, aliniata cu bara --}}
+    <div class="nav-strip relative flex shrink-0 items-center justify-between px-5 py-3.5 sm:px-8">
+        <p class="flex items-center gap-2.5 font-mono text-[0.65rem] tracking-[0.2em] text-paper-dim uppercase">
+            <span class="led is-on" aria-hidden="true"></span>
+            {{ __('site.nav.menu_title') }}
+        </p>
+
+        <button
+            type="button"
+            data-nav-close
+            aria-controls="nav-menu"
+            class="inline-flex h-11 w-11 items-center justify-center rounded-sm border border-line text-paper transition-colors hover:border-gold hover:text-gold active:translate-y-px"
+        >
+            <span class="sr-only">{{ __('site.nav.close') }}</span>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" />
+            </svg>
+        </button>
+    </div>
+
+    {{-- 2. circuitele = paginile. Se aprind in cascada la deschidere. --}}
+    <nav class="relative shrink-0 px-5 sm:px-8" aria-label="{{ __('site.nav.main') }}">
+        <ul>
             @foreach ($links as $link)
                 @php($active = request()->routeIs($ru.$link['route']))
                 @php($inSection = $active || request()->routeIs($ru.$link['route'].'.*'))
-                <li class="border-b border-line/60">
-                    <a href="{{ URL::localized($link['route']) }}" class="flex items-center justify-between gap-4 py-4" @if ($active) aria-current="page" @endif>
-                        <span class="flex items-center gap-3.5">
-                            <span @class(['led', 'is-on' => $inSection]) aria-hidden="true"></span>
-                            <span class="font-mono text-[0.6rem] tracking-[0.16em] text-paper-dim uppercase">{{ $link['code'] }}</span>
-                            <span @class(['text-lg leading-none', 'text-gold' => $inSection, 'text-paper' => ! $inSection])>
-                                {{ __('site.nav.'.$link['route']) }}
-                            </span>
+                <li class="nav-circuit border-b border-line/60" style="--i: {{ $loop->index }}">
+                    <a
+                        href="{{ URL::localized($link['route']) }}"
+                        class="flex items-center gap-4 py-4"
+                        @if ($active) aria-current="page" @endif
+                    >
+                        <span @class(['led shrink-0', 'is-on' => $inSection]) aria-hidden="true"></span>
+                        <span class="font-mono text-xs tracking-[0.16em] text-paper-dim tabular-nums">{{ $link['code'] }}</span>
+                        <span @class(['nav-label font-display text-3xl leading-none', 'text-gold' => $inSection, 'text-paper' => ! $inSection])>
+                            {{ __('site.nav.'.$link['route']) }}
                         </span>
-                        <span class="font-mono text-[0.6rem] tracking-[0.16em] uppercase {{ $inSection ? 'text-gold' : 'text-paper-dim' }}">
-                            {{ $inSection ? __('site.nav.active') : '—' }}
+                        <span class="ml-auto flex items-center">
+                            @if ($inSection)
+                                <span class="font-mono text-[0.6rem] tracking-[0.16em] text-gold uppercase">{{ __('site.nav.active') }}</span>
+                            @else
+                                <svg class="h-4 w-4 text-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            @endif
                         </span>
                     </a>
                 </li>
             @endforeach
-
-            <li class="flex items-center justify-between gap-4 py-4">
-                <span class="eyebrow">{{ __('site.nav.switch') }}</span>
-                <x-partials.lang-switch />
-            </li>
         </ul>
+    </nav>
+
+    {{-- 3. sigla care se construieste — tabloul energizat. Umple spatiul liber. --}}
+    <div class="relative flex min-h-0 flex-1 items-center justify-center px-5 py-3" data-nav-anim>
+        <x-signature.logo-build />
     </div>
-</header>
+
+    {{-- 4. josul: telefonul (conversia) in zona degetului, plus limba. --}}
+    <div class="nav-foot relative shrink-0 border-t border-line/60 px-5 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-8">
+        <a
+            href="tel:{{ $phoneHref }}"
+            class="nav-cta energize-sweep flex items-center justify-center gap-3 rounded-sm bg-gold px-6 py-4 font-mono text-base font-medium text-ink tabular-nums"
+        >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 1.9.6 2.8a2 2 0 0 1-.4 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.8.6a2 2 0 0 1 1.7 2Z" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            {{ $phone }}
+        </a>
+
+        <div class="nav-foot-lang mt-4 flex items-center justify-between">
+            <span class="eyebrow">{{ __('site.nav.switch') }}</span>
+            <x-partials.lang-switch />
+        </div>
+    </div>
+</div>

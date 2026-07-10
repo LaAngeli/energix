@@ -654,13 +654,7 @@ function initWorksCounter() {
  * forma `1 - seg(t, a, b)` cu `a >= 5.95`, deci pe intervalul [0, END] valoreaza
  * exact 1. Termenii aceia sunt omisi mai jos fiindca sunt constanti, nu ignorati.
  */
-function initLogoBuild() {
-    const root = document.querySelector('[data-logo-build]');
-
-    if (! root) {
-        return;
-    }
-
+function setupLogoBuild(root) {
     /*
      | Ciclul sursei e 7s, dar ultimele 1.5s sunt demontarea. Ne oprim la 5.5s:
      | unda punctului s-a stins (5.3s), iar sigla e complet aprinsa.
@@ -970,6 +964,9 @@ function initLogoBuild() {
     }
 
     let started = false;
+    let raf = 0;
+    let guard = 0;
+    let primed = null;
 
     function play() {
         if (started) {
@@ -986,11 +983,11 @@ function initLogoBuild() {
         }
 
         const t0 = performance.now();
-        let raf = requestAnimationFrame(function tick(now) {
+        raf = requestAnimationFrame(function tick(now) {
             const t = (now - t0) / 1000;
 
             if (t >= END) {
-                frame(END); // sigla aprinsa, apoi inghetata pana la un nou acces al paginii
+                frame(END); // sigla aprinsa, apoi inghetata pana la o noua pornire
 
                 return;
             }
@@ -1003,62 +1000,103 @@ function initLogoBuild() {
          | rAF ingheata in tab-urile de fundal. Garantam starea finala chiar daca
          | vizitatorul a deschis pagina intr-un tab din spate.
          */
-        setTimeout(() => {
+        guard = setTimeout(() => {
             cancelAnimationFrame(raf);
             frame(END);
         }, END * 1000 + 250);
     }
 
-    function boot() {
-        /*
-         | Fontul schimba latimile literelor, deci wordmark-ul se aseaza abia dupa ce
-         | fata e incarcata.
-         |
-         | `document.fonts.ready` NU e suficient: se rezolva inainte ca o fata inca
-         | nefolosita sa intre in coada de incarcare, iar `getComputedTextLength()` ar
-         | masura atunci metricile fontului de rezerva. Cerem explicit fata, cu textul
-         | care ne intereseaza — aceeasi capcana ca la verificarea diacriticelor.
-         */
-        const wordmark = document.fonts?.load('600 160px Quicksand', 'energıx') ?? Promise.resolve();
-
-        wordmark.catch(() => {}).then(() => {
-            layoutWord();
-            frame(0); // cadrul zero: pagina goala, nimic desenat inca
-
-            const io = new IntersectionObserver(
-                ([entry]) => {
-                    if (! entry.isIntersecting) {
-                        return;
-                    }
-
-                    io.disconnect();
-                    play();
-                },
-                { threshold: 0.35 },
-            );
-
-            io.observe(root);
-        });
+    /** Opreste bucla curenta si readuce cadrul zero — pentru o noua rulare. */
+    function reset() {
+        cancelAnimationFrame(raf);
+        clearTimeout(guard);
+        started = false;
+        frame(0);
     }
 
     /*
-     | Sub `lg` sigla e `display: none`, deci nu are ce anima. Fara garda, apelul
-     | `fonts.load()` ar descarca totusi Quicksand (~15 KB) pe fiecare telefon, ca
-     | sa masoare litere invizibile. Pornim doar cand coloana chiar exista.
+     | Pregatirea: incarca fontul, aseaza literele, deseneaza cadrul zero.
+     | Idempotent — se poate chema la fiecare deschidere a meniului fara cost.
+     |
+     | `document.fonts.ready` NU e suficient inainte de `getComputedTextLength()`:
+     | se rezolva inainte ca o fata inca nefolosita sa intre in coada de incarcare,
+     | iar literele s-ar aseza pe metricile fontului de rezerva. Cerem explicit fata.
+     |
+     | ⚠️ `layoutWord()` masoara latimile, deci `root` trebuie sa fie VIZIBIL (nu
+     | `display:none`) cand se cheama. Instanta din meniu e primita abia la deschidere.
      */
-    const desktop = window.matchMedia('(min-width: 64rem)');
+    function prime() {
+        if (primed) {
+            return primed;
+        }
 
-    if (desktop.matches) {
-        boot();
+        const wordmark = document.fonts?.load('600 160px Quicksand', 'energıx') ?? Promise.resolve();
 
-        return;
+        primed = wordmark.catch(() => {}).then(() => {
+            layoutWord();
+            frame(0);
+        });
+
+        return primed;
     }
 
-    desktop.addEventListener('change', function once(event) {
-        if (event.matches) {
-            desktop.removeEventListener('change', once);
-            boot();
+    /** Hero (/despre): porneste o singura data, cand intra in cadru. */
+    function observeAndPlay() {
+        const io = new IntersectionObserver(
+            ([entry]) => {
+                if (! entry.isIntersecting) {
+                    return;
+                }
+
+                io.disconnect();
+                play();
+            },
+            { threshold: 0.35 },
+        );
+
+        io.observe(root);
+    }
+
+    return { prime, play, reset, observeAndPlay };
+}
+
+/*
+| Doua instante ale siglei: hero-ul de pe /despre si tabloul din meniul mobil.
+| Fiecare are propriul context (closure pe `root`), ca sa ruleze independent.
+*/
+function initLogoBuild() {
+    document.querySelectorAll('[data-logo-build]').forEach((root) => {
+        const controller = setupLogoBuild(root);
+        root.logoBuild = controller; // il ia `initNav` pentru instanta din meniu
+
+        /*
+         | Instanta din meniu se porneste la deschidere (vezi `initNav`): fontul nu
+         | se descarca pana nu deschizi meniul, iar literele se masoara doar cand
+         | overlay-ul e vizibil. Aici o lasam in pace.
+         */
+        if (root.closest('[data-nav-menu]')) {
+            return;
         }
+
+        /*
+         | Hero-ul e `display: none` sub `lg`. Fara garda, `fonts.load()` ar descarca
+         | Quicksand pe fiecare telefon degeaba. Pornim doar cand coloana chiar exista.
+         */
+        const desktop = window.matchMedia('(min-width: 64rem)');
+        const go = () => controller.prime().then(() => controller.observeAndPlay());
+
+        if (desktop.matches) {
+            go();
+
+            return;
+        }
+
+        desktop.addEventListener('change', function once(event) {
+            if (event.matches) {
+                desktop.removeEventListener('change', once);
+                go();
+            }
+        });
     });
 }
 
@@ -1169,20 +1207,49 @@ function initNav() {
         return;
     }
 
+    const closers = menu.querySelectorAll('[data-nav-close]');
+    const logo = menu.querySelector('[data-logo-build]');
+
     const setOpen = (open) => {
         toggle.setAttribute('aria-expanded', String(open));
         menu.hidden = ! open;
+        menu.classList.toggle('is-open', open); // comanda vizibilitatea + cascada circuitelor
         document.body.style.overflow = open ? 'hidden' : '';
+
+        if (! open) {
+            return;
+        }
+
+        // Muta focusul in tablou; la inchidere il returnam pe buton (mai jos).
+        menu.querySelector('[data-nav-close]')?.focus();
+
+        /*
+         | Tabloul se pune sub tensiune la fiecare deschidere: sigla se reconstruieste
+         | de la zero. `prime()` masoara literele — posibil abia acum, cand overlay-ul
+         | e vizibil — apoi `reset()` + `play()` ruleaza secventa din nou.
+         */
+        if (logo?.logoBuild) {
+            logo.logoBuild.prime().then(() => {
+                logo.logoBuild.reset();
+                logo.logoBuild.play();
+            });
+        }
+    };
+
+    const close = () => {
+        setOpen(false);
+        toggle.focus();
     };
 
     toggle.addEventListener('click', () => {
         setOpen(toggle.getAttribute('aria-expanded') !== 'true');
     });
 
+    closers.forEach((button) => button.addEventListener('click', close));
+
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
-            setOpen(false);
-            toggle.focus();
+            close();
         }
     });
 
