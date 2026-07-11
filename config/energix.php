@@ -126,38 +126,39 @@ return [
 
     /*
      | Galerie ILUSTRATIVA pana la fotografii de pe santierele proprii (declarat
-     | onest pe pagina). 4 imagini pe segment, in ordinea etapelor lucrarii.
+     | onest pe pagina). In ordinea etapelor lucrarii, pe segment.
      | Titlurile: lang `site.gallery.items.{key}`.
      |
      | Sursa: Unsplash (licenta Unsplash) si Pexels (licenta Pexels) — uz comercial
      | permis, fara atribuire. Procesate local: crop 4:3, 1280x960, WebP, fara EXIF.
      | Provenienta per fisier:
-     |   apartament-doze        pexels.com/photos/7937305
-     |   apartament-tablou      pexels.com/photos/28950842
-     |   apartament-prize       pexels.com/photos/5691633
-     |   apartament-iluminat    unsplash.com/photos/7XaBaKwrV1E
-     |   casa-santier-tamburi   unsplash.com/photos/13OG1NbFfZk
-     |   casa-cablare-santier   unsplash.com/photos/KbG6H_6vK4c
-     |   casa-tablou            unsplash.com/photos/47jO5Y8nsYo
-     |   casa-constructie       unsplash.com/photos/fK8MpQ2i5xk
-     |   industrial-tablouri    pexels.com/photos/33706880
+     |   apartament-doze          pexels.com/photos/7937305
+     |   apartament-tablou        pexels.com/photos/28950842
+     |   apartament-montaj-priza  pexels.com/photos/4981794
+     |   apartament-iluminat      unsplash.com/photos/7XaBaKwrV1E
+     |   casa-santier-tamburi     unsplash.com/photos/13OG1NbFfZk
+     |   casa-tablou              unsplash.com/photos/47jO5Y8nsYo
+     |   casa-constructie         unsplash.com/photos/fK8MpQ2i5xk
+     |   industrial-tablouri         pexels.com/photos/33706880
      |   industrial-poduri-cabluri   unsplash.com/photos/1ssfP70oFxY
      |   industrial-tablou-forta     unsplash.com/photos/PkHf7BUWbtk
+     |   industrial-dulap-comanda    unsplash.com/photos/kK7uPfb2YWU (Markus Spiske)
      |   industrial-spatiu-comercial unsplash.com/photos/28bJE7KR7cM
-     | Copertile (cover-*) sunt aceleasi cadre, taiate la 3:2 (1280x854).
+     | Copertile (cover-*) sunt cadre din acelasi set, taiate la 3:2 (1280x854);
+     | cover-case vine din `casa-santier-tamburi`.
      */
     'gallery' => [
         ['key' => 'flat_wiring', 'image' => 'images/content/apartament-doze.webp', 'category' => 'apartamente'],
         ['key' => 'flat_panel', 'image' => 'images/content/apartament-tablou.webp', 'category' => 'apartamente'],
-        ['key' => 'flat_sockets', 'image' => 'images/content/apartament-prize.webp', 'category' => 'apartamente'],
+        ['key' => 'flat_outlet', 'image' => 'images/content/apartament-montaj-priza.webp', 'category' => 'apartamente'],
         ['key' => 'flat_light', 'image' => 'images/content/apartament-iluminat.webp', 'category' => 'apartamente'],
         ['key' => 'house_site', 'image' => 'images/content/casa-santier-tamburi.webp', 'category' => 'case'],
-        ['key' => 'house_frame', 'image' => 'images/content/casa-cablare-santier.webp', 'category' => 'case'],
         ['key' => 'house_panel', 'image' => 'images/content/casa-tablou.webp', 'category' => 'case'],
         ['key' => 'house_full', 'image' => 'images/content/casa-constructie.webp', 'category' => 'case'],
         ['key' => 'ind_panel', 'image' => 'images/content/industrial-tablouri.webp', 'category' => 'industriale'],
         ['key' => 'ind_trays', 'image' => 'images/content/industrial-poduri-cabluri.webp', 'category' => 'industriale'],
         ['key' => 'ind_power', 'image' => 'images/content/industrial-tablou-forta.webp', 'category' => 'industriale'],
+        ['key' => 'ind_control', 'image' => 'images/content/industrial-dulap-comanda.webp', 'category' => 'industriale'],
         ['key' => 'ind_retail', 'image' => 'images/content/industrial-spatiu-comercial.webp', 'category' => 'industriale'],
     ],
 

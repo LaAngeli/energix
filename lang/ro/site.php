@@ -251,15 +251,15 @@ return [
         'items' => [
             'flat_wiring' => 'Doze și trasee de cablu în apartament',
             'flat_panel' => 'Tabloul electric al unui apartament',
-            'flat_sockets' => 'Prize montate în apartament',
+            'flat_outlet' => 'Montajul unei prize în apartament',
             'flat_light' => 'Corpuri de iluminat montate în apartament',
             'house_site' => 'Cablare electrică pe șantier de casă',
-            'house_frame' => 'Trasee și doze într-o casă în construcție',
             'house_panel' => 'Echiparea tabloului unei case',
             'house_full' => 'Instalație electrică de casă, în execuție',
             'ind_panel' => 'Tablouri de distribuție industriale',
             'ind_trays' => 'Trasee de cabluri în hală',
             'ind_power' => 'Echiparea unui tablou de forță',
+            'ind_control' => 'Dulap de comandă și forță industrial',
             'ind_retail' => 'Instalație electrică în spațiu comercial',
         ],
         'categories' => [
