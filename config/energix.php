@@ -138,6 +138,7 @@ return [
      |   apartament-iluminat      unsplash.com/photos/7XaBaKwrV1E
      |   casa-santier-tamburi     unsplash.com/photos/13OG1NbFfZk
      |   casa-tablou              unsplash.com/photos/47jO5Y8nsYo
+     |   casa-tablou-releu        unsplash.com/photos/ufo5IiRdqjc (Mark Kats)
      |   casa-constructie         unsplash.com/photos/fK8MpQ2i5xk
      |   industrial-tablouri         pexels.com/photos/33706880
      |   industrial-poduri-cabluri   unsplash.com/photos/1ssfP70oFxY
@@ -154,6 +155,7 @@ return [
         ['key' => 'flat_light', 'image' => 'images/content/apartament-iluminat.webp', 'category' => 'apartamente'],
         ['key' => 'house_site', 'image' => 'images/content/casa-santier-tamburi.webp', 'category' => 'case'],
         ['key' => 'house_panel', 'image' => 'images/content/casa-tablou.webp', 'category' => 'case'],
+        ['key' => 'house_protect', 'image' => 'images/content/casa-tablou-releu.webp', 'category' => 'case'],
         ['key' => 'house_full', 'image' => 'images/content/casa-constructie.webp', 'category' => 'case'],
         ['key' => 'ind_panel', 'image' => 'images/content/industrial-tablouri.webp', 'category' => 'industriale'],
         ['key' => 'ind_trays', 'image' => 'images/content/industrial-poduri-cabluri.webp', 'category' => 'industriale'],

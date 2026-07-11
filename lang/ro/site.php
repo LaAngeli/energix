@@ -255,6 +255,7 @@ return [
             'flat_light' => 'Corpuri de iluminat montate în apartament',
             'house_site' => 'Cablare electrică pe șantier de casă',
             'house_panel' => 'Echiparea tabloului unei case',
+            'house_protect' => 'Tablou de casă cu releu de tensiune',
             'house_full' => 'Instalație electrică de casă, în execuție',
             'ind_panel' => 'Tablouri de distribuție industriale',
             'ind_trays' => 'Trasee de cabluri în hală',
