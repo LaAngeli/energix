@@ -23,18 +23,26 @@
                 </p>
             </div>
 
-            <div class="grid gap-x-10 gap-y-8 pt-4 md:grid-cols-3">
-                <div>
+            {{--
+            | Mobil (sub md): coloanele stivuite nu sunt o lista continua, ci randuri
+            | de placuta separate de hairline — acelasi idiom „specificatii stantate”
+            | ca fisa de lucrare. TOATE ajustarile de mobil stau pe `max-md:`/`max-sm:`,
+            | deci de la breakpoint in sus footerul ramane bit-identic cu desktopul.
+            --}}
+            <div class="grid gap-x-10 gap-y-8 pt-4 max-md:gap-y-0 max-md:divide-y max-md:divide-line/60 md:grid-cols-3">
+                <div class="max-md:pb-7">
                     <h2 class="eyebrow">{{ __('site.common.object') }}</h2>
                     <p class="mt-3 text-sm text-paper-dim">{{ __('site.about_page.lead') }}</p>
-                    <x-social-links class="mt-5" />
+                    {{-- Pe mobil, cele 5 tinte de 44px se distribuie uniform pe latime. --}}
+                    <x-social-links class="mt-5 max-md:justify-between" />
                 </div>
 
-                <div>
+                <div class="max-md:py-7">
                     <h2 class="eyebrow">{{ __('site.nav.contact') }}</h2>
                     <ul class="mt-3 space-y-2.5">
                         <li>
-                            <a href="tel:{{ $contact['phone_href'] }}" class="readout text-lg text-gold transition hover:brightness-110">
+                            {{-- Telefonul e conversia principala: pe mobil, o idee mai mare. --}}
+                            <a href="tel:{{ $contact['phone_href'] }}" class="readout text-lg text-gold transition hover:brightness-110 max-md:text-xl">
                                 {{ $contact['phone'] }}
                             </a>
                         </li>
@@ -47,7 +55,7 @@
                     </ul>
                 </div>
 
-                <div>
+                <div class="max-md:pt-7">
                     <h2 class="eyebrow">{{ __('site.common.schedule') }}</h2>
                     <ul class="mt-3 space-y-1.5 text-sm">
                         @foreach (__('site.hours') as $slot)
@@ -62,7 +70,8 @@
             </div>
         </div>
 
-        <div class="mt-6 flex flex-col gap-3 text-xs text-paper-dim sm:flex-row sm:items-center sm:justify-between">
+        {{-- Pe mobil, cele trei randuri stau centrate si simetrice; de la sm, neschimbat. --}}
+        <div class="mt-6 flex flex-col gap-3 text-xs text-paper-dim max-sm:items-center max-sm:text-center sm:flex-row sm:items-center sm:justify-between">
             <p>&copy; {{ date('Y') }} Energix. {{ __('site.common.rights') }}</p>
 
             {{--
@@ -80,7 +89,7 @@
             </p>
 
             <nav aria-label="{{ __('site.common.legal') }}">
-                <ul class="flex flex-wrap gap-x-5 gap-y-2">
+                <ul class="flex flex-wrap gap-x-5 gap-y-2 max-sm:justify-center">
                     <li><a href="{{ URL::localized('legal.terms') }}" class="transition hover:text-paper">{{ __('site.common.legal_terms') }}</a></li>
                     <li><a href="{{ URL::localized('legal.privacy') }}" class="transition hover:text-paper">{{ __('site.common.legal_privacy') }}</a></li>
                     <li><a href="{{ URL::localized('legal.cookies') }}" class="transition hover:text-paper">{{ __('site.common.legal_cookies') }}</a></li>
