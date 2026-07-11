@@ -84,7 +84,7 @@
                     href="https://advista.marketing"
                     target="_blank"
                     rel="noopener"
-                    class="text-paper transition-colors hover:text-gold"
+                    class="text-paper underline underline-offset-2 transition-colors hover:text-gold"
                 >AdVista</a>
             </p>
 

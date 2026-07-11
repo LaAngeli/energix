@@ -20,6 +20,7 @@
                     id="stage-tab-{{ $i }}"
                     aria-controls="stage-panel-{{ $i }}"
                     aria-selected="{{ $i === 0 ? 'true' : 'false' }}"
+                    aria-label="{{ $stage['title'] }}"
                     tabindex="{{ $i === 0 ? '0' : '-1' }}"
                     class="stage-tab group flex flex-col items-center gap-2.5 pb-1"
                 >

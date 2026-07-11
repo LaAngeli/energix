@@ -59,10 +59,15 @@
 
     <div class="panel-bus mt-5" aria-hidden="true"></div>
 
-    <ol class="grid grid-cols-3 gap-x-2 lg:grid-cols-6" role="group" aria-label="{{ __('site.panel.group') }}">
+    {{--
+    | `<div role="group">`, nu `<ol>`: astea sunt disjunctoare intr-un grid, nu o
+    | lista de citit secvential. Un `<ol>` cu `role="group"` pe el rupe semantica
+    | implicita de lista pentru `<li>`-urile din interior (axe: "listitem").
+    --}}
+    <div class="grid grid-cols-3 gap-x-2 lg:grid-cols-6" role="group" aria-label="{{ __('site.panel.group') }}">
         @foreach (config('energix.panel_circuits') as $circuit)
             @php($name = __("site.panel.circuits.{$circuit['key']}"))
-            <li class="circuit flex flex-col items-center" data-circuit>
+            <div class="circuit flex flex-col items-center" data-circuit>
                 <span class="circuit-drop" aria-hidden="true"></span>
 
                 <button
@@ -110,9 +115,9 @@
                     </svg>
                     <span class="font-mono text-[0.58rem] tracking-[0.12em] uppercase">{{ $name }}</span>
                 </span>
-            </li>
+            </div>
         @endforeach
-    </ol>
+    </div>
 
     <p class="mt-4 border-t border-line pt-3 text-center font-mono text-[0.6rem] tracking-[0.14em] text-paper-dim uppercase">
         {{ __('site.panel.hint') }}
