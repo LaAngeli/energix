@@ -27,6 +27,14 @@
     @foreach ($columns as $column)
         <div>
             @foreach ($column as $i => $item)
+                {{--
+                | Butonul are `lg:min-h-[6rem]` (~96px) pe desktop: acopera si cazul
+                | intrebarii pe 2 randuri (item 01 = 90.5px), asa ca TOATE randurile
+                | de intrebari inchise au aceeasi inaltime, iar liniile de separator
+                | se aliniaza pixel-perfect intre cele doua coloane. Deschiderea
+                | acordeonului adauga inaltime DOAR pe itemul respectiv (nu se
+                | propaga in restul randurilor, cum ar fi facut `auto-rows-fr`).
+                --}}
                 <div class="faq-item border-t border-graphite/15 [&:last-child]:border-b" data-faq-item>
                     <h3 class="m-0">
                         <button
@@ -34,7 +42,7 @@
                             data-faq-toggle
                             aria-expanded="false"
                             aria-controls="faq-a-{{ $i }}"
-                            class="group grid w-full grid-cols-[auto_1fr_auto] items-start gap-x-4 py-4 text-left sm:gap-x-5 sm:py-5"
+                            class="group grid w-full grid-cols-[auto_1fr_auto] items-start gap-x-4 py-4 text-left sm:gap-x-5 sm:py-5 lg:min-h-[6rem]"
                         >
                             <span class="readout mt-0.5 text-sm text-graphite-dim transition-colors group-hover:text-graphite sm:mt-1">
                                 {{ str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT) }}
