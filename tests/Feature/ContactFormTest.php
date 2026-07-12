@@ -97,6 +97,94 @@ it('cere campurile obligatorii', function (): void {
     Mail::assertNothingSent();
 });
 
+/*
+|--------------------------------------------------------------------------
+| Continut: nume, telefon, mesaj
+|--------------------------------------------------------------------------
+|
+| Regresie: numele era doar `required|string|min:2` — „Ion123” sau „12345”
+| treceau, iar telefonul accepta „----------” (charset fara nicio cifra).
+|
+*/
+
+it('respinge nume care nu sunt nume', function (string $field, string $value): void {
+    Mail::fake();
+
+    $response = $this->post(route('contact.store'), energixContactPayload([$field => $value]));
+
+    $response->assertSessionHasErrors($field);
+    Mail::assertNothingSent();
+})->with([
+    'cifre in nume' => ['name', 'Ion123'],
+    'doar cifre' => ['name', '12345'],
+    'simboluri' => ['name', 'Ion@Popescu'],
+    'cratime dublate' => ['name', 'Ana--Maria'],
+    'cratima la margine' => ['name', '-Ion'],
+    'cifre in prenume' => ['prenume', 'Maria2'],
+]);
+
+it('accepta nume reale, cu diacritice si chirilice', function (string $name, string $prenume): void {
+    Mail::fake();
+
+    $this->post(route('contact.store'), energixContactPayload([
+        'name' => $name,
+        'prenume' => $prenume,
+    ]))->assertSessionHasNoErrors();
+
+    Mail::assertSent(ContactMessage::class);
+})->with([
+    'diacritice romanesti' => ['Țurcanu', 'Ștefan'],
+    'nume compus' => ['Popescu-Tăriceanu', 'Ana-Maria'],
+    'chirilic' => ['Пётр', 'Александрович'],
+    'apostrof' => ["O'Brien", 'Sean'],
+]);
+
+it('respinge telefoane fara cifre reale', function (string $phone): void {
+    Mail::fake();
+
+    $response = $this->post(route('contact.store'), energixContactPayload(['phone' => $phone]));
+
+    $response->assertSessionHasErrors('phone');
+    Mail::assertNothingSent();
+})->with([
+    'doar separatori' => ['----------'],
+    'paranteze goale' => ['+() - ()'],
+    'prea putine cifre' => ['069 12'],
+    'litere' => ['telefon 069'],
+]);
+
+it('respinge mesajele cu linkuri — semnatura spamului', function (string $message): void {
+    Mail::fake();
+
+    $response = $this->post(route('contact.store'), energixContactPayload(['message' => $message]));
+
+    $response->assertSessionHasErrors('message');
+    Mail::assertNothingSent();
+})->with([
+    'http' => ['Va rog vizitati http://spam.example pentru oferte tari'],
+    'https' => ['Buna ziua, castigati bani aici: https://spam.example/win acum'],
+    'www' => ['Detalii pe www.spam.example despre produsele noastre minune'],
+    'bbcode' => ['Cumpara [url=spam.example]aici[/url] tot ce vrei ieftin'],
+]);
+
+/*
+|--------------------------------------------------------------------------
+| Erori in limba paginii
+|--------------------------------------------------------------------------
+*/
+
+it('afiseaza erorile de validare in limba paginii', function (): void {
+    Mail::fake();
+
+    // Pe ruta RO, eroarea vine din lang/ro.
+    $this->post(route('contact.store'), energixContactPayload(['name' => 'Ion123']))
+        ->assertSessionHasErrors(['name' => trans('site.form.errors.name_format', [], 'ro')]);
+
+    // Pe ruta RU, ACEEASI greseala primeste mesajul rusesc.
+    $this->post(route('ru.contact.store'), energixContactPayload(['name' => 'Ion123']))
+        ->assertSessionHasErrors(['name' => trans('site.form.errors.name_format', [], 'ru')]);
+});
+
 it('nu da 500 cand SMTP-ul pica, ci anunta userul', function (): void {
     // Mail::fake() nu poate simula o eroare de transport, iar MAIL_MAILER=array nu arunca.
     // Fortam `Mail::to(...)->send(...)` sa arunce, exact ca un SMTP picat, ca sa verificam

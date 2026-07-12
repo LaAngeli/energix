@@ -417,6 +417,27 @@ return [
         'placeholder' => 'Descrie pe scurt proiectul: tipul spațiului, suprafața, stadiul șantierului.',
         'honeypot' => 'Nu completa acest câmp',
         'submit' => 'Închide circuitul — trimite',
+
+        /*
+         | Erorile de validare. Stau aici, nu hardcodate în ContactRequest, ca pe
+         | /ru/kontakty erorile să apară în rusă, nu în română.
+         */
+        'errors' => [
+            'name' => 'Spune-ne cum te cheamă.',
+            'name_format' => 'Numele poate conține doar litere, spații sau cratime.',
+            'prenume' => 'Ne trebuie și prenumele.',
+            'prenume_format' => 'Prenumele poate conține doar litere, spații sau cratime.',
+            'phone' => 'Fără număr de telefon nu te putem suna înapoi.',
+            'phone_format' => 'Numărul de telefon nu pare valid.',
+            'phone_digits' => 'Numărul de telefon trebuie să conțină între 8 și 15 cifre.',
+            'email' => 'Ne trebuie un email ca să îți trimitem oferta.',
+            'email_format' => 'Adresa de email nu pare validă.',
+            'message' => 'Descrie-ne pe scurt ce ai nevoie.',
+            'message_min' => 'Scrie câteva cuvinte în plus, ca să înțelegem ce îți trebuie.',
+            'message_links' => 'Mesajul arată a spam: scoate linkurile și încearcă din nou.',
+            'blocked' => 'Mesajul nu a putut fi trimis.',
+            'stale' => 'Mesajul nu a putut fi trimis. Reîncarcă pagina și încearcă din nou.',
+        ],
     ],
 
     'cta' => [

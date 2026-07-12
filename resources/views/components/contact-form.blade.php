@@ -1,8 +1,15 @@
 @php
     $fields = [
-        ['name' => 'name', 'label' => __('site.form.name'), 'type' => 'text', 'autocomplete' => 'family-name'],
-        ['name' => 'prenume', 'label' => __('site.form.surname'), 'type' => 'text', 'autocomplete' => 'given-name'],
+        ['name' => 'name', 'label' => __('site.form.name'), 'type' => 'text', 'autocomplete' => 'family-name', 'hint' => __('site.form.errors.name_format')],
+        ['name' => 'prenume', 'label' => __('site.form.surname'), 'type' => 'text', 'autocomplete' => 'given-name', 'hint' => __('site.form.errors.prenume_format')],
     ];
+
+    /*
+     | Oglinda client-side a regexului din ContactRequest: doar litere (orice
+     | alfabet), legate de un singur spatiu, cratima sau apostrof. E strat de UX —
+     | browserul refuza cifrele inainte de POST; AUTORITATEA ramane serverul.
+     */
+    $namePattern = "[\p{L}\p{M}]+([ '\-][\p{L}\p{M}]+)*";
 @endphp
 
 <div {{ $attributes }}>
@@ -59,6 +66,8 @@
                         required
                         minlength="2"
                         maxlength="50"
+                        pattern="{{ $namePattern }}"
+                        title="{{ $field['hint'] }}"
                         data-circuit-field
                         @error($field['name']) aria-invalid="true" aria-describedby="{{ $field['name'] }}-error" @enderror
                         class="mt-2 w-full rounded-sm border border-line bg-ink-raised px-4 py-3 text-paper transition placeholder:text-paper-dim/60 focus:border-gold focus:outline-none"
@@ -83,6 +92,10 @@
                 required
                 minlength="6"
                 maxlength="20"
+                {{-- In v-mode (regex HTML), parantezele din clasa TREBUIE escapate,
+                     altfel browserul ignora tot pattern-ul, silentios. --}}
+                pattern="\+?[0-9\(\)\s\-]{5,19}"
+                title="{{ __('site.form.errors.phone_format') }}"
                 data-circuit-field
                 @error('phone') aria-invalid="true" aria-describedby="phone-error" @enderror
                 class="mt-2 w-full rounded-sm border border-line bg-ink-raised px-4 py-3 text-paper tabular-nums transition placeholder:text-paper-dim/60 focus:border-gold focus:outline-none"
