@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Requests\ContactRequest;
 use App\Mail\ContactMessage;
+use App\Mail\ContactThankYou;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 
@@ -35,7 +36,7 @@ beforeEach(function (): void {
     Cache::flush();
 });
 
-it('trimite emailul si confirma pentru un formular valid', function (): void {
+it('trimite notificarea catre firma si confirma pentru un formular valid', function (): void {
     Mail::fake();
 
     $response = $this->post(route('contact.store'), energixContactPayload());
@@ -47,6 +48,78 @@ it('trimite emailul si confirma pentru un formular valid', function (): void {
 
     $response->assertRedirect();
     $response->assertSessionHas('contact.success');
+});
+
+it('trimite si confirmarea inapoi la client', function (): void {
+    Mail::fake();
+
+    $this->post(route('contact.store'), energixContactPayload(['email' => 'ion@example.md']));
+
+    // Doua emailuri: notificarea catre firma + confirmarea catre client.
+    Mail::assertSent(ContactThankYou::class, fn (ContactThankYou $mail): bool => $mail->hasTo('ion@example.md'));
+    Mail::assertSent(ContactMessage::class);
+});
+
+it('confirmarea care pica NU pierde lead-ul si NU sperie userul', function (): void {
+    /*
+     | Notificarea (prima) pleaca; confirmarea (a doua) arunca. Userul trebuie sa
+     | vada tot succes — mesajul LUI a ajuns la firma. `to()` intoarce mockul (self),
+     | iar `send()` arunca doar pentru confirmare.
+     */
+    Mail::shouldReceive('to')->andReturnSelf();
+    Mail::shouldReceive('send')->andReturnUsing(function ($mailable): void {
+        if ($mailable instanceof ContactThankYou) {
+            throw new RuntimeException('mailbox full');
+        }
+    });
+
+    $response = $this->post(route('contact.store'), energixContactPayload());
+
+    $response->assertRedirect();
+    $response->assertSessionHas('contact.success');
+});
+
+it('foloseste subiectul de business, nu „Cerere noua de pe energix.md”', function (): void {
+    // Subiectul vine din `__()`, care citeste locala aplicatiei (implicit `ro`).
+    $mail = new ContactMessage(energixContactPayload());
+
+    $mail->assertHasSubject('Cerere de ofertă — Ion Popescu');
+    expect($mail->render())->not->toContain('Cerere nouă de pe energix.md');
+});
+
+it('randeaza emailurile in limba de trimitere', function (): void {
+    app()->setLocale('ru');
+
+    // Notificarea RU: subiect si continut in rusa.
+    (new ContactMessage(energixContactPayload()))->assertHasSubject('Заявка на смету — Ion Popescu');
+
+    // Confirmarea RU la fel.
+    $thanks = new ContactThankYou(energixContactPayload());
+    $thanks->assertHasSubject(trans('site.email.thanks.subject', [], 'ru'));
+    expect($thanks->render())->toContain(trans('site.email.thanks.team', [], 'ru'));
+
+    app()->setLocale('ro');
+});
+
+it('pune semnatura Energix in ambele emailuri', function (): void {
+    foreach ([new ContactMessage(energixContactPayload()), new ContactThankYou(energixContactPayload())] as $mail) {
+        $html = $mail->render();
+
+        expect($html)->toContain(config('energix.contact.phone'))
+            ->and($html)->toContain('energix.md')
+            ->and($html)->toContain(trans('site.email.sig.tagline', [], 'ro'));
+    }
+});
+
+it('nu interpreteaza continutul mesajului ca HTML in email', function (): void {
+    // Un `<script>` din mesaj trebuie sa ramana text escapat, nu cod.
+    $mail = new ContactMessage(energixContactPayload([
+        'message' => 'Salut <script>alert(1)</script>',
+    ]));
+
+    expect($mail->render())
+        ->toContain('&lt;script&gt;')
+        ->not->toContain('<script>alert(1)</script>');
 });
 
 it('respinge cererea cand honeypot-ul e completat', function (): void {

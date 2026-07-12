@@ -28,7 +28,9 @@ class ContactMessage extends Mailable
         $sender = trim($this->data['prenume'].' '.$this->data['name']);
 
         return new Envelope(
-            subject: 'Cerere nouă de pe energix.md — '.$sender,
+            // „Cerere de ofertă”, nu „Cerere noua de pe energix.md”: e limbajul
+            // business-ului (CTA-ul e „Cere o ofertă”). Localizat prin `->locale()`.
+            subject: __('site.email.notify.subject', ['name' => $sender]),
             // Raspunzi direct clientului cu „Reply”, dar plicul ramane trimis de pe
             // adresa proprie, ca sa nu pice verificarea SPF/DMARC a domeniului.
             replyTo: [new Address($this->data['email'], $sender)],
@@ -45,8 +47,8 @@ class ContactMessage extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.contact',
-            text: 'emails.contact-text',
+            view: 'emails.notify',
+            text: 'emails.notify-text',
             with: ['data' => $this->data],
         );
     }

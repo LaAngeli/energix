@@ -438,6 +438,50 @@ return [
             'blocked' => 'Mesajul nu a putut fi trimis.',
             'stale' => 'Mesajul nu a putut fi trimis. Reîncarcă pagina și încearcă din nou.',
         ],
+
+        // Mesajele de pe pagină după trimitere. Localizate, ca pe /ru să apară în rusă.
+        'success' => 'Am primit cererea ta. Ți-am trimis o confirmare pe email — te contactăm în cel mai scurt timp.',
+        'error' => 'Nu am reușit să trimitem mesajul. Sună-ne direct la :phone.',
+    ],
+
+    /*
+     | Textele emailurilor. Doua mesaje pleaca la fiecare trimitere:
+     |   `notify`  — catre firma, cu datele clientului;
+     |   `thanks`  — inapoi la client, confirmarea.
+     | Ambele in limba de trimitere; semnatura (`sig`) e comuna.
+     */
+    'email' => [
+        'notify' => [
+            'subject' => 'Cerere de ofertă — :name',
+            'preheader' => ':name a trimis o cerere prin formularul de contact.',
+            'eyebrow' => 'Cerere nouă prin formular',
+            'intro' => 'a completat formularul de contact.',
+            'label_phone' => 'Telefon',
+            'label_email' => 'Email',
+            'label_message' => 'Mesaj',
+            'received' => 'Primită pe :date, la ora :time.',
+            'reply_hint' => 'Apasă „Răspunde” ca să scrii direct clientului — răspunsul ajunge la :name.',
+        ],
+        'thanks' => [
+            'subject' => 'Am primit cererea ta — Energix',
+            'preheader' => 'Am primit cererea ta. O analizăm și te contactăm în cel mai scurt timp.',
+            'eyebrow' => 'Confirmare',
+            'heading' => 'Îți mulțumim, :name!',
+            'lead' => 'Am primit cererea ta și o analizăm chiar acum.',
+            'body' => 'Un electrician de-al nostru se uită peste ce ne-ai scris și te contactează în cel mai scurt timp — de regulă, în aceeași zi lucrătoare.',
+            'your_message' => 'Ce ne-ai scris',
+            'urgent_label' => 'Ai nevoie de un răspuns mai rapid?',
+            'urgent_cta' => 'Sună-ne direct la :phone.',
+            'signoff' => 'Pe curând,',
+            'team' => 'Echipa Energix',
+        ],
+        'sig' => [
+            'tagline' => 'Instalații electrice complete, de la zero — apartamente, case, spații industriale.',
+            'web_label' => 'Web',
+            'hours_label' => 'Program',
+            'follow' => 'Ne găsești și pe',
+            'automated' => 'Email trimis automat de energix.md. Datele tale nu sunt folosite în alt scop.',
+        ],
     ],
 
     'cta' => [
