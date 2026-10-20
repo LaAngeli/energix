@@ -176,18 +176,48 @@ proiect; nu deduce contextul din cod.
 - @.claude/context/SECURITY-NOTES.md — probleme moștenite din site-ul vechi
 - @.claude/context/SEO.md — strategia SEO/AEO/GEO, harta de cuvinte-cheie, RO+RU
 
-## Flux de lucru: commit + push automat, deploy doar la comandă
+## Push și deploy — doar sesiunea de release
 
-Cerință directă a userului (2026-07-10).
+Regula userului (2026-10-20), valabilă pentru ORICE sesiune care lucrează pe acest
+proiect: checkout-ul principal, worktree-urile din `.claude/worktrees/*` și sesiunile
+deschise în alt folder care ating repo-ul printr-o cale sau prin domeniul `energix.md`.
+
+- **Doar sesiunea de release „Energix - Operational | Deploy"** face `git push`
+  (inclusiv cutover-ul de mai jos), merge sau release pe GitHub, deploy (SSH / SCP /
+  rsync către server, inclusiv simpla citire prin SSH) și orice operație pe Hostinger sau
+  Cloudflare. ID-urile ei sunt în `.git/release-session`; pe ale tale le vezi cu
+  `echo $CLAUDE_CODE_SESSION_ID $CLAUDE_CODE_HOST_SESSION_ID`.
+- **Orice altă sesiune, după ce sarcina e îndeplinită cu succes, are voie doar la commit:**
+  1. pe `laravel-rewrite` în checkout-ul principal sau într-un worktree, pe ramura lui;
+  2. înainte de commit trec: `php artisan test --compact`,
+     `vendor/bin/pint --dirty --format agent`, plus `npm run build` dacă a atins vederi,
+     CSS sau JS (toate prin unealta PowerShell);
+  3. căi explicite la `git add` (vezi mai jos), fără atribuiri de agent în mesaj;
+  4. îi spune userului ramura, commitul și ce a verificat: „gata de push din sesiunea
+     de release".
+- Celelalte sesiuni **nu** fac push, nu deschid PR (un PR cere push), nu fac merge, nu fac
+  deploy și nu oferă userului butoane pentru ele.
+- Sesiunea de release aduce ramurile din worktree-uri în `laravel-rewrite`, rulează din nou
+  testele și build-ul, apoi face push. Deploy face doar la comanda `deploy`.
+- Regula e impusă tehnic în două straturi: hook-ul git `.git/hooks/pre-push` și garda
+  PreToolUse `~/.claude/hooks/release-guard.cjs` din `~/.claude/settings.json`. Dacă un
+  push sau un deploy e blocat, nu căuta altă cale (alt shell, `--no-verify`, API-ul GitHub,
+  alt remote): raportează și oprește-te.
+- Nu edita `.git/release-session`, hook-ul sau garda. Doar userul mută rolul, spunându-i
+  direct noii sesiuni.
+
+## Flux de lucru: commit după fiecare task, deploy doar la comandă
+
+Cerință directă a userului (2026-07-10; push-ul restrâns la sesiunea de release pe 2026-10-20).
 
 ### După fiecare task terminat și **verificat** că funcționează
 
-Commit + push, fără să mai întrebi:
+Commit, fără să mai întrebi. Sesiunea de release face și push; celelalte se opresc la commit:
 
 ```bash
 git add <cale1> <cale2> …   # DOAR fișierele atinse de task; NICIODATĂ `git add -A`
 git commit -m "<mesaj descriptiv, in romana>"
-git push                    # merge pe origin/laravel-rewrite, upstream deja setat
+git push                    # DOAR sesiunea de release; merge pe origin/laravel-rewrite
 ```
 
 🔴 **Căi explicite, nu `git add -A`.** Cerință directă a userului (2026-07-10). Se pot
@@ -209,16 +239,17 @@ dacă ai vreun dubiu, nu presupune.
 
 ### Deploy pe host: **doar** la comanda explicită `deploy`
 
-Fără cuvântul `deploy` din partea userului, **nu** scrii nimic pe server:
-fără `rsync`, fără `scp`, fără `ssh ... 'mv/ln/rm'`, fără `artisan` remote.
-Citirea de pe server (inspecție, `ls`, `curl -I`) e permisă oricând.
+Doar sesiunea de release, și nici ea fără cuvântul `deploy` din partea userului: până
+atunci **nu** scrie nimic pe server — fără `rsync`, fără `scp`, fără `ssh ... 'mv/ln/rm'`,
+fără `artisan` remote. Citirea prin SSH (inspecție, `ls`) îi e permisă oricând.
+`curl -I` pe site e permis oricărei sesiuni.
 
 La `deploy` se urmează pas cu pas `.claude/context/DEPLOY-HOSTINGER.md`.
 
 ### `git push --force origin laravel-rewrite:main`
 
 Ăsta e cutover-ul pe GitHub. Nu e „push". **Nu-l face niciodată din proprie inițiativă**,
-nici după un task reușit. Doar la cerere explicită.
+nici după un task reușit. Doar sesiunea de release, doar la cerere explicită.
 
 ## Reguli scurte, non-negociabile
 
